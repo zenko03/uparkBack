@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Triggers de Restriction SAGE - Guide Utilisateur</title>
+    <style>
+        body {
+            font-family: 'Calibri', 'Arial', sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9fb;
+        }
+        h1, h2, h3 {
+            color: #1a3c6e;
+            border-bottom: 2px solid #1a3c6e;
+            padding-bottom: 8px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            font-size: 20px;
+            margin-top: 30px;
+        }
+        h3 {
+            font-size: 17px;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #1a3c6e;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f5f9;
+        }
+        .note {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffb300;
+            padding: 12px;
+            margin: 15px 0;
+            font-style: italic;
+        }
+        .code {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 12px;
+            color: #777;
+        }
+        @media print {
+            body { margin: 20px; }
+            .container { box-shadow: none; }
+            a { color: inherit; text-decoration: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>Gestion des Triggers de Restriction SAGE</h1>
+<p style="text-align:center; font-style:italic; color:#555;">Guide Utilisateur – Version Professionnelle</p>
+
+<hr style="border:1px solid #1a3c6e; margin:30px 0;">
+
+<h2>Avant de commencer : Première utilisation</h2>
+
+<p>Lors du <strong>premier lancement de l’application</strong>, suivez ces étapes :</p>
+
+<ol>
+    <li><strong>Configuration de la connexion à la base SAGE</strong><br>
+        Une fenêtre s’ouvre pour saisir les informations SQL Server (serveur, base, utilisateur, mot de passe).<br>
+        Validez → l’application redémarre.
+    </li>
+    <li><strong>Installation des tables et triggers</strong><br>
+        Menu <strong>Paramètres</strong> → <strong>Installation de la Base de Données</strong>.<br>
+        Message de confirmation en cas de succès.
+    </li>
+    <li><strong>Modification de la connexion</strong><br>
+        <strong>Paramètres > Configuration de la Connexion</strong> → redémarrage requis.
+    </li>
+</ol>
+
+<hr>
+
+<h2>1. Introduction</h2>
+
+<h3>1.1. Objectif de l’application</h3>
+<p>L’outil permet de <strong>sécuriser et automatiser</strong> la gestion des <strong>documents d’achat à bon d’import (DABI)</strong> dans <strong>SAGE Gestion Commerciale</strong>.</p>
+
+<p><strong>Objectifs principaux :</strong></p>
+<ul>
+    <li>Contrôler les souches d’achat pour DABI</li>
+    <li>Restreindre l’accès aux tiers par utilisateur</li>
+    <li>Limiter les articles saisis en DABI</li>
+    <li>Activer/désactiver les triggers SQL en temps réel</li>
+</ul>
+
+<h3>1.2. Interface principale</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Bouton</th>
+            <th>Fonction</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Souches Achat</td>
+            <td>Définir les souches autorisées ou exclusives pour DABI</td>
+        </tr>
+        <tr>
+            <td>Restrictions Tiers</td>
+            <td>Assigner des fournisseurs à chaque utilisateur</td>
+        </tr>
+        <tr>
+            <td>Articles DABI</td>
+            <td>Gérer articles et utilisateurs autorisés DABI</td>
+        </tr>
+        <tr>
+            <td>Status Trigger</td>
+            <td>Activer/désactiver les triggers SQL</td>
+        </tr>
+    </tbody>
+</table>
+
+<hr>
+
+<h2>2. Module 1 : Gérer les Souches DABI</h2>
+
+<h3>2.1. Accès et interface</h3>
+<p>Cliquez sur <strong>Souches Achat</strong>.</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Intitulé</th>
+            <th>Statut DABI</th>
+            <th>Journal</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1</td>
+            <td>Achat LOCAL</td>
+            <td>DABI Autorisé</td>
+            <td>ACH</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Achat IMPORT</td>
+            <td style="color:red; font-weight:bold;">DABI Exclusif</td>
+            <td>ACHIMP</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Achat SERVICES</td>
+            <td>Non configuré</td>
+            <td>ACHSER</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>2.2. Statuts DABI</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Statut</th>
+            <th>Signification</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong style="color:red;">DABI Exclusif</strong></td>
+            <td>Souche réservée <strong>uniquement</strong> aux DABI</td>
+        </tr>
+        <tr>
+            <td>DABI Autorisé</td>
+            <td>Utilisable pour DABI et documents standards</td>
+        </tr>
+        <tr>
+            <td>Non configuré</td>
+            <td>Comportement SAGE standard</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="note">
+    <strong>Note :</strong> Le statut <strong>DABI Exclusif</strong> est affiché en <span style="color:red;">rouge</span>.
+</div>
+
+<h3>2.3. Configurer une souche</h3>
+<ol>
+    <li>Sélectionner une ligne → <strong>Configurer DABI</strong></li>
+    <li>Fenêtre de configuration :</li>
+</ol>
+
+<div class="code">
+[ ] Activer la restriction DABI<br>
+[ ] Souche DABI exclusive<br><br>
+[Enregistrer] [Annuler]
+</div>
+
+<ul>
+    <li><strong>DABI Autorisé</strong> → Cocher uniquement la 1ʳᵉ case</li>
+    <li><strong>DABI Exclusif</strong> → Cocher les deux cases</li>
+</ul>
+
+<hr>
+
+<h2>3. Module 2 : Gérer les Restrictions par Tiers</h2>
+
+<h3>3.1. Interface</h3>
+
+<table style="font-size:90%;">
+    <thead>
+        <tr>
+            <th>Utilisateurs</th>
+            <th>Tiers Disponibles</th>
+            <th>Tiers Autorisés</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Admin<br>Florin (3)<br>UserTest</td>
+            <td>FOURNISSEUR A<br>FOURNISSEUR B<br>FOURNISSEUR D</td>
+            <td>(vide ou liste)</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><strong>Boutons :</strong> [Ajouter] [Retirer] [Tout Ajouter] [Tout Retirer]</p>
+
+<h3>3.2. Assigner des tiers</h3>
+<ol>
+    <li>Sélectionner un utilisateur → panneaux se mettent à jour</li>
+    <li>Coché → <strong>Ajouter</strong> ou <strong>Retirer</strong></li>
+</ol>
+
+<hr>
+
+<h2>4. Module 3 : Gérer les Articles DABI</h2>
+
+<p>Deux listes <strong>indépendantes</strong> :</p>
+<ul>
+    <li>Articles autorisés pour DABI</li>
+    <li>Utilisateurs autorisés à saisir des DABI</li>
+</ul>
+
+<div class="note">
+    <strong>Important :</strong> Utilisateur non autorisé <strong>OU</strong> article non autorisé = saisie impossible.
+</div>
+
+<h3>4.1. Interface</h3>
+<p>Onglets :</p>
+<ul>
+    <li><strong>Articles DABI</strong> : cases à cocher + [Rechercher] + [Sauvegarder]</li>
+    <li><strong>Utilisateurs DABI</strong> : idem</li>
+</ul>
+
+<p><strong>Administrateurs SAGE</strong> : exemptés des restrictions.</p>
+
+<hr>
+
+<h2>5. Module 4 : Gestion des Triggers SQL</h2>
+
+<p>Cliquez sur <strong>Status Trigger</strong>.</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Trigger</th>
+            <th>Fonction</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>TR_DABI_SOUCHE_RESTRICTION</code></td>
+            <td>Contrôle des souches</td>
+        </tr>
+        <tr>
+            <td><code>TR_DABI_ARTICLE_RESTRICTION</code></td>
+            <td>Contrôle des articles</td>
+        </tr>
+        <tr>
+            <td><code>TR_DABI_ARTICLE_DELETE</code></td>
+            <td>Protection contre suppression</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>Cocher/décocher → <strong>Sauvegarder</strong></p>
+
+<hr>
+
+<h2>6. Fonctionnalités communes</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Fonction</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Rechercher</td>
+            <td>Filtre dynamique</td>
+        </tr>
+        <tr>
+            <td>Actualiser</td>
+            <td>Recharge données (F5)</td>
+        </tr>
+        <tr>
+            <td>Exporter</td>
+            <td>Fichier CSV (Excel)</td>
+        </tr>
+    </tbody>
+</table>
+
+<hr>
+
+<h2>7. Vérification du statut des triggers</h2>
+<p>Via <strong>Status Trigger</strong> → état en temps réel.<br>
+<strong>Désactivé = aucune restriction appliquée</strong>.</p>
+
+</div>
+
+<footer>
+    © 2025 – Outil de Gestion des Triggers SAGE
+</footer>
+
+</body>
+</html>
