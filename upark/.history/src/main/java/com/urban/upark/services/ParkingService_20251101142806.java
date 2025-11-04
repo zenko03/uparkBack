@@ -1,6 +1,5 @@
 package com.urban.upark.services;
 
-import com.urban.upark.models.AvailabilitiesDate;
 import com.urban.upark.models.Parking;
 import com.urban.upark.models.Vehicles;
 import com.urban.upark.repositories.ParkingRepository;
@@ -114,7 +113,7 @@ public class ParkingService {
         LocalDate startLocalDate = startDate.toLocalDate();
         LocalDate endLocalDate = endDate.toLocalDate();
         
-        List<AvailabilitiesDate> availabilities =
+        List<com.urban.upark.models.AvailabilitiesDate> availabilities =
             availabilitiesDateRepository.findOverlappingAvailabilities(
                 parking.getId_Parking(), startLocalDate, endLocalDate);
         

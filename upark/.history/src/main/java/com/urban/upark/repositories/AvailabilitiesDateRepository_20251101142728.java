@@ -1,0 +1,24 @@
+package com.urban.upark.repositories;
+
+import com.urban.upark.models.AvailabilitiesDate;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+@Repository
+public interface AvailabilitiesDateRepository extends JpaRepository<AvailabilitiesDate, Integer> {
+    List<AvailabilitiesDate> findByParkingId(int parkingId);
+    
+    @Query("SELECT a FROM AvailabilitiesDate a WHERE a.parking.id_Parking = :parkingId AND " +
+           "((a.startDate <= :endDate AND a.endDate >= :startDate))")
+    List<AvailabilitiesDate> findOverlappingAvailabilities(
+        @Param("parkingId") int parkingId,
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate
+    );
+}

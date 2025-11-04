@@ -19,10 +19,6 @@ public class JwtService {
 
     private static final String SECRET_KEY="MCECbHH3hg6YJjOvZsZQe8M1Qxk2qNg8E4wsF9Z+GpdnrZPx";
 
-    public JwtService() {
-        super();
-    }
-
     public String extractUsername(String token) {
         return extractClaim(token,Claims::getSubject);
     }

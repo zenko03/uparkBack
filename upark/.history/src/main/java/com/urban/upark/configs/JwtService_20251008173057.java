@@ -1,7 +1,7 @@
 package com.urban.upark.configs;
 
 import java.security.Key;
-import java.util.function.Function;
+import java.util.function.*;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -17,13 +17,9 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY="MCECbHH3hg6YJjOvZsZQe8M1Qxk2qNg8E4wsF9Z+GpdnrZPx";
+    private static final String SECRET_KEY="MCECbHH3hg6YJjOvZsZQe8M1Qxk2qNg8E4wsF9Z+GpdnrZPx" ;
 
-    public JwtService() {
-        super();
-    }
-
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         return extractClaim(token,Claims::getSubject);
     }
 
@@ -49,7 +45,7 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token,UserDetails userDetails){
-        final String username=extractUsername(token);
+        final String username=extractEmail(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 

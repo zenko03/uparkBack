@@ -1,7 +1,7 @@
 package com.urban.upark.configs;
 
 import java.security.Key;
-import java.util.function.Function;
+import java.util.function.*;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -17,11 +17,7 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY="MCECbHH3hg6YJjOvZsZQe8M1Qxk2qNg8E4wsF9Z+GpdnrZPx";
-
-    public JwtService() {
-        super();
-    }
+    private static final String SECRET_KEY="MCECbHH3hg6YJjOvZsZQe8M1Qxk2qNg8E4wsF9Z+GpdnrZPx" ;
 
     public String extractUsername(String token) {
         return extractClaim(token,Claims::getSubject);

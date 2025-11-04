@@ -50,7 +50,4 @@ public class Reservation {
     
     @OneToMany(mappedBy = "reservation")
     private List<CommissionReceived> commissionsReceived;
-    
-    @OneToMany(mappedBy = "reservation")
-    private List<ReservationVehicles> reservationVehicles;
 }

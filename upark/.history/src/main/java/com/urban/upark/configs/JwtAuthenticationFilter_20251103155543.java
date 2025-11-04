@@ -31,6 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
+        // TODO Auto-generated method stub
         final String authHeader=request.getHeader("Authorization");
         final String jwt;
         final String username;
@@ -39,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         jwt=authHeader.substring(7);
-        username= jwtService.extractUsername(jwt); 
+        username= jwtService.extractUsername(jwt); // todo extract the username from JWT token;
         if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null){
             UserDetails userDetails=this.userDetailsService.loadUserByUsername(username);
             if (jwtService.isTokenValid(jwt, userDetails)) {

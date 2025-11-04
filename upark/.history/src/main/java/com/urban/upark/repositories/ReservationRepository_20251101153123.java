@@ -14,7 +14,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     // cherche les réservations qui se chevauchent pour un parking donné:
     // oh: startDate1 <= endDate2 AND endDate1 >= startDate2
     @Query("SELECT r FROM Reservation r JOIN r.reservationVehicles rv JOIN rv.announcementsVehicles av JOIN av.availabilitiesDates ad WHERE ad.parking.Id_Parking = :parkingId AND " +
-           "((ad.startDate <= :endDate AND ad.endDate >= :startDate))")
+           "((ad.start_date <= :endDate AND ad.end_date >= :startDate))")
     List<Reservation> findOverlappingReservations(
         @Param("parkingId") int parkingId,
         @Param("startDate") LocalDateTime startDate,

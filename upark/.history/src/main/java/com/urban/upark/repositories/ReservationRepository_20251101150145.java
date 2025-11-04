@@ -13,8 +13,8 @@ import java.util.List;
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
     // cherche les réservations qui se chevauchent pour un parking donné:
     // oh: startDate1 <= endDate2 AND endDate1 >= startDate2
-    @Query("SELECT r FROM Reservation r JOIN r.reservationVehicles rv JOIN rv.announcementsVehicles av JOIN av.availabilitiesDates ad WHERE ad.parking.Id_Parking = :parkingId AND " +
-           "((ad.startDate <= :endDate AND ad.endDate >= :startDate))")
+    @Query("SELECT r FROM Reservation r WHERE r.parking.id_Parking = :parkingId AND " +
+           "((r.startDate <= :endDate AND r.endDate >= :startDate))")
     List<Reservation> findOverlappingReservations(
         @Param("parkingId") int parkingId,
         @Param("startDate") LocalDateTime startDate,
