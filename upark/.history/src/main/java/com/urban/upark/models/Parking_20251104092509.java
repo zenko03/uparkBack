@@ -18,9 +18,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -42,15 +39,13 @@ public class Parking {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
 
-    @Column(name = "localisation", nullable = false, columnDefinition = "GEOGRAPHY")
+    @Column(name = "localisation", nullable = false, columnDefinition = "TEXT")
     private String localisation;
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "Id_Users")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password", "commissionPartners"})
     private Users user;
     
     @OneToMany(mappedBy = "parking")
-    @JsonIgnore
     private List<ParkingVehicles> parkingVehicles;
 }

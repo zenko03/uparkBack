@@ -18,8 +18,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Data
 @Builder
@@ -47,10 +49,11 @@ public class Parking {
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "Id_Users")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password", "commissionPartners"})
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "Id_Users")
+    @JsonIdentityReference(alwaysAsId = true)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Users user;
     
     @OneToMany(mappedBy = "parking")
-    @JsonIgnore
     private List<ParkingVehicles> parkingVehicles;
 }

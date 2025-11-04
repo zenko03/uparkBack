@@ -18,7 +18,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Data
@@ -51,6 +50,5 @@ public class Parking {
     private Users user;
     
     @OneToMany(mappedBy = "parking")
-    @JsonIgnore
     private List<ParkingVehicles> parkingVehicles;
 }

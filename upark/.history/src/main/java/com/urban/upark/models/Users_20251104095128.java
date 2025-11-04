@@ -69,6 +69,7 @@ public class Users implements UserDetails {
     }
 
     @Override
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     public String getUsername() {
         return userName;
     }
