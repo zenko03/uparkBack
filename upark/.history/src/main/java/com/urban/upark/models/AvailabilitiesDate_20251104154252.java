@@ -44,11 +44,9 @@ public class AvailabilitiesDate {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Id_Reservation_vehicles")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private ReservationVehicles reservationVehicles;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Id_Announcements_vehicles")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private AnnouncementsVehicles announcementsVehicles;
 }

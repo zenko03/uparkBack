@@ -1,8 +1,6 @@
 package com.urban.upark.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -47,19 +45,15 @@ public class Reservation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Id_Users")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password"})
     private Users user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Id_Reservation_status")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private ReservationStatus reservationStatus;
     
     @OneToMany(mappedBy = "reservation")
-    @JsonIgnore
     private List<CommissionReceived> commissionsReceived;
     
     @OneToMany(mappedBy = "reservation")
-    @JsonIgnore
     private List<ReservationVehicles> reservationVehicles;
 }

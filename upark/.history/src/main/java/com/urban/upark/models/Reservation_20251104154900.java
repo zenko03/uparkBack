@@ -47,19 +47,15 @@ public class Reservation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Id_Users")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password"})
     private Users user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Id_Reservation_status")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private ReservationStatus reservationStatus;
     
     @OneToMany(mappedBy = "reservation")
-    @JsonIgnore
     private List<CommissionReceived> commissionsReceived;
     
-    @OneToMany(mappedBy = "reservation")
-    @JsonIgnore
+    @OneToMany(mappedBy = "reservation")  
     private List<ReservationVehicles> reservationVehicles;
 }
