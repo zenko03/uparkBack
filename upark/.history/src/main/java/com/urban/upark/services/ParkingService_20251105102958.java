@@ -100,7 +100,6 @@ public class ParkingService {
         return parkings.stream()
                 .filter(parking -> filterByPrice(parking, minPrice, maxPrice))
                 .filter(parking -> filterByVehicleType(parking, vehicleType))
-                .filter(parking -> filterByNumberOfVehicles(parking, vehicleType, numberOfVehicles))
                 .filter(parking -> filterByAvailability(parking, startDate, endDate))
                 .sorted(getSortComparator(sortBy, startDate))
                 .collect(Collectors.toList());
@@ -131,22 +130,6 @@ public class ParkingService {
         return parkingVehiclesRepository.findByParkingId(parking.getId_Parking())
                 .stream()
                 .anyMatch(pv -> pv.getVehicle().getId_Vehicles() == vehicleType);
-    }
-
-    /**
-     * Filtre les parkings par nombre de véhicules disponibles
-     */
-    private boolean filterByNumberOfVehicles(Parking parking, Integer vehicleType, Integer numberOfVehicles) {
-        if (numberOfVehicles == null) {
-            return true;
-        }
-        
-        // Vérifier si le parking a assez de places pour le type de véhicule demandé
-        return parkingVehiclesRepository.findByParkingId(parking.getId_Parking())
-                .stream()
-                .filter(pv -> vehicleType == null || pv.getVehicle().getId_Vehicles() == vehicleType)
-                .mapToInt(pv -> pv.getNumbers())
-                .sum() >= numberOfVehicles;
     }
 
     /**

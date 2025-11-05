@@ -74,9 +74,6 @@ public class ReservationController {
             updatedReservation.setTotalPrice(reservationDetails.getTotalPrice());
             updatedReservation.setCreationDate(reservationDetails.getCreationDate());
             updatedReservation.setPaymentDate(reservationDetails.getPaymentDate());
-            updatedReservation.setStartDateTime(reservationDetails.getStartDateTime());
-            updatedReservation.setEndDateTime(reservationDetails.getEndDateTime());
-            updatedReservation.setPaymentMethod(reservationDetails.getPaymentMethod());
             updatedReservation.setUser(reservationDetails.getUser());
             updatedReservation.setReservationStatus(reservationDetails.getReservationStatus());
             return ResponseEntity.ok(reservationService.save(updatedReservation));

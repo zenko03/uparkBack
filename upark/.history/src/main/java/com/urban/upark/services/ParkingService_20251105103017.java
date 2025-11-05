@@ -134,22 +134,6 @@ public class ParkingService {
     }
 
     /**
-     * Filtre les parkings par nombre de véhicules disponibles
-     */
-    private boolean filterByNumberOfVehicles(Parking parking, Integer vehicleType, Integer numberOfVehicles) {
-        if (numberOfVehicles == null) {
-            return true;
-        }
-        
-        // Vérifier si le parking a assez de places pour le type de véhicule demandé
-        return parkingVehiclesRepository.findByParkingId(parking.getId_Parking())
-                .stream()
-                .filter(pv -> vehicleType == null || pv.getVehicle().getId_Vehicles() == vehicleType)
-                .mapToInt(pv -> pv.getNumbers())
-                .sum() >= numberOfVehicles;
-    }
-
-    /**
      * Filtre les parkings par disponibilité
      */
     private boolean filterByAvailability(Parking parking, LocalDateTime startDate, LocalDateTime endDate) {

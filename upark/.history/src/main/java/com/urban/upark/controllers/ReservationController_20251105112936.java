@@ -36,34 +36,8 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<Reservation> createReservation(@RequestBody ReservationRequest request) {
-        try {
-            Reservation reservation = reservationService.createReservation(request);
-            return ResponseEntity.ok(reservation);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @PostMapping("/calculate-price")
-    public ResponseEntity<BigDecimal> calculatePrice(@RequestBody PriceCalculationRequest request) {
-        try {
-            BigDecimal totalPrice = reservationService.calculateTotalPrice(request);
-            return ResponseEntity.ok(totalPrice);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @GetMapping("/user/{userId}")
-    public List<Reservation> getUserReservations(@PathVariable int userId) {
-        return reservationService.findByUserId(userId);
-    }
-
-    @PostMapping("/check-availability")
-    public ResponseEntity<Boolean> checkAvailability(@RequestBody PriceCalculationRequest request) {
-        boolean available = reservationService.checkAvailability(request);
-        return ResponseEntity.ok(available);
+    public Reservation createReservation(@RequestBody Reservation reservation) {
+        return reservationService.save(reservation);
     }
 
     @PutMapping("/{id}")
@@ -74,9 +48,6 @@ public class ReservationController {
             updatedReservation.setTotalPrice(reservationDetails.getTotalPrice());
             updatedReservation.setCreationDate(reservationDetails.getCreationDate());
             updatedReservation.setPaymentDate(reservationDetails.getPaymentDate());
-            updatedReservation.setStartDateTime(reservationDetails.getStartDateTime());
-            updatedReservation.setEndDateTime(reservationDetails.getEndDateTime());
-            updatedReservation.setPaymentMethod(reservationDetails.getPaymentMethod());
             updatedReservation.setUser(reservationDetails.getUser());
             updatedReservation.setReservationStatus(reservationDetails.getReservationStatus());
             return ResponseEntity.ok(reservationService.save(updatedReservation));

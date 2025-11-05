@@ -147,6 +147,7 @@ CREATE TABLE Reservation(
    payement_date TIMESTAMP,
    start_datetime TIMESTAMP NOT NULL,
    end_datetime TIMESTAMP NOT NULL,
+   payment_method VARCHAR(50),
    Id_Users INTEGER,
    Id_Reservation_status INTEGER,
    PRIMARY KEY(Id_Reservation),
