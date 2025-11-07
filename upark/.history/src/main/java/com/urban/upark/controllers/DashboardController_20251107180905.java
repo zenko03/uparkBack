@@ -143,6 +143,7 @@ public class DashboardController {
 
     // UTILISATEURS ACTIFS
     /**
+     
      * ex: /api/dashboard/users/active?startDate=2024-01-01&endDate=2024-01-31
      */
     @GetMapping("/users/active")

@@ -11,6 +11,10 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Controller pour le tableau de bord administrateur
+ * Implémente tous les endpoints requis par le CDC pour les statistiques
+ */
 @RestController
 @RequestMapping("/api/dashboard")
 @RequiredArgsConstructor
@@ -20,7 +24,15 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
 
-    //  Statistiques globales"
+    // =====================================================================
+    // TABLEAU DE BORD PRINCIPAL
+    // CDC : "Tableau de bord - Statistiques globales"
+    // =====================================================================
+
+    /**
+     * Aperçu complet du tableau de bord
+     * GET /api/dashboard/overview
+     */
     @GetMapping("/overview")
     public ResponseEntity<Map<String, Object>> getDashboardOverview() {
         try {
@@ -143,6 +155,7 @@ public class DashboardController {
 
     // UTILISATEURS ACTIFS
     /**
+     
      * ex: /api/dashboard/users/active?startDate=2024-01-01&endDate=2024-01-31
      */
     @GetMapping("/users/active")

@@ -186,9 +186,51 @@ public class DashboardService {
         }
     }
 
+    // =====================================================================
+    // STATISTIQUES COMPARATIVES
+    // =====================================================================
 
-   
+    /**
+     * Comparaison mensuelle des performances
+     */
+    public List<Map<String, Object>> getMonthlyComparison(int months) {
+        try {
+            log.info("Récupération de la comparaison mensuelle sur {} mois", months);
+            
+            List<Map<String, Object>> comparison = dashboardRepository.getMonthlyComparison(months);
+            
+            // Formatter les mois et ajouter des calculs
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.FRENCH);
+            comparison.forEach(item -> {
+                // Formatter le mois
+                if (item.containsKey("mois")) {
+                    Object moisObj = item.get("mois");
+                    if (moisObj instanceof java.sql.Timestamp) {
+                        java.sql.Timestamp timestamp = (java.sql.Timestamp) moisObj;
+                        item.put("moisFormate", timestamp.toLocalDateTime().format(formatter));
+                    }
+                }
+                
+                // Formatter les montants
+                Object commissionsObj = item.get("commissions_mois");
+                if (commissionsObj instanceof Number) {
+                    BigDecimal commissions = new BigDecimal(commissionsObj.toString());
+                    item.put("commissionsFormatees", formatCurrency(commissions));
+                }
+            });
+            
+            log.info("Comparaison mensuelle récupérée: {} mois", comparison.size());
+            return comparison;
+            
+        } catch (Exception e) {
+            log.error("Erreur lors de la récupération de la comparaison mensuelle: {}", e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    // =====================================================================
     // UTILITAIRES
+    // =====================================================================
 
     /**
      * Formate un montant en devise
@@ -198,8 +240,9 @@ public class DashboardService {
         return String.format("%,.2f €", amount);
     }
 
-    
-      //Vérifie la disponibilité des vues du tableau de bord
+    /**
+     * Vérifie la disponibilité des vues du tableau de bord
+     */
     public boolean checkDashboardViewsAvailability() {
         try {
             Map<String, Object> overview = dashboardRepository.getDashboardOverview();
