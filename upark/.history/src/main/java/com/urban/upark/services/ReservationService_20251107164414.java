@@ -124,9 +124,9 @@ public class ReservationService {
     public List<Reservation> findReservationsWithFilters(Integer statusId, Integer userId,
                                                         Integer parkingId, LocalDateTime startDate,
                                                         LocalDateTime endDate) {
-        // Si les dates sont fournies, utiliser la méthode avec dates
+        // Si les dates sont fournies, utiliser la méthode complète
         if (startDate != null || endDate != null) {
-            return reservationRepository.findReservationsWithDateFilters(statusId, userId, parkingId, startDate, endDate);
+            return reservationRepository.findReservationsWithFilters(statusId, userId, parkingId, startDate, endDate);
         }
         // Sinon utiliser la version simplifiée pour éviter les problèmes de type
         return reservationRepository.findReservationsWithBasicFilters(statusId, userId, parkingId);

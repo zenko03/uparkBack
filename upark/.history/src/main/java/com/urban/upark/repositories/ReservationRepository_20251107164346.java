@@ -24,6 +24,27 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query("SELECT r FROM Reservation r WHERE r.user.Id_Users = :userId ORDER BY r.creationDate DESC")
     List<Reservation> findByUserIdOrderByCreationDateDesc(@Param("userId") int userId);
 
+    // Filtres avancés pour le back office
+    @Query("SELECT r FROM Reservation r WHERE " +
+           "(:statusId IS NULL OR r.reservationStatus.Id_Reservation_status = :statusId) AND " +
+           "(:userId IS NULL OR r.user.Id_Users = :userId) AND " +
+           "(:parkingId IS NULL OR EXISTS (" +
+           "    SELECT 1 FROM ReservationVehicles rv " +
+           "    JOIN rv.announcementsVehicles av " +
+           "    WHERE rv.reservation.Id_Reservation = r.Id_Reservation " +
+           "    AND av.parkingVehicles.parking.Id_Parking = :parkingId" +
+           ")) AND " +
+           "(:startDate IS NULL OR r.creationDate >= :startDate) AND " +
+           "(:endDate IS NULL OR r.creationDate <= :endDate) " +
+           "ORDER BY r.creationDate DESC")
+    List<Reservation> findReservationsWithFilters(
+        @Param("statusId") Integer statusId,
+        @Param("userId") Integer userId,
+        @Param("parkingId") Integer parkingId,
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate
+    );
+
     // Version simplifiée sans les paramètres de date pour éviter les problèmes de type
     @Query("SELECT r FROM Reservation r WHERE " +
            "(:statusId IS NULL OR r.reservationStatus.Id_Reservation_status = :statusId) AND " +
@@ -41,32 +62,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
         @Param("parkingId") Integer parkingId
     );
 
-    // Version avec dates - utilisation de COALESCE pour éviter les problèmes de typage
     @Query("SELECT r FROM Reservation r WHERE " +
            "(:statusId IS NULL OR r.reservationStatus.Id_Reservation_status = :statusId) AND " +
-           "(:userId IS NULL OR r.user.Id_Users = :userId) AND " +
-           "(:parkingId IS NULL OR EXISTS (" +
-           "    SELECT 1 FROM ReservationVehicles rv " +
-           "    JOIN rv.announcementsVehicles av " +
-           "    WHERE rv.reservation.Id_Reservation = r.Id_Reservation " +
-           "    AND av.parkingVehicles.parking.Id_Parking = :parkingId" +
-           ")) AND " +
-           "(COALESCE(:startDate, '1970-01-01T00:00:00') IS NULL OR r.creationDate >= :startDate) AND " +
-           "(COALESCE(:endDate, '2999-12-31T23:59:59') IS NULL OR r.creationDate <= :endDate) " +
-           "ORDER BY r.creationDate DESC")
-    List<Reservation> findReservationsWithDateFilters(
-        @Param("statusId") Integer statusId,
-        @Param("userId") Integer userId,
-        @Param("parkingId") Integer parkingId,
-        @Param("startDate") LocalDateTime startDate,
-        @Param("endDate") LocalDateTime endDate
-    );
-
-    // Version simplifiée pour by-date-range avec COALESCE
-    @Query("SELECT r FROM Reservation r WHERE " +
-           "(:statusId IS NULL OR r.reservationStatus.Id_Reservation_status = :statusId) AND " +
-           "(COALESCE(:startDate, '1970-01-01T00:00:00') IS NULL OR r.startDateTime >= :startDate) AND " +
-           "(COALESCE(:endDate, '2999-12-31T23:59:59') IS NULL OR r.endDateTime <= :endDate) " +
+           "(:startDate IS NULL OR r.startDateTime >= :startDate) AND " +
+           "(:endDate IS NULL OR r.endDateTime <= :endDate) " +
            "ORDER BY r.startDateTime DESC")
     List<Reservation> findReservationsByDateRange(
         @Param("statusId") Integer statusId,
