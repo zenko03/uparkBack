@@ -69,35 +69,20 @@ public class ReservationController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Reservation> updateReservation(@PathVariable int id, @RequestBody Reservation reservationDetails) {
-        try {
-            Optional<Reservation> reservationOpt = reservationService.findById(id);
-            if (reservationOpt.isPresent()) {
-                Reservation existingReservation = reservationOpt.get();
-                
-                if (reservationDetails.getTotalPrice() != null) {
-                    existingReservation.setTotalPrice(reservationDetails.getTotalPrice());
-                }
-                if (reservationDetails.getPaymentDate() != null) {
-                    existingReservation.setPaymentDate(reservationDetails.getPaymentDate());
-                }
-                if (reservationDetails.getStartDateTime() != null) {
-                    existingReservation.setStartDateTime(reservationDetails.getStartDateTime());
-                }
-                if (reservationDetails.getEndDateTime() != null) {
-                    existingReservation.setEndDateTime(reservationDetails.getEndDateTime());
-                }
-                if (reservationDetails.getPaymentMethod() != null) {
-                    existingReservation.setPaymentMethod(reservationDetails.getPaymentMethod());
-                }
-                
-                
-                return ResponseEntity.ok(reservationService.save(existingReservation));
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().build();
+        Optional<Reservation> reservation = reservationService.findById(id);
+        if (reservation.isPresent()) {
+            Reservation updatedReservation = reservation.get();
+            updatedReservation.setTotalPrice(reservationDetails.getTotalPrice());
+            updatedReservation.setCreationDate(reservationDetails.getCreationDate());
+            updatedReservation.setPaymentDate(reservationDetails.getPaymentDate());
+            updatedReservation.setStartDateTime(reservationDetails.getStartDateTime());
+            updatedReservation.setEndDateTime(reservationDetails.getEndDateTime());
+            updatedReservation.setPaymentMethod(reservationDetails.getPaymentMethod());
+            updatedReservation.setUser(reservationDetails.getUser());
+            updatedReservation.setReservationStatus(reservationDetails.getReservationStatus());
+            return ResponseEntity.ok(reservationService.save(updatedReservation));
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 

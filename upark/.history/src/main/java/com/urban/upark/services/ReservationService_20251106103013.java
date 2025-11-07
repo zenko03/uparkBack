@@ -136,20 +136,7 @@ public class ReservationService {
     private ReservationStatus getStatusByValue(int value) {
         // Chercher le statut par sa valeur dans la base
         return reservationStatusRepository.findByValue(value)
-                .orElseGet(() -> {
-                    // Créer et sauvegarder le statut s'il n'existe pas
-                    String label = switch (value) {
-                        case 15 -> "En cours";
-                        case 20 -> "Confirmée";
-                        case 30 -> "Terminée";
-                        default -> "En attente";
-                    };
-                    ReservationStatus status = ReservationStatus.builder()
-                            .label(label)
-                            .value(value)
-                            .build();
-                    return reservationStatusRepository.save(status);
-                });
+                .orElse(getDefaultReservationStatus());
     }
 
     public boolean checkAvailability(PriceCalculationRequest request) {
@@ -158,7 +145,7 @@ public class ReservationService {
     }
 
     /**
-     * Vérifie la disponibilité via Availabilities_date _ Availabilities_frequence
+     * Vérifie la disponibilité en utilisant les tables Availabilities_date et Availabilities_frequence
      */
     private boolean checkAvailabilityWithAvailabilities(PriceCalculationRequest request) {
         int parkingId = request.getParkingId();
@@ -229,15 +216,14 @@ public class ReservationService {
      */
     private List<Integer> getDayOfWeekIdsInRange(LocalDateTime startDateTime, LocalDateTime endDateTime) {
         List<Integer> dayIds = new java.util.ArrayList<>();
-        LocalDate currentDate = startDateTime.toLocalDate();
-        LocalDate endDate = endDateTime.toLocalDate();
+        LocalDateTime current = startDateTime.toLocalDate().atStartOfDay();
         
-        while (!currentDate.isAfter(endDate)) {
+        while (!current.isAfter(endDateTime.toLocalDate())) {
             // DayOfWeek: 1=Monday, 7=Sunday (selon Java)
             // Adapter selon la base de données
-            int dayId = currentDate.getDayOfWeek().getValue();
+            int dayId = current.getDayOfWeek().getValue();
             dayIds.add(dayId);
-            currentDate = currentDate.plusDays(1);
+            current = current.plusDays(1);
         }
         
         return dayIds;
@@ -312,14 +298,7 @@ public class ReservationService {
 
     private ReservationStatus getDefaultReservationStatus() {
         return reservationStatusRepository.findByValue(10)
-                .orElseGet(() -> {
-                    // Créer et sauvegarder le statut par défaut s'il n'existe pas
-                    ReservationStatus defaultStatus = ReservationStatus.builder()
-                            .label("En attente")
-                            .value(10)
-                            .build();
-                    return reservationStatusRepository.save(defaultStatus);
-                });
+                .orElse(ReservationStatus.builder().label("En attente").value(10).build());
     }
 
     private void createReservationVehicles(Reservation reservation, VehicleSelection vehicleSelection, int parkingId) {

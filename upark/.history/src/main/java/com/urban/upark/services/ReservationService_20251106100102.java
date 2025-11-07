@@ -8,7 +8,6 @@ import com.urban.upark.dto.reservation.VehicleSelection;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -26,9 +25,6 @@ public class ReservationService {
     private final ReservationStatusRepository reservationStatusRepository;
     private final ReservationVehiclesRepository reservationVehiclesRepository;
     private final AnnouncementsVehiclesRepository announcementsVehiclesRepository;
-    private final AvailabilitiesDateRepository availabilitiesDateRepository;
-    private final ParkingVehiclesRepository parkingVehiclesRepository;
-    private final AvailabilitiesFrequenceRepository availabilitiesFrequenceRepository;
 
     public List<Reservation> findAll() {
         return reservationRepository.findAll();
@@ -136,20 +132,7 @@ public class ReservationService {
     private ReservationStatus getStatusByValue(int value) {
         // Chercher le statut par sa valeur dans la base
         return reservationStatusRepository.findByValue(value)
-                .orElseGet(() -> {
-                    // Créer et sauvegarder le statut s'il n'existe pas
-                    String label = switch (value) {
-                        case 15 -> "En cours";
-                        case 20 -> "Confirmée";
-                        case 30 -> "Terminée";
-                        default -> "En attente";
-                    };
-                    ReservationStatus status = ReservationStatus.builder()
-                            .label(label)
-                            .value(value)
-                            .build();
-                    return reservationStatusRepository.save(status);
-                });
+                .orElse(getDefaultReservationStatus());
     }
 
     public boolean checkAvailability(PriceCalculationRequest request) {
@@ -158,7 +141,7 @@ public class ReservationService {
     }
 
     /**
-     * Vérifie la disponibilité via Availabilities_date _ Availabilities_frequence
+     * Vérifie la disponibilité en utilisant les tables Availabilities_date et Availabilities_frequence
      */
     private boolean checkAvailabilityWithAvailabilities(PriceCalculationRequest request) {
         int parkingId = request.getParkingId();
@@ -215,41 +198,21 @@ public class ReservationService {
      */
     private List<AvailabilitiesFrequence> findFrequencyAvailabilities(int parkingId, int vehicleTypeId,
                                                                      LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        // Récupérer les jours de la semaine dans la période
-        List<Integer> dayOfWeekIds = getDayOfWeekIdsInRange(startDateTime, endDateTime);
-        
-        return dayOfWeekIds.stream()
-                .flatMap(dayId -> availabilitiesFrequenceRepository.findByParkingAndDayOfWeek(parkingId, dayId).stream())
-                .filter(af -> af.getAnnouncementsVehicles().getParkingVehicles().getVehicle().getId_Vehicles() == vehicleTypeId)
+        // Implémentation simplifiée - à adapter selon la structure exacte
+        return announcementsVehiclesRepository.findByParkingAndVehicleType(parkingId, vehicleTypeId)
+                .stream()
+                .flatMap(av -> av.getAvailabilitiesFrequences().stream())
+                .filter(af -> isFrequencyAvailable(af, startDateTime, endDateTime))
                 .collect(java.util.stream.Collectors.toList());
-    }
-
-    /**
-     * Extrait les IDs des jours de la semaine pour une période donnée
-     */
-    private List<Integer> getDayOfWeekIdsInRange(LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        List<Integer> dayIds = new java.util.ArrayList<>();
-        LocalDate currentDate = startDateTime.toLocalDate();
-        LocalDate endDate = endDateTime.toLocalDate();
-        
-        while (!currentDate.isAfter(endDate)) {
-            // DayOfWeek: 1=Monday, 7=Sunday (selon Java)
-            // Adapter selon la base de données
-            int dayId = currentDate.getDayOfWeek().getValue();
-            dayIds.add(dayId);
-            currentDate = currentDate.plusDays(1);
-        }
-        
-        return dayIds;
     }
 
     /**
      * Vérifie si une disponibilité par fréquence couvre la période demandée
      */
     private boolean isFrequencyAvailable(AvailabilitiesFrequence af, LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        // Vérifier si les heures de disponibilité couvrent la période demandée
-        return !startDateTime.toLocalTime().isAfter(af.getEndHour()) &&
-               !endDateTime.toLocalTime().isBefore(af.getStartHour());
+        // Logique à implémenter selon les jours de la semaine
+        // Pour l'instant, retourne true comme base
+        return true;
     }
 
     /**
@@ -267,38 +230,10 @@ public class ReservationService {
                 .mapToInt(ParkingVehicles::getNumbers)
                 .sum();
         
-        if (baseCapacity == 0) {
-            return 0; // Pas de capacité pour ce type de véhicule
-        }
-        
-        // Vérifier les disponibilités spécifiques
-        boolean hasDateAvailability = !dateAvailabilities.isEmpty() &&
-            dateAvailabilities.stream().anyMatch(da ->
-                isDateAvailabilityCoveringPeriod(da, startDateTime, endDateTime));
-        
-        boolean hasFrequencyAvailability = !frequencyAvailabilities.isEmpty() &&
-            frequencyAvailabilities.stream().anyMatch(af ->
-                isFrequencyAvailable(af, startDateTime, endDateTime));
-        
-        // Si aucune disponibilité définie, considérer comme non disponible
-        if (!hasDateAvailability && !hasFrequencyAvailability) {
-            return 0;
-        }
-        
         // Soustraire les réservations existantes
         int reservedCapacity = getReservedCapacity(parkingId, vehicleTypeId, startDateTime, endDateTime);
         
-        return Math.max(0, baseCapacity - reservedCapacity);
-    }
-
-    /**
-     * Vérifie si une disponibilité par date couvre la période
-     */
-    private boolean isDateAvailabilityCoveringPeriod(AvailabilitiesDate da, LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        LocalDateTime availabilityStart = da.getStartDate().atTime(da.getStartHour());
-        LocalDateTime availabilityEnd = da.getEndDate().atTime(da.getEndHour());
-        
-        return !startDateTime.isAfter(availabilityEnd) && !endDateTime.isBefore(availabilityStart);
+        return baseCapacity - reservedCapacity;
     }
 
     /**
@@ -306,20 +241,13 @@ public class ReservationService {
      */
     private int getReservedCapacity(int parkingId, int vehicleTypeId, LocalDateTime startDateTime, LocalDateTime endDateTime) {
         // Logique pour compter les véhicules déjà réservés dans cette période
-        // Pour l'instant, retourne 0 comme base - à implémenter selon les besoins
+        // Pour l'instant, retourne 0 comme base
         return 0;
     }
 
     private ReservationStatus getDefaultReservationStatus() {
         return reservationStatusRepository.findByValue(10)
-                .orElseGet(() -> {
-                    // Créer et sauvegarder le statut par défaut s'il n'existe pas
-                    ReservationStatus defaultStatus = ReservationStatus.builder()
-                            .label("En attente")
-                            .value(10)
-                            .build();
-                    return reservationStatusRepository.save(defaultStatus);
-                });
+                .orElse(ReservationStatus.builder().label("En attente").value(10).build());
     }
 
     private void createReservationVehicles(Reservation reservation, VehicleSelection vehicleSelection, int parkingId) {

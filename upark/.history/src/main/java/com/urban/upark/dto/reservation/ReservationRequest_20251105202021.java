@@ -13,8 +13,9 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PriceCalculationRequest {
+public class ReservationRequest {
     private int parkingId;
+    private int userId;
     
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime startDateTime;
@@ -22,5 +23,17 @@ public class PriceCalculationRequest {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime endDateTime;
     
+    private String paymentMethod;
+    
+    // Pour l'interface mobile avec sélection des véhicules
     private List<VehicleSelection> selectedVehicles;
+}
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+class VehicleSelection {
+    private int vehicleTypeId;  // ID du type de véhicule (moto, voiture, etc.)
+    private int quantity;       // Nombre sélectionné
 }

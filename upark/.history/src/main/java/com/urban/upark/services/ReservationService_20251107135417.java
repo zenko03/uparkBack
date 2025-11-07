@@ -136,20 +136,7 @@ public class ReservationService {
     private ReservationStatus getStatusByValue(int value) {
         // Chercher le statut par sa valeur dans la base
         return reservationStatusRepository.findByValue(value)
-                .orElseGet(() -> {
-                    // Créer et sauvegarder le statut s'il n'existe pas
-                    String label = switch (value) {
-                        case 15 -> "En cours";
-                        case 20 -> "Confirmée";
-                        case 30 -> "Terminée";
-                        default -> "En attente";
-                    };
-                    ReservationStatus status = ReservationStatus.builder()
-                            .label(label)
-                            .value(value)
-                            .build();
-                    return reservationStatusRepository.save(status);
-                });
+                .orElse(getDefaultReservationStatus());
     }
 
     public boolean checkAvailability(PriceCalculationRequest request) {
@@ -158,7 +145,7 @@ public class ReservationService {
     }
 
     /**
-     * Vérifie la disponibilité via Availabilities_date _ Availabilities_frequence
+     * Vérifie la disponibilité via Availabilities_date $ Availabilities_frequence
      */
     private boolean checkAvailabilityWithAvailabilities(PriceCalculationRequest request) {
         int parkingId = request.getParkingId();
@@ -312,14 +299,7 @@ public class ReservationService {
 
     private ReservationStatus getDefaultReservationStatus() {
         return reservationStatusRepository.findByValue(10)
-                .orElseGet(() -> {
-                    // Créer et sauvegarder le statut par défaut s'il n'existe pas
-                    ReservationStatus defaultStatus = ReservationStatus.builder()
-                            .label("En attente")
-                            .value(10)
-                            .build();
-                    return reservationStatusRepository.save(defaultStatus);
-                });
+                .orElse(ReservationStatus.builder().label("En attente").value(10).build());
     }
 
     private void createReservationVehicles(Reservation reservation, VehicleSelection vehicleSelection, int parkingId) {

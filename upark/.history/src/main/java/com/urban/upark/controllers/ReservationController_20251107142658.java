@@ -74,6 +74,7 @@ public class ReservationController {
             if (reservationOpt.isPresent()) {
                 Reservation existingReservation = reservationOpt.get();
                 
+                // Mettre à jour uniquement les champs modifiables
                 if (reservationDetails.getTotalPrice() != null) {
                     existingReservation.setTotalPrice(reservationDetails.getTotalPrice());
                 }
@@ -90,6 +91,8 @@ public class ReservationController {
                     existingReservation.setPaymentMethod(reservationDetails.getPaymentMethod());
                 }
                 
+                // NE PAS modifier creationDate, user et reservationStatus en PUT
+                // Ces champs doivent rester inchangés
                 
                 return ResponseEntity.ok(reservationService.save(existingReservation));
             } else {

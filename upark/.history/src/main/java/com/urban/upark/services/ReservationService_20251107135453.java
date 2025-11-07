@@ -136,20 +136,7 @@ public class ReservationService {
     private ReservationStatus getStatusByValue(int value) {
         // Chercher le statut par sa valeur dans la base
         return reservationStatusRepository.findByValue(value)
-                .orElseGet(() -> {
-                    // Créer et sauvegarder le statut s'il n'existe pas
-                    String label = switch (value) {
-                        case 15 -> "En cours";
-                        case 20 -> "Confirmée";
-                        case 30 -> "Terminée";
-                        default -> "En attente";
-                    };
-                    ReservationStatus status = ReservationStatus.builder()
-                            .label(label)
-                            .value(value)
-                            .build();
-                    return reservationStatusRepository.save(status);
-                });
+                .orElse(getDefaultReservationStatus());
     }
 
     public boolean checkAvailability(PriceCalculationRequest request) {

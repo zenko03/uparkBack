@@ -80,7 +80,8 @@ public class ParkingController {
     }
 
     /**
-     * Ex: /api/parkings/search/address?address=AMPITATAFIKA
+     * Recherche de parkings par adresse
+     * Ex: /api/parkings/search/address?address=Paris
      */
     @GetMapping("/search/address")
     public List<Parking> searchByAddress(
@@ -89,7 +90,8 @@ public class ParkingController {
     }
 
     /**
-     * Recherche  parkings par coordonnées géographiques
+     * Recherche de parkings par coordonnées géographiques
+     * Ex: /api/parkings/search/location?location=SRID=4326;POINT(2.3522 48.8566)&radius=5
      */
     @GetMapping("/search/location")
     public List<Parking> searchByLocation(
@@ -99,7 +101,7 @@ public class ParkingController {
     }
 
     /**
-     * 
+     * Recherche combinée adresse + localisation
      * Ex: /api/parkings/search/combined?address=Paris&location=SRID=4326;POINT(2.3522 48.8566)&radius=5
      */
     @GetMapping("/search/combined")
