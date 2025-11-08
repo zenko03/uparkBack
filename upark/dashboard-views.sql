@@ -1,13 +1,5 @@
 -- =====================================================================
--- VIEWS SQL POUR TABLEAU DE BORD UPARK - VERSION FINALE
--- =====================================================================
--- Basé sur les statistiques requises par le CDC (lignes 65-69)
--- Optimisé pour PostgreSQL avec jointures correctes
--- =====================================================================
-
--- =====================================================================
 -- VIEW 1 : STATISTIQUES DES COMMISSIONS
--- CDC : "Total des commissions générées (jour / mois / global)"
 -- =====================================================================
 
 CREATE OR REPLACE VIEW v_dashboard_commissions AS
@@ -41,7 +33,6 @@ GROUP BY
 
 -- =====================================================================
 -- VIEW 2 : STATISTIQUES DES RÉSERVATIONS PAR STATUT
--- CDC : "Nombre de réservations par statut"
 -- =====================================================================
 
 CREATE OR REPLACE VIEW v_dashboard_reservations_stats AS
@@ -77,9 +68,6 @@ GROUP BY
 
 -- =====================================================================
 -- VIEW 3 : CLASSEMENT DES PARKINGS LES PLUS LOUÉS
--- CDC : "Classement des parkings les plus loués"
--- CORRECTION : Jointure correcte via les tables de liaison
--- Chaîne : Reservation -> Reservation_vehicles -> Announcements_vehicles -> Parking_vehicles -> Parking
 -- =====================================================================
 
 CREATE OR REPLACE VIEW v_dashboard_parking_ranking AS
@@ -126,7 +114,6 @@ ORDER BY nombre_reservations DESC;
 
 -- =====================================================================
 -- VIEW 4 : UTILISATEURS ACTIFS
--- CDC : "Nombre d'utilisateurs actifs"
 -- =====================================================================
 
 CREATE OR REPLACE VIEW v_dashboard_active_users AS
@@ -163,8 +150,7 @@ GROUP BY
 ORDER BY jour DESC;
 
 -- =====================================================================
--- VIEW 5 : SYNTHÈSE GLOBALE DU TABLEAU DE BORD
--- Combinaison des indicateurs principaux pour un aperçu rapide
+-- VIEW 5 : SYNTHÈSE GLOBALE 
 -- =====================================================================
 
 CREATE OR REPLACE VIEW v_dashboard_synthese AS
@@ -208,9 +194,8 @@ SELECT
      ORDER BY COUNT(r.Id_Reservation) DESC
      LIMIT 1) AS top_parking_mois;
 
--- =====================================================================
--- INDEX RECOMMANDÉS POUR OPTIMISER LES PERFORMANCES
--- =====================================================================
+
+-- INDEX
 
 -- Index pour les commissions
 CREATE INDEX IF NOT EXISTS idx_commission_received_payement_date ON commission_received(payement_date);

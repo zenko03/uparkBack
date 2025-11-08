@@ -116,3 +116,22 @@ BEGIN
     RAISE NOTICE '====================================================================';
 END $$;
 
+-- =====================================================================
+-- INSTRUCTIONS D'UTILISATION
+-- =====================================================================
+
+/*
+1. Exécuter ce script dans PostgreSQL:
+   psql -d nom_base -f cleanup-database.sql
+
+2. Ou via l'interface SQL de votre choix (pgAdmin, DBeaver, etc.)
+
+3. Attendre la confirmation du nettoyage complet
+
+4. Exécuter ensuite le script des nouvelles données de test
+
+ATTENTION:
+- Ce script supprime IRRÉVERSIBLEMENT toutes les données
+- À utiliser uniquement en environnement de développement/test
+- Vérifier que vous êtes sur la bonne base de données avant exécution
+*/
