@@ -98,4 +98,16 @@ public class CommissionReceivedService {
             return null;
         }
     }
+    
+    /**
+     * Récupère le montant total des commissions pour une réservation donnée
+     */
+    public BigDecimal getTotalCommissionByReservation(int reservationId) {
+        List<CommissionReceived> commissions = commissionReceivedRepository
+                .findByReservationIdReservation(reservationId);
+        
+        return commissions.stream()
+                .map(CommissionReceived::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 }

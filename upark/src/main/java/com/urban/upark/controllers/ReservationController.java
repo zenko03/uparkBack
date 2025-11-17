@@ -5,6 +5,7 @@ import com.urban.upark.services.ReservationService;
 import com.urban.upark.dto.reservation.ReservationRequest;
 import com.urban.upark.dto.reservation.ReservationResponse;
 import com.urban.upark.dto.reservation.PriceCalculationRequest;
+import com.urban.upark.dto.reservation.ReservationDetailDTO;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,11 @@ public class ReservationController {
     @GetMapping
     public List<Reservation> getAllReservations() {
         return reservationService.findAll();
+    }
+    
+    @GetMapping("/details")
+    public List<ReservationDetailDTO> getAllReservationsWithDetails() {
+        return reservationService.findAllWithDetails();
     }
 
     @GetMapping("/{id}")

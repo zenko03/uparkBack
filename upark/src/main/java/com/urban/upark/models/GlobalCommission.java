@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -21,7 +22,7 @@ public class GlobalCommission {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int Id_Global_commission;
 
-    private Double rate;
+    private BigDecimal rate;
 
     @Column(name = "creation_date")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")

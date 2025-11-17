@@ -6,6 +6,7 @@ import com.urban.upark.dto.reservation.ReservationRequest;
 import com.urban.upark.dto.reservation.ReservationResponse;
 import com.urban.upark.dto.reservation.PriceCalculationRequest;
 import com.urban.upark.dto.reservation.VehicleSelection;
+import com.urban.upark.dto.reservation.ReservationDetailDTO;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,97 @@ public class ReservationService {
 
     public List<Reservation> findAll() {
         return reservationRepository.findAll();
+    }
+    
+    /**
+     * Récupère toutes les réservations avec les informations enrichies (parking, commission)
+     */
+    public List<ReservationDetailDTO> findAllWithDetails() {
+        List<Reservation> reservations = reservationRepository.findAll();
+        List<ReservationDetailDTO> detailDTOs = new ArrayList<>();
+        
+        for (Reservation reservation : reservations) {
+            ReservationDetailDTO dto = mapToDetailDTO(reservation);
+            detailDTOs.add(dto);
+        }
+        
+        return detailDTOs;
+    }
+    
+    /**
+     * Convertit une Reservation en ReservationDetailDTO avec parking et commission
+     */
+    private ReservationDetailDTO mapToDetailDTO(Reservation reservation) {
+        // Récupérer les infos parking via la chaîne de relations
+        ReservationDetailDTO.ParkingInfo parkingInfo = extractParkingInfo(reservation);
+        
+        // Calculer la commission totale pour cette réservation
+        BigDecimal commission = commissionReceivedService.getTotalCommissionByReservation(reservation.getId_Reservation());
+        
+        return ReservationDetailDTO.builder()
+                .idReservation(reservation.getId_Reservation())
+                .totalPrice(reservation.getTotalPrice())
+                .creationDate(reservation.getCreationDate())
+                .paymentDate(reservation.getPaymentDate())
+                .startDateTime(reservation.getStartDateTime())
+                .endDateTime(reservation.getEndDateTime())
+                .paymentMethod(reservation.getPaymentMethod())
+                .user(ReservationDetailDTO.UserInfo.builder()
+                        .idUsers(reservation.getUser().getId_Users())
+                        .firstName(reservation.getUser().getFirst_name())
+                        .lastName(reservation.getUser().getLast_name())
+                        .email(reservation.getUser().getEmail())
+                        .telephone(reservation.getUser().getTelephone())
+                        .build())
+                .parking(parkingInfo)
+                .reservationStatus(ReservationDetailDTO.ReservationStatusInfo.builder()
+                        .idReservationStatus(reservation.getReservationStatus().getId_Reservation_status())
+                        .label(reservation.getReservationStatus().getLabel())
+                        .value(reservation.getReservationStatus().getValue_())
+                        .build())
+                .commission(commission)
+                .build();
+    }
+    
+    /**
+     * Extrait les informations du parking depuis une réservation
+     */
+    private ReservationDetailDTO.ParkingInfo extractParkingInfo(Reservation reservation) {
+        try {
+            // Naviguer: Reservation -> ReservationVehicles -> AnnouncementsVehicles -> ParkingVehicles -> Parking
+            if (reservation.getReservationVehicles() != null && !reservation.getReservationVehicles().isEmpty()) {
+                ReservationVehicles rv = reservation.getReservationVehicles().get(0);
+                AnnouncementsVehicles av = rv.getAnnouncementsVehicles();
+                
+                if (av != null && av.getParkingVehicles() != null) {
+                    ParkingVehicles pv = av.getParkingVehicles();
+                    Parking parking = pv.getParking();
+                    
+                    if (parking != null) {
+                        Users owner = parking.getUser();
+                        
+                        return ReservationDetailDTO.ParkingInfo.builder()
+                                .idParking(parking.getId_Parking())
+                                .name(parking.getName())
+                                .address(parking.getAddress())
+                                .idOwner(owner != null ? owner.getId_Users() : 0)
+                                .ownerName(owner != null ? owner.getFirst_name() + " " + owner.getLast_name() : "")
+                                .build();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("⚠️ Error extracting parking info for reservation " + reservation.getId_Reservation() + ": " + e.getMessage());
+        }
+        
+        // Retourner un parking vide si non trouvé
+        return ReservationDetailDTO.ParkingInfo.builder()
+                .idParking(0)
+                .name("Parking non trouvé")
+                .address("")
+                .idOwner(0)
+                .ownerName("")
+                .build();
     }
 
     public Optional<Reservation> findById(int id) {
