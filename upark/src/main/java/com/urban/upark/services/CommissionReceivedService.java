@@ -104,7 +104,7 @@ public class CommissionReceivedService {
      */
     public BigDecimal getTotalCommissionByReservation(int reservationId) {
         List<CommissionReceived> commissions = commissionReceivedRepository
-                .findByReservationIdReservation(reservationId);
+                .findByReservationId(reservationId);
         
         return commissions.stream()
                 .map(CommissionReceived::getPrice)

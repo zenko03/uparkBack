@@ -5,13 +5,15 @@ import com.urban.upark.services.GlobalCommissionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/global-commission")
+@RequestMapping("/api/commissions/global")
 @RequiredArgsConstructor
 public class GlobalCommissionController {
 
@@ -21,20 +23,27 @@ public class GlobalCommissionController {
     public List<GlobalCommission> getAllGlobalCommissions() {
         return globalCommissionService.findAll();
     }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<GlobalCommission> getGlobalCommissionById(@PathVariable int id) {
-        Optional<GlobalCommission> globalCommission = globalCommissionService.findById(id);
-        if (globalCommission.isPresent()) {
-            return ResponseEntity.ok(globalCommission.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    
+    @GetMapping("/current")
+    public ResponseEntity<GlobalCommission> getCurrentCommission() {
+        Optional<GlobalCommission> commission = globalCommissionService.getCurrentCommission();
+        return commission.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
-
+    
+    @GetMapping("/history")
+    public List<GlobalCommission> getCommissionHistory() {
+        return globalCommissionService.getCommissionHistory();
+    }
+    
     @PostMapping
-    public GlobalCommission createGlobalCommission(@RequestBody GlobalCommission globalCommission) {
-        return globalCommissionService.save(globalCommission);
+    public ResponseEntity<GlobalCommission> createNewCommission(@RequestBody Map<String, BigDecimal> body) {
+        BigDecimal rate = body.get("rate");
+        if (rate == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        GlobalCommission commission = globalCommissionService.createNewCommission(rate);
+        return ResponseEntity.ok(commission);
     }
 
     @PutMapping("/{id}")

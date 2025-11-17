@@ -75,15 +75,15 @@ public class ReservationService {
                 .user(ReservationDetailDTO.UserInfo.builder()
                         .idUsers(reservation.getUser().getId_Users())
                         .firstName(reservation.getUser().getFirst_name())
-                        .lastName(reservation.getUser().getLast_name())
+                        .lastName(reservation.getUser().getName())
                         .email(reservation.getUser().getEmail())
-                        .telephone(reservation.getUser().getTelephone())
+                        .telephone(reservation.getUser().getPhone_number())
                         .build())
                 .parking(parkingInfo)
                 .reservationStatus(ReservationDetailDTO.ReservationStatusInfo.builder()
                         .idReservationStatus(reservation.getReservationStatus().getId_Reservation_status())
                         .label(reservation.getReservationStatus().getLabel())
-                        .value(reservation.getReservationStatus().getValue_())
+                        .value(reservation.getReservationStatus().getValue())
                         .build())
                 .commission(commission)
                 .build();
@@ -108,10 +108,10 @@ public class ReservationService {
                         
                         return ReservationDetailDTO.ParkingInfo.builder()
                                 .idParking(parking.getId_Parking())
-                                .name(parking.getName())
-                                .address(parking.getAddress())
+                                .name(parking.getLabel())
+                                .address(parking.getLocalisation())
                                 .idOwner(owner != null ? owner.getId_Users() : 0)
-                                .ownerName(owner != null ? owner.getFirst_name() + " " + owner.getLast_name() : "")
+                                .ownerName(owner != null ? owner.getFirst_name() + " " + owner.getName() : "")
                                 .build();
                     }
                 }
