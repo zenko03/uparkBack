@@ -55,26 +55,26 @@ INSERT INTO Commission_types (label) VALUES
 -- ÉTAPE 2: UTILISATEURS (base pour les autres tables)
 -- =====================================================================
 
--- Mot de passe: password123 (encodé en BCrypt: $2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBaUKk7h.T0mUO)
+-- Mot de passe: test123 
 INSERT INTO Users (name, first_name, user_name, email, password, phone_number, role) VALUES
 -- Administrateurs
-('Rakoto', 'Jean Claude', 'admin_rakoto', 'admin@upark.mg', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBaUKk7h.T0mUO', '+261341234567', 'ADMIN'),
-('Rabe', 'Marie Claire', 'admin_marie', 'marie.admin@upark.mg', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBaUKk7h.T0mUO', '+261322345678', 'ADMIN'),
+('Rakoto', 'Jean Claude', 'admin_rakoto', 'admin@upark.mg', '$2a$10$IYaZpJtkzuwqs8FYtedGxOr8jtX8pjJXcuz4Cw0o5.EMnC2hIThKq', '+261341234567', 'ADMIN'),
+('Rabe', 'Marie Claire', 'admin_marie', 'marie.admin@upark.mg', '$2a$10$IYaZpJtkzuwqs8FYtedGxOr8jtX8pjJXcuz4Cw0o5.EMnC2hIThKq', '+261322345678', 'ADMIN'),
 
 -- Propriétaires de parkings
-('Randrianarisoa', 'Andry', 'andry_parking', 'andry.parking@gmail.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBaUKk7h.T0mUO', '+261331112223', 'USER'),
-('Razafindrabe', 'Nirina', 'nirina_owner', 'nirina.owner@yahoo.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBaUKk7h.T0mUO', '+261332233344', 'USER'),
-('Rakotondrasoa', 'Mialy', 'mialy_park', 'mialy.parking@hotmail.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBaUKk7h.T0mUO', '+261333444555', 'USER'),
-('Andriamialisoa', 'Tiana', 'tiana_parking', 'tiana.parking@outlook.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBaUKk7h.T0mUO', '+261334555666', 'USER'),
+('Randrianarisoa', 'Andry', 'andry_parking', 'andry.parking@gmail.com', '$2a$10$IYaZpJtkzuwqs8FYtedGxOr8jtX8pjJXcuz4Cw0o5.EMnC2hIThKq', '+261331112223', 'USER'),
+('Razafindrabe', 'Nirina', 'nirina_owner', 'nirina.owner@yahoo.com', '$2a$10$IYaZpJtkzuwqs8FYtedGxOr8jtX8pjJXcuz4Cw0o5.EMnC2hIThKq', '+261332233344', 'USER'),
+('Rakotondrasoa', 'Mialy', 'mialy_park', 'mialy.parking@hotmail.com', '$2a$10$IYaZpJtkzuwqs8FYtedGxOr8jtX8pjJXcuz4Cw0o5.EMnC2hIThKq', '+261333444555', 'USER'),
+('Andriamialisoa', 'Tiana', 'tiana_parking', 'tiana.parking@outlook.com', '$2a$10$IYaZpJtkzuwqs8FYtedGxOr8jtX8pjJXcuz4Cw0o5.EMnC2hIThKq', '+261334555666', 'USER'),
 
 -- Locataires/clients
-('Rasoa', 'Sitraka', 'sitraka_client', 'sitraka.client@gmail.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBaUKk7h.T0mUO', '+261335666777', 'USER'),
-('Rakotozafy', 'Feno', 'feno_user', 'feno.user@yahoo.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBaUKk7h.T0mUO', '+261336777888', 'USER'),
-('Razafimahatratra', 'Liva', 'liva_client', 'liva.client@hotmail.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBaUKk7h.T0mUO', '+261337888999', 'USER'),
-('Randrianomenjanahary', 'Njaka', 'njaka_user', 'njaka.user@outlook.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBaUKk7h.T0mUO', '+261338999000', 'USER'),
+('Rasoa', 'Sitraka', 'sitraka_client', 'sitraka.client@gmail.com', '$2a$10$IYaZpJtkzuwqs8FYtedGxOr8jtX8pjJXcuz4Cw0o5.EMnC2hIThKq', '+261335666777', 'USER'),
+('Rakotozafy', 'Feno', 'feno_user', 'feno.user@yahoo.com', '$2a$10$IYaZpJtkzuwqs8FYtedGxOr8jtX8pjJXcuz4Cw0o5.EMnC2hIThKq', '+261336777888', 'USER'),
+('Razafimahatratra', 'Liva', 'liva_client', 'liva.client@hotmail.com', '$2a$10$IYaZpJtkzuwqs8FYtedGxOr8jtX8pjJXcuz4Cw0o5.EMnC2hIThKq', '+261337888999', 'USER'),
+('Randrianomenjanahary', 'Njaka', 'njaka_user', 'njaka.user@outlook.com', '$2a$10$IYaZpJtkzuwqs8FYtedGxOr8jtX8pjJXcuz4Cw0o5.EMnC2hIThKq', '+261338999000', 'USER'),
 
 -- Partenaires
-('Société Parking Mada', 'Contact', 'partner_mada', 'contact@parking-mada.mg', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBaUKk7h.T0mUO', '+261320001111', 'PARTNER');
+('Société Parking Mada', 'Contact', 'partner_mada', 'contact@parking-mada.mg', '$2a$10$IYaZpJtkzuwqs8FYtedGxOr8jtX8pjJXcuz4Cw0o5.EMnC2hIThKq', '+261320001111', 'PARTNER');
 
 -- Profils des utilisateurs
 INSERT INTO Profils (Id_Profil_types, Id_Users) VALUES
@@ -169,19 +169,6 @@ INSERT INTO Parking_vehicles (numbers, Id_Vehicles, Id_Parking) VALUES
 INSERT INTO Global_commission (rate, creation_date) VALUES
 (10.0, CURRENT_TIMESTAMP - INTERVAL '30 days');
 
--- Commissions par véhicule
-INSERT INTO Commission_vehicles (rate, creation_date, Id_Vehicles) VALUES
-(8.0, CURRENT_TIMESTAMP - INTERVAL '30 days', 1), -- Voiture
-(6.0, CURRENT_TIMESTAMP - INTERVAL '30 days', 2), -- Moto
-(12.0, CURRENT_TIMESTAMP - INTERVAL '30 days', 3), -- Utilitaire
-(15.0, CURRENT_TIMESTAMP - INTERVAL '30 days', 4), -- Camionnette
-(7.0, CURRENT_TIMESTAMP - INTERVAL '30 days', 5), -- Citadine
-(10.0, CURRENT_TIMESTAMP - INTERVAL '30 days', 6), -- SUV
-(5.0, CURRENT_TIMESTAMP - INTERVAL '30 days', 7); -- Vélo électrique
-
--- Commissions partenaires
-INSERT INTO Commission_partners (rate, creation_date, Id_Users) VALUES
-(5.0, CURRENT_TIMESTAMP - INTERVAL '30 days', 11); -- Partenaire Mada
 
 -- Délai de réservation
 INSERT INTO Reservation_delay (delay_in_hours, delay_in_minutes, creation_date) VALUES

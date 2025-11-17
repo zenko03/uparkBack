@@ -1,6 +1,7 @@
 package com.urban.upark.controllers;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService service;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
@@ -28,6 +30,12 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> login(
         @RequestBody AuthenticationRequest request){
         return ResponseEntity.ok(service.authenticate(request));
+    }
+
+    @PostMapping("/hash-password")
+    public ResponseEntity<String> hashPassword(@RequestBody String password) {
+        String hashedPassword = passwordEncoder.encode(password);
+        return ResponseEntity.ok(hashedPassword);
     }
 
 }
