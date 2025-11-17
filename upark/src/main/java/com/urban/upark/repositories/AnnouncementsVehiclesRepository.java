@@ -12,9 +12,24 @@ import java.util.List;
 public interface AnnouncementsVehiclesRepository extends JpaRepository<AnnouncementsVehicles, Integer> {
     
     @Query("SELECT av FROM AnnouncementsVehicles av " +
-           "WHERE av.parkingVehicles.parking.Id_Parking = :parkingId " +
-           "AND av.parkingVehicles.vehicle.Id_Vehicles = :vehicleTypeId")
+           "JOIN FETCH av.parkingVehicles pv " +
+           "JOIN FETCH pv.parking p " +
+           "JOIN FETCH pv.vehicle v " +
+           "WHERE p.Id_Parking = :parkingId " +
+           "AND v.Id_Vehicles = :vehicleTypeId")
     List<AnnouncementsVehicles> findByParkingAndVehicleType(
+        @Param("parkingId") int parkingId, 
+        @Param("vehicleTypeId") int vehicleTypeId
+    );
+    
+    // Alternative avec requête SQL native
+    @Query(value = "SELECT av.* FROM announcements_vehicles av " +
+                   "JOIN parking_vehicles pv ON av.id_parking_vehicles = pv.id_parking_vehicles " +
+                   "WHERE pv.id_parking = :parkingId " +
+                   "AND pv.id_vehicles = :vehicleTypeId " +
+                   "LIMIT 1", 
+           nativeQuery = true)
+    AnnouncementsVehicles findByParkingAndVehicleTypeNative(
         @Param("parkingId") int parkingId, 
         @Param("vehicleTypeId") int vehicleTypeId
     );

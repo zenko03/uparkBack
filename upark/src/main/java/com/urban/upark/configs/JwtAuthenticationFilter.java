@@ -31,6 +31,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
+        
+        // Liste des endpoints publics à ignorer par le filtre JWT
+        String requestURI = request.getRequestURI();
+        
+        // Log pour déboguer
+        System.out.println("🔍 JWT Filter - URI: " + requestURI);
+        
+        // Vérifier si c'est un endpoint public (ORDRE IMPORTANT: plus spécifique d'abord)
+        if (requestURI.startsWith("/api/v1/auth/") ||
+            requestURI.startsWith("/api/auth/") ||
+            requestURI.startsWith("/api/parkings") ||  // Tous les endpoints parkings sont publics
+            requestURI.startsWith("/api/vehicles") ||
+            requestURI.startsWith("/api/reservations/test-public") ||
+            requestURI.startsWith("/api/reservations/calculate-price") ||
+            requestURI.startsWith("/api/reservations/check-availability")) {
+            System.out.println("✅ Endpoint public - pas de vérification JWT");
+            filterChain.doFilter(request, response);
+            return;
+        }
+        
+        System.out.println("🔐 Endpoint protégé - vérification JWT requise");
+        
         final String authHeader=request.getHeader("Authorization");
         final String jwt;
         final String username;
@@ -39,7 +61,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         jwt=authHeader.substring(7);
-        username= jwtService.extractUsername(jwt); 
+        username= jwtService.extractUsername(jwt);
         if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null){
             UserDetails userDetails=this.userDetailsService.loadUserByUsername(username);
             if (jwtService.isTokenValid(jwt, userDetails)) {

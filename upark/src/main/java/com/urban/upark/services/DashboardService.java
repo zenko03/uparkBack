@@ -32,6 +32,26 @@ public class DashboardService {
             if (overview != null) {
                 overview.put("timestamp", LocalDate.now());
                 overview.put("statut", "actif");
+                
+                // Ajouter les statistiques par statut de réservation
+                Map<String, Integer> reservationsByStatus = dashboardRepository.getReservationsCountByStatus();
+                overview.put("reservations_a_venir", reservationsByStatus.getOrDefault("à venir", 0));
+                overview.put("reservations_en_cours", reservationsByStatus.getOrDefault("En cours", 0));
+                overview.put("reservations_terminees", reservationsByStatus.getOrDefault("Terminée", 0));
+                overview.put("reservations_annulees", reservationsByStatus.getOrDefault("Annulée", 0));
+                
+                // Ajouter utilisateurs actifs du mois (pas seulement du jour)
+                Long activeUsersMonth = dashboardRepository.getActiveUsersLast30Days();
+                overview.put("utilisateurs_actifs_mois", activeUsersMonth != null ? activeUsersMonth : 0L);
+                
+                // Ajouter les commissions globales (tous les temps)
+                BigDecimal commissionsGlobal = dashboardRepository.getTotalCommissionsAllTime();
+                overview.put("commissions_global", commissionsGlobal != null ? commissionsGlobal : BigDecimal.ZERO);
+                
+                // Commissions - s'assurer qu'elles sont présentes
+                if (!overview.containsKey("commissions_jour")) {
+                    overview.put("commissions_jour", 0);
+                }
             }
             
             log.info("Aperçu du tableau de bord récupéré avec succès");

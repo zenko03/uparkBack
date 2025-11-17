@@ -11,4 +11,7 @@ import java.util.List;
 public interface ParkingVehiclesRepository extends JpaRepository<ParkingVehicles, Integer> {
     @Query("SELECT pv FROM ParkingVehicles pv WHERE pv.parking.Id_Parking = :parkingId")
     List<ParkingVehicles> findByParkingId(@Param("parkingId") int parkingId);
+    
+    @Query("SELECT pv FROM ParkingVehicles pv WHERE pv.parking.Id_Parking = :parkingId AND pv.vehicle.Id_Vehicles = :vehicleId")
+    List<ParkingVehicles> findByParkingIdAndVehicleId(@Param("parkingId") int parkingId, @Param("vehicleId") int vehicleId);
 }

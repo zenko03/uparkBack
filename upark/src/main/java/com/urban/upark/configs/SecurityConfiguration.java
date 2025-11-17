@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,26 +26,38 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable()) 
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
+                // OPTIONS requests must be first for CORS preflight
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                // Public endpoints (most specific first)
+                .requestMatchers("/api/reservations/test-public").permitAll()
+                .requestMatchers("/api/reservations/calculate-price").permitAll()
+                .requestMatchers("/api/reservations/check-availability").permitAll()
+                // General public endpoints
                 .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/parkings/**").permitAll()
+                .requestMatchers("/api/vehicles/**").permitAll()
+                .requestMatchers("/api/parkings/search").permitAll()
+                .requestMatchers("/api/parkings/search/**").permitAll()
+                .requestMatchers("/api/parkings/*/availability").permitAll()
+                // All other requests need authentication
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS)
             )
             .authenticationProvider(authenticationProvider)
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new CorsFilter(), JwtAuthenticationFilter.class); // Add CORS filter before JWT
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:5173",
-            "http://127.0.0.1:5173"
-        )); 
+        // Allow all origins for development
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList(
             "Authorization",

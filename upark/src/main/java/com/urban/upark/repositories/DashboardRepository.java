@@ -63,6 +63,17 @@ public class DashboardRepository {
         return jdbcTemplate.queryForObject(sql, BigDecimal.class);
     }
 
+    /**
+     * Total des commissions (tous les temps)
+     */
+    public BigDecimal getTotalCommissionsAllTime() {
+        String sql = """
+            SELECT COALESCE(SUM(price), 0) as total_global
+            FROM commission_received
+            """;
+        return jdbcTemplate.queryForObject(sql, BigDecimal.class);
+    }
+
     // =====================================================================
     // STATISTIQUES DES RÉSERVATIONS PAR STATUT
     // =====================================================================
@@ -207,6 +218,30 @@ public class DashboardRepository {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * Nombre de réservations par statut (tous les temps)
+     */
+    public Map<String, Integer> getReservationsCountByStatus() {
+        String sql = """
+            SELECT rs.label, COUNT(r.id_reservation) as count
+            FROM reservation_status rs
+            LEFT JOIN reservation r ON rs.id_reservation_status = r.id_reservation_status
+            GROUP BY rs.id_reservation_status, rs.label
+            ORDER BY rs.id_reservation_status
+            """;
+        
+        List<Map<String, Object>> results = jdbcTemplate.queryForList(sql);
+        Map<String, Integer> statusCounts = new java.util.HashMap<>();
+        
+        for (Map<String, Object> row : results) {
+            String label = (String) row.get("label");
+            Long count = (Long) row.get("count");
+            statusCounts.put(label, count != null ? count.intValue() : 0);
+        }
+        
+        return statusCounts;
     }
 
     // =====================================================================

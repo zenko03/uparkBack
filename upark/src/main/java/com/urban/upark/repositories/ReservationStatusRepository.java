@@ -13,4 +13,7 @@ public interface ReservationStatusRepository extends JpaRepository<ReservationSt
     
     @Query("SELECT rs FROM ReservationStatus rs WHERE rs.value = :value")
     Optional<ReservationStatus> findByValue(@Param("value") int value);
+    
+    @Query("SELECT rs FROM ReservationStatus rs WHERE rs.label = :label")
+    Optional<ReservationStatus> findByLabel(@Param("label") String label);
 }

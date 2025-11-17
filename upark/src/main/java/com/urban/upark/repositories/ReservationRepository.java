@@ -24,6 +24,15 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query("SELECT r FROM Reservation r WHERE r.user.Id_Users = :userId ORDER BY r.creationDate DESC")
     List<Reservation> findByUserIdOrderByCreationDateDesc(@Param("userId") int userId);
 
+    @Query("SELECT DISTINCT r FROM Reservation r " +
+           "LEFT JOIN FETCH r.reservationVehicles rv " +
+           "LEFT JOIN FETCH rv.announcementsVehicles av " +
+           "LEFT JOIN FETCH av.parkingVehicles pv " +
+           "LEFT JOIN FETCH pv.parking " +
+           "WHERE r.user.Id_Users = :userId " +
+           "ORDER BY r.creationDate DESC")
+    List<Reservation> findByUserIdWithParkingInfo(@Param("userId") int userId);
+
     // Version simplifiée sans les paramètres de date pour éviter les problèmes de type
     @Query("SELECT r FROM Reservation r WHERE " +
            "(:statusId IS NULL OR r.reservationStatus.Id_Reservation_status = :statusId) AND " +
@@ -73,4 +82,22 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
         @Param("startDate") LocalDateTime startDate,
         @Param("endDate") LocalDateTime endDate
     );
+    
+    // Trouver les réservations avec un statut spécifique et date de début passée
+    @Query("SELECT r FROM Reservation r WHERE r.reservationStatus.Id_Reservation_status = :statusId AND r.startDateTime < :dateTime")
+    List<Reservation> findByReservationStatusIdAndStartDateTimeBefore(
+        @Param("statusId") Integer statusId,
+        @Param("dateTime") LocalDateTime dateTime
+    );
+    
+    // Trouver les réservations avec un statut spécifique et date de fin passée
+    @Query("SELECT r FROM Reservation r WHERE r.reservationStatus.Id_Reservation_status = :statusId AND r.endDateTime < :dateTime")
+    List<Reservation> findByReservationStatusIdAndEndDateTimeBefore(
+        @Param("statusId") Integer statusId,
+        @Param("dateTime") LocalDateTime dateTime
+    );
+    
+    // Trouver les réservations par statut
+    @Query("SELECT r FROM Reservation r WHERE r.reservationStatus.Id_Reservation_status = :statusId")
+    List<Reservation> findByReservationStatusId(@Param("statusId") Integer statusId);
 }

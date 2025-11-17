@@ -31,20 +31,18 @@ INSERT INTO Profil_types (types) VALUES
 
 -- Statuts de réservation (complets et logiques)
 INSERT INTO Reservation_status (label, value_) VALUES
-('En attente de confirmation', 10),
-('Confirmée', 20),
+('à venir', 10),
 ('En cours', 15),
-('Terminée', 30),
-('Annulée', 25),
-('Remboursée', 35);
+('Terminée', 20),
+('Annulée', 25);
 
 -- Statuts de paiement
 INSERT INTO Payment_status (label, value_) VALUES
-('En attente', 0),
-('Payé', 1),
-('Échoué', 2),
-('Remboursé', 3),
-('Partiellement remboursé', 4);
+('En attente', 10),
+('Payé', 20),
+('Échoué', 25),
+('Remboursé', 30),
+('Partiellement remboursé', 35);
 
 -- Types de commission
 INSERT INTO Commission_types (label) VALUES

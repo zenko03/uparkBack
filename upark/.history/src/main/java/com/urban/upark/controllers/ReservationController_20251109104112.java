@@ -3,7 +3,6 @@ package com.urban.upark.controllers;
 import com.urban.upark.models.Reservation;
 import com.urban.upark.services.ReservationService;
 import com.urban.upark.dto.reservation.ReservationRequest;
-import com.urban.upark.dto.reservation.ReservationResponse;
 import com.urban.upark.dto.reservation.PriceCalculationRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -49,33 +48,19 @@ public class ReservationController {
         }
     }
 
-    @GetMapping("/test-public")
-    public ResponseEntity<String> testPublic() {
-        return ResponseEntity.ok("Public endpoint working!");
-    }
-
     @PostMapping("/calculate-price")
     public ResponseEntity<BigDecimal> calculatePrice(@RequestBody PriceCalculationRequest request) {
         try {
-            System.out.println("🔍 Received calculate-price request:");
-            System.out.println("  - Parking ID: " + request.getParkingId());
-            System.out.println("  - Start DateTime: " + request.getStartDateTime());
-            System.out.println("  - End DateTime: " + request.getEndDateTime());
-            System.out.println("  - Selected Vehicles: " + request.getSelectedVehicles());
-            
             BigDecimal totalPrice = reservationService.calculateTotalPrice(request);
-            System.out.println("  - Calculated Price: " + totalPrice);
             return ResponseEntity.ok(totalPrice);
         } catch (Exception e) {
-            System.err.println("❌ Error in calculate-price: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
     }
 
     @GetMapping("/user/{userId}")
-    public List<ReservationResponse> getUserReservations(@PathVariable int userId) {
-        return reservationService.findByUserIdWithParkingInfo(userId);
+    public List<Reservation> getUserReservations(@PathVariable int userId) {
+        return reservationService.findByUserId(userId);
     }
 
     @PostMapping("/check-availability")
@@ -158,40 +143,6 @@ public class ReservationController {
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();
-        }
-    }
-
-   
-    @PostMapping("/{id}/cancel")
-    public ResponseEntity<Reservation> cancelReservation(@PathVariable int id) {
-        try {
-            Optional<Reservation> canceledReservation = reservationService.cancelReservation(id);
-            if (canceledReservation.isPresent()) {
-                return ResponseEntity.ok(canceledReservation.get());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    
-    @PutMapping("/{id}/status/{statusId}")
-    public ResponseEntity<Reservation> updateReservationStatus(
-            @PathVariable int id, 
-            @PathVariable int statusId) {
-        try {
-            Optional<Reservation> updatedReservation = reservationService.updateStatus(id, statusId);
-            if (updatedReservation.isPresent()) {
-                return ResponseEntity.ok(updatedReservation.get());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().build();
         }
     }
 }

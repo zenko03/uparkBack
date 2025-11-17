@@ -11,6 +11,16 @@ import java.util.List;
 @Repository
 public interface ParkingRepository extends JpaRepository<Parking, Integer> {
     
+    @Query(value = "SELECT p.*, ST_AsText(p.localisation) as localisation " +
+           "FROM parking p",
+           nativeQuery = true)
+    List<Parking> findAllWithLocationText();
+    
+    @Query(value = "SELECT p.*, ST_AsText(p.localisation) as localisation " +
+           "FROM parking p WHERE p.id_parking = :id",
+           nativeQuery = true)
+    Parking findByIdWithLocationText(@Param("id") int id);
+    
     @Query(value = "SELECT *, " +
            "ST_Distance(localisation, ST_GeogFromText(:location)) as distance " +
            "FROM parking " +
