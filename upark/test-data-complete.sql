@@ -74,7 +74,7 @@ INSERT INTO Users (name, first_name, user_name, email, password, phone_number, r
 ('Randrianomenjanahary', 'Njaka', 'njaka_user', 'njaka.user@outlook.com', '$2a$10$IYaZpJtkzuwqs8FYtedGxOr8jtX8pjJXcuz4Cw0o5.EMnC2hIThKq', '+261338999000', 'USER'),
 
 -- Partenaires
-('Société Parking Mada', 'Contact', 'partner_mada', 'contact@parking-mada.mg', '$2a$10$IYaZpJtkzuwqs8FYtedGxOr8jtX8pjJXcuz4Cw0o5.EMnC2hIThKq', '+261320001111', 'PARTNER');
+('Société Parking Mada', 'Contact', 'partner_mada', 'contact@parking-mada.mg', '$2a$10$IYaZpJtkzuwqs8FYtedGxOr8jtX8pjJXcuz4Cw0o5.EMnC2hIThKq', '+261320001111', 'USER');
 
 -- Profils des utilisateurs
 INSERT INTO Profils (Id_Profil_types, Id_Users) VALUES
@@ -223,8 +223,7 @@ INSERT INTO Announcements_vehicles (numbers, Id_Announcements, Id_Parking_vehicl
 (10, 7, 26), -- 10 places moto Ampefiloha
 
 -- Annonce 8 (67Ha)
-(30, 8, 29), -- 30 places voiture 67Ha
-(15, 8, 30); -- 15 places moto 67Ha
+(30, 8, 29); -- 30 places voiture 67Ha
 
 -- =====================================================================
 -- ÉTAPE 7: NOTES DE PARKING (évaluations)
@@ -367,16 +366,7 @@ INSERT INTO Availabilities_frequence (start_hour, end_hour, Id_Reservation_vehic
 ('07:30:00', '19:30:00', NULL, 8, 3), -- Mercredi
 ('07:30:00', '19:30:00', NULL, 8, 4), -- Jeudi
 ('07:30:00', '19:30:00', NULL, 8, 5), -- Vendredi
-('09:00:00', '17:00:00', NULL, 8, 6), -- Samedi
-
--- Parking 67Ha - Tous les jours
-('08:00:00', '20:00:00', NULL, 24, 1), -- Lundi
-('08:00:00', '20:00:00', NULL, 24, 2), -- Mardi
-('08:00:00', '20:00:00', NULL, 24, 3), -- Mercredi
-('08:00:00', '20:00:00', NULL, 24, 4), -- Jeudi
-('08:00:00', '20:00:00', NULL, 24, 5), -- Vendredi
-('09:00:00', '21:00:00', NULL, 24, 6), -- Samedi
-('10:00:00', '19:00:00', NULL, 24, 7); -- Dimanche
+('09:00:00', '17:00:00', NULL, 8, 6); -- Samedi
 
 -- =====================================================================
 -- CONFIRMATION D'INSERTION
