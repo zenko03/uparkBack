@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "render": {
+      "type": "streamable-http",
+      "url": "https://mcp.render.com/mcp",
+      "headers": {
+        "Authorization": "Bearer VOTRE_CLE_RENDER"
+      },
+      "disabled": false,
+      "alwaysAllow": [] 
+    }
+  }
+}
