@@ -14,6 +14,6 @@ services:
 databases:
   - name: upark-db
     databaseName: upark_db
-    user: upark_user
+    user: upark_db_user
     region: frankfurt
     plan: free
