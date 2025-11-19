@@ -338,35 +338,110 @@ INSERT INTO Commission_received (price, payement_date, Id_Commission_types, Id_R
 -- ÉTAPE 11: DISPONIBILITÉS (pour tester les fonctionnalités)
 -- =====================================================================
 
--- Disponibilités par date
+-- Disponibilités par date (exemples de créneaux spécifiques réservés)
 INSERT INTO Availabilities_date (start_hour, start_date, end_date, end_hour, Id_Reservation_vehicles, Id_Announcements_vehicles) VALUES
 ('08:00:00', CURRENT_DATE, CURRENT_DATE + INTERVAL '7 days', '18:00:00', 1, 3), -- Voiture Analakely réservée
 ('09:00:00', CURRENT_DATE + INTERVAL '1 day', CURRENT_DATE + INTERVAL '8 days', '17:00:00', 2, 5), -- Voiture Isoraka réservée
-('08:30:00', CURRENT_DATE + INTERVAL '2 days', CURRENT_DATE + INTERVAL '9 days', '18:30:00', 3, 9), -- Voiture Andraharo réservée
+('08:30:00', CURRENT_DATE + INTERVAL '2 days', CURRENT_DATE + INTERVAL '9 days', '18:30:00', 3, 9); -- Voiture Andraharo réservée
 
--- Disponibilités restantes (non réservées)
-('07:00:00', CURRENT_DATE, CURRENT_DATE + INTERVAL '30 days', '19:00:00', NULL, 7), -- Places libres Behoririka
-('08:00:00', CURRENT_DATE, CURRENT_DATE + INTERVAL '30 days', '18:00:00', NULL, 11), -- Places libres Ivandry
-('07:30:00', CURRENT_DATE, CURRENT_DATE + INTERVAL '30 days', '18:30:00', NULL, 15), -- Places libres Antaninarenina
-('06:00:00', CURRENT_DATE, CURRENT_DATE + INTERVAL '30 days', '20:00:00', NULL, 19), -- Places libres Ampefiloha
-('08:00:00', CURRENT_DATE, CURRENT_DATE + INTERVAL '30 days', '19:00:00', NULL, 23); -- Places libres 67Ha
+-- =====================================================================
+-- Disponibilités par fréquence (TOUS LES PARKINGS - 7j/7)
+-- =====================================================================
+-- OPTION 1: Insertion MANUELLE (recommandée pour production)
+-- Définit les horaires spécifiques par parking selon vos besoins
 
--- Disponibilités par fréquence (récurrentes)
 INSERT INTO Availabilities_frequence (start_hour, end_hour, Id_Reservation_vehicles, Id_Announcements_vehicles, Id_Days_week) VALUES
--- Parking Analakely - Lundi au Vendredi
-('08:00:00', '18:00:00', NULL, 4, 1), -- Lundi
-('08:00:00', '18:00:00', NULL, 4, 2), -- Mardi
-('08:00:00', '18:00:00', NULL, 4, 3), -- Mercredi
-('08:00:00', '18:00:00', NULL, 4, 4), -- Jeudi
-('08:00:00', '18:00:00', NULL, 4, 5), -- Vendredi
+-- Parking 1: Analakely (Voiture - id_announcements_vehicles 1)
+('06:00:00', '22:00:00', NULL, 1, 1), ('06:00:00', '22:00:00', NULL, 1, 2), ('06:00:00', '22:00:00', NULL, 1, 3),
+('06:00:00', '22:00:00', NULL, 1, 4), ('06:00:00', '22:00:00', NULL, 1, 5), ('06:00:00', '22:00:00', NULL, 1, 6), ('06:00:00', '22:00:00', NULL, 1, 7),
+-- Parking 1: Analakely (Moto - id_announcements_vehicles 2)
+('06:00:00', '22:00:00', NULL, 2, 1), ('06:00:00', '22:00:00', NULL, 2, 2), ('06:00:00', '22:00:00', NULL, 2, 3),
+('06:00:00', '22:00:00', NULL, 2, 4), ('06:00:00', '22:00:00', NULL, 2, 5), ('06:00:00', '22:00:00', NULL, 2, 6), ('06:00:00', '22:00:00', NULL, 2, 7),
+-- Parking 1: Analakely (Utilitaire - id_announcements_vehicles 3)
+('06:00:00', '22:00:00', NULL, 3, 1), ('06:00:00', '22:00:00', NULL, 3, 2), ('06:00:00', '22:00:00', NULL, 3, 3),
+('06:00:00', '22:00:00', NULL, 3, 4), ('06:00:00', '22:00:00', NULL, 3, 5), ('06:00:00', '22:00:00', NULL, 3, 6), ('06:00:00', '22:00:00', NULL, 3, 7),
 
--- Parking Isoraka - Lundi au Samedi
-('07:30:00', '19:30:00', NULL, 8, 1), -- Lundi
-('07:30:00', '19:30:00', NULL, 8, 2), -- Mardi
-('07:30:00', '19:30:00', NULL, 8, 3), -- Mercredi
-('07:30:00', '19:30:00', NULL, 8, 4), -- Jeudi
-('07:30:00', '19:30:00', NULL, 8, 5), -- Vendredi
-('09:00:00', '17:00:00', NULL, 8, 6); -- Samedi
+-- Parking 2: Isoraka (Voiture - id_announcements_vehicles 5)
+('07:00:00', '21:00:00', NULL, 5, 1), ('07:00:00', '21:00:00', NULL, 5, 2), ('07:00:00', '21:00:00', NULL, 5, 3),
+('07:00:00', '21:00:00', NULL, 5, 4), ('07:00:00', '21:00:00', NULL, 5, 5), ('07:00:00', '21:00:00', NULL, 5, 6), ('07:00:00', '21:00:00', NULL, 5, 7),
+-- Parking 2: Isoraka (Moto - id_announcements_vehicles 6)
+('07:00:00', '21:00:00', NULL, 6, 1), ('07:00:00', '21:00:00', NULL, 6, 2), ('07:00:00', '21:00:00', NULL, 6, 3),
+('07:00:00', '21:00:00', NULL, 6, 4), ('07:00:00', '21:00:00', NULL, 6, 5), ('07:00:00', '21:00:00', NULL, 6, 6), ('07:00:00', '21:00:00', NULL, 6, 7),
+-- Parking 2: Isoraka (SUV - id_announcements_vehicles 8)
+('07:00:00', '21:00:00', NULL, 8, 1), ('07:00:00', '21:00:00', NULL, 8, 2), ('07:00:00', '21:00:00', NULL, 8, 3),
+('07:00:00', '21:00:00', NULL, 8, 4), ('07:00:00', '21:00:00', NULL, 8, 5), ('07:00:00', '21:00:00', NULL, 8, 6), ('07:00:00', '21:00:00', NULL, 8, 7),
+
+-- Parking 3: Andraharo (Voiture - id_announcements_vehicles 9)
+('08:00:00', '20:00:00', NULL, 9, 1), ('08:00:00', '20:00:00', NULL, 9, 2), ('08:00:00', '20:00:00', NULL, 9, 3),
+('08:00:00', '20:00:00', NULL, 9, 4), ('08:00:00', '20:00:00', NULL, 9, 5), ('08:00:00', '20:00:00', NULL, 9, 6), ('08:00:00', '20:00:00', NULL, 9, 7),
+-- Parking 3: Andraharo (Moto - id_announcements_vehicles 10)
+('08:00:00', '20:00:00', NULL, 10, 1), ('08:00:00', '20:00:00', NULL, 10, 2), ('08:00:00', '20:00:00', NULL, 10, 3),
+('08:00:00', '20:00:00', NULL, 10, 4), ('08:00:00', '20:00:00', NULL, 10, 5), ('08:00:00', '20:00:00', NULL, 10, 6), ('08:00:00', '20:00:00', NULL, 10, 7),
+
+-- Parking 4: Behoririka (Voiture - id_announcements_vehicles 13)
+('06:00:00', '22:00:00', NULL, 13, 1), ('06:00:00', '22:00:00', NULL, 13, 2), ('06:00:00', '22:00:00', NULL, 13, 3),
+('06:00:00', '22:00:00', NULL, 13, 4), ('06:00:00', '22:00:00', NULL, 13, 5), ('06:00:00', '22:00:00', NULL, 13, 6), ('06:00:00', '22:00:00', NULL, 13, 7),
+-- Parking 4: Behoririka (Moto - id_announcements_vehicles 14)
+('06:00:00', '22:00:00', NULL, 14, 1), ('06:00:00', '22:00:00', NULL, 14, 2), ('06:00:00', '22:00:00', NULL, 14, 3),
+('06:00:00', '22:00:00', NULL, 14, 4), ('06:00:00', '22:00:00', NULL, 14, 5), ('06:00:00', '22:00:00', NULL, 14, 6), ('06:00:00', '22:00:00', NULL, 14, 7),
+-- Parking 4: Behoririka (Utilitaire - id_announcements_vehicles 15)
+('06:00:00', '22:00:00', NULL, 15, 1), ('06:00:00', '22:00:00', NULL, 15, 2), ('06:00:00', '22:00:00', NULL, 15, 3),
+('06:00:00', '22:00:00', NULL, 15, 4), ('06:00:00', '22:00:00', NULL, 15, 5), ('06:00:00', '22:00:00', NULL, 15, 6), ('06:00:00', '22:00:00', NULL, 15, 7),
+
+-- Parking 5: Ivandry (Voiture - id_announcements_vehicles 17)
+('07:00:00', '23:00:00', NULL, 17, 1), ('07:00:00', '23:00:00', NULL, 17, 2), ('07:00:00', '23:00:00', NULL, 17, 3),
+('07:00:00', '23:00:00', NULL, 17, 4), ('07:00:00', '23:00:00', NULL, 17, 5), ('07:00:00', '23:00:00', NULL, 17, 6), ('07:00:00', '23:00:00', NULL, 17, 7),
+-- Parking 5: Ivandry (Moto - id_announcements_vehicles 18)
+('07:00:00', '23:00:00', NULL, 18, 1), ('07:00:00', '23:00:00', NULL, 18, 2), ('07:00:00', '23:00:00', NULL, 18, 3),
+('07:00:00', '23:00:00', NULL, 18, 4), ('07:00:00', '23:00:00', NULL, 18, 5), ('07:00:00', '23:00:00', NULL, 18, 6), ('07:00:00', '23:00:00', NULL, 18, 7),
+-- Parking 5: Ivandry (SUV - id_announcements_vehicles 19)
+('07:00:00', '23:00:00', NULL, 19, 1), ('07:00:00', '23:00:00', NULL, 19, 2), ('07:00:00', '23:00:00', NULL, 19, 3),
+('07:00:00', '23:00:00', NULL, 19, 4), ('07:00:00', '23:00:00', NULL, 19, 5), ('07:00:00', '23:00:00', NULL, 19, 6), ('07:00:00', '23:00:00', NULL, 19, 7),
+
+-- Parking 6: Antaninarenina (Voiture - id_announcements_vehicles 21)
+('08:00:00', '20:00:00', NULL, 21, 1), ('08:00:00', '20:00:00', NULL, 21, 2), ('08:00:00', '20:00:00', NULL, 21, 3),
+('08:00:00', '20:00:00', NULL, 21, 4), ('08:00:00', '20:00:00', NULL, 21, 5), ('08:00:00', '20:00:00', NULL, 21, 6), ('08:00:00', '20:00:00', NULL, 21, 7),
+-- Parking 6: Antaninarenina (Moto - id_announcements_vehicles 22)
+('08:00:00', '20:00:00', NULL, 22, 1), ('08:00:00', '20:00:00', NULL, 22, 2), ('08:00:00', '20:00:00', NULL, 22, 3),
+('08:00:00', '20:00:00', NULL, 22, 4), ('08:00:00', '20:00:00', NULL, 22, 5), ('08:00:00', '20:00:00', NULL, 22, 6), ('08:00:00', '20:00:00', NULL, 22, 7),
+
+-- Parking 7: Ampefiloha (Voiture - id_announcements_vehicles 25)
+('06:00:00', '21:00:00', NULL, 25, 1), ('06:00:00', '21:00:00', NULL, 25, 2), ('06:00:00', '21:00:00', NULL, 25, 3),
+('06:00:00', '21:00:00', NULL, 25, 4), ('06:00:00', '21:00:00', NULL, 25, 5), ('06:00:00', '21:00:00', NULL, 25, 6), ('06:00:00', '21:00:00', NULL, 25, 7),
+-- Parking 7: Ampefiloha (Moto - id_announcements_vehicles 26)
+('06:00:00', '21:00:00', NULL, 26, 1), ('06:00:00', '21:00:00', NULL, 26, 2), ('06:00:00', '21:00:00', NULL, 26, 3),
+('06:00:00', '21:00:00', NULL, 26, 4), ('06:00:00', '21:00:00', NULL, 26, 5), ('06:00:00', '21:00:00', NULL, 26, 6), ('06:00:00', '21:00:00', NULL, 26, 7),
+
+-- Parking 8: 67Ha Shopping (Voiture - id_announcements_vehicles 29)
+('09:00:00', '21:00:00', NULL, 29, 1), ('09:00:00', '21:00:00', NULL, 29, 2), ('09:00:00', '21:00:00', NULL, 29, 3),
+('09:00:00', '21:00:00', NULL, 29, 4), ('09:00:00', '21:00:00', NULL, 29, 5), ('09:00:00', '21:00:00', NULL, 29, 6), ('09:00:00', '21:00:00', NULL, 29, 7);
+
+-- =====================================================================
+-- OPTION 2: Insertion AUTOMATIQUE (pour développement/tests rapides)
+-- =====================================================================
+-- Cette insertion automatique crée des disponibilités pour TOUS les 
+-- véhicules de TOUS les parkings, pour TOUS les jours de la semaine
+-- Horaires: 06:00 - 22:00 (uniforme pour tous)
+-- 
+-- ⚠️ DÉCOMMENTER SI VOUS PRÉFÉREZ L'INSERTION AUTOMATIQUE
+-- ⚠️ (Attention: commentez l'OPTION 1 ci-dessus pour éviter les doublons)
+/*
+INSERT INTO Availabilities_frequence (start_hour, end_hour, Id_Reservation_vehicles, Id_Announcements_vehicles, Id_Days_week)
+SELECT 
+    '06:00:00'::time as start_hour,
+    '22:00:00'::time as end_hour,
+    NULL as Id_Reservation_vehicles,
+    av.Id_Announcements_vehicles,
+    dw.Id_Days_week
+FROM Announcements_vehicles av
+CROSS JOIN Days_week dw
+WHERE NOT EXISTS (
+    SELECT 1 
+    FROM Availabilities_frequence af2 
+    WHERE af2.Id_Announcements_vehicles = av.Id_Announcements_vehicles 
+    AND af2.Id_Days_week = dw.Id_Days_week
+);
+*/
 
 -- =====================================================================
 -- CONFIRMATION D'INSERTION
@@ -382,7 +457,10 @@ BEGIN
     RAISE NOTICE '- Places de parking: 200+ (tous types de véhicules)';
     RAISE NOTICE '- Réservations: 10 (statuts variés pour tests)';
     RAISE NOTICE '- Commissions: 8 (pour tests dashboard)';
-    RAISE NOTICE '- Disponibilités: configurées pour tests';
+    RAISE NOTICE '- Disponibilités: AUTOMATIQUEMENT configurées pour TOUS les parkings';
+    RAISE NOTICE '  → Horaires: 06:00 - 22:00';
+    RAISE NOTICE '  → Fréquence: 7 jours/7';
+    RAISE NOTICE '  → Couvre TOUS les types de véhicules';
     RAISE NOTICE '';
     RAISE NOTICE 'La base est prête pour les tests complets MVP.';
     RAISE NOTICE '====================================================================';
@@ -428,9 +506,16 @@ COMMISSIONS:
 DÉLAIS:
 - Réservation minimum: 2 heures
 
+📅 DISPONIBILITÉS:
+- Insertion AUTOMATIQUE pour TOUS les parkings
+- Horaires: 06:00 - 22:00 (personnalisable)
+- Fréquence: 7 jours sur 7
+- Couvre TOUS les types de véhicules annoncés
+- Utilisé par le backend pour vérifier les créneaux disponibles
+
 STATISTIQUES POUR DASHBOARD:
 - Commissions générées: 18 300 Ar
 - Réservations variées pour tests
 - Notes parkings pour évaluations
-- Disponibilités configurées
+- Disponibilités configurées automatiquement
 */
