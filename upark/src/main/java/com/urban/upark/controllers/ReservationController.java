@@ -45,13 +45,22 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<Reservation> createReservation(@RequestBody ReservationRequest request) {
+    public ResponseEntity<?> createReservation(@RequestBody ReservationRequest request) {
         try {
+            System.out.println("🔵 POST /reservations - Request received:");
+            System.out.println("  - parkingId: " + request.getParkingId());
+            System.out.println("  - userId: " + request.getUserId());
+            System.out.println("  - startDateTime: " + request.getStartDateTime());
+            System.out.println("  - endDateTime: " + request.getEndDateTime());
+            System.out.println("  - paymentMethod: " + request.getPaymentMethod());
+            System.out.println("  - selectedVehicles: " + request.getSelectedVehicles());
+            
             Reservation reservation = reservationService.createReservation(request);
             return ResponseEntity.ok(reservation);
         } catch (Exception e) {
+            System.err.println("❌ Error creating reservation: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
