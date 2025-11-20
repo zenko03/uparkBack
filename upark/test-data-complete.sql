@@ -30,13 +30,15 @@ INSERT INTO Profil_types (types) VALUES
 ('Administrateur');
 
 -- Statuts de réservation (complets et logiques)
+-- ⚠️ IMPORTANT: Ne pas créer de doublons (value_ doit être unique)
 INSERT INTO Reservation_status (label, value_) VALUES
-('à venir', 10),
-('En cours', 15),
-('Terminée', 20),
-('Annulée', 25);
+('à venir', 10),    -- Réservation confirmée mais pas encore commencée
+('En cours', 15),   -- Réservation active actuellement
+('Terminée', 20),   -- Réservation terminée
+('Annulée', 25);     -- Réservation annulée
 
 -- Statuts de paiement
+-- ⚠️ IMPORTANT: value_ doit être unique
 INSERT INTO Payment_status (label, value_) VALUES
 ('En attente', 10),
 ('Payé', 20),

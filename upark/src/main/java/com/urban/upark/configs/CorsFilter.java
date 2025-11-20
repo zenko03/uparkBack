@@ -25,6 +25,7 @@ public class CorsFilter implements Filter {
             "http://10.0.2.2:8081",          // Android Emulator → localhost PC
             "http://127.0.0.1:8081",
             "http://localhost:3000",          // si tu testes avec Expo Web ou autre
+            "http://localhost:5173",          // Vite dev server (React Admin Panel)
 
             // Appareils physiques sur le même réseau WiFi
             "http://192.168.1.",              // tous les 192.168.1.x (change si ton réseau est différent)
@@ -67,7 +68,7 @@ public class CorsFilter implements Filter {
         // Réponse immédiate aux requêtes preflight OPTIONS
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
-            return; // on arrête ici, pas besoin d’aller plus loin
+            return; // on arrête ici, pas besoin d'aller plus loin
         }
 
         chain.doFilter(request, response);
