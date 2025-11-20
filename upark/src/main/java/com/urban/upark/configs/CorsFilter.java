@@ -37,7 +37,8 @@ public class CorsFilter implements Filter {
             "https://www.upark.mg",
             "capacitor://localhost",          // Capacitor iOS
             "ionic://localhost",              // Ionic
-            "http://localhost"                // Expo Go parfois
+            "http://localhost",                // Expo Go parfois
+            "https://parking-administration-ne15.vercel.app"
     );
 
     @Override
