@@ -235,7 +235,7 @@ public class ReservationService {
 
         System.out.println("  - Calculated price: " + totalPrice);
 
-        // Créer la réservation
+        // Créer la réservation avec le statut approprié selon la date actuelle
         Reservation reservation = Reservation.builder()
                 .startDateTime(request.getStartDateTime())
                 .endDateTime(request.getEndDateTime())
@@ -243,11 +243,14 @@ public class ReservationService {
                 .paymentMethod(request.getPaymentMethod())
                 .creationDate(LocalDateTime.now())
                 .user(user)
-                .reservationStatus(getDefaultReservationStatus())
                 .build();
+        
+        // Déterminer le statut initial selon la date actuelle
+        updateReservationStatus(reservation);
 
         Reservation savedReservation = reservationRepository.save(reservation);
         System.out.println("✅ Reservation saved with ID: " + savedReservation.getId_Reservation());
+        System.out.println("📊 Initial status: " + savedReservation.getReservationStatus().getLabel());
 
         // Créer les réservations de véhicules
         if (request.getSelectedVehicles() != null && !request.getSelectedVehicles().isEmpty()) {
@@ -386,6 +389,11 @@ public class ReservationService {
         // 'En cours' (15) : Réservation active actuellement
         // 'Terminée' (20) : Réservation terminée
         // 'Annulée' (25) : Réservation annulée (non géré ici, uniquement manuel)
+        
+        // Ne pas mettre à jour les réservations annulées
+        if (reservation.getReservationStatus() != null && reservation.getReservationStatus().getValue() == 25) {
+            return;
+        }
         
         if (reservation.getStartDateTime().isAfter(now)) {
             // La réservation n'a pas encore commencé → "à venir"
@@ -645,6 +653,89 @@ public class ReservationService {
         } catch (Exception e) {
             System.err.println("❌ Error creating reservation vehicles: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Met à jour tous les statuts de réservations en fonction de la date/heure actuelle
+     * Similaire à la logique du ReservationStatusScheduler mais exécuté manuellement
+     *
+     * @return Le nombre de réservations mises à jour
+     */
+    public int updateAllReservationStatuses() {
+        System.out.println("🔄 Mise à jour manuelle de tous les statuts de réservations");
+        
+        LocalDateTime now = LocalDateTime.now();
+        int updatedCount = 0;
+        
+        try {
+            // Récupérer tous les statuts
+            ReservationStatus statusAVenir = getStatusByValue(10);
+            ReservationStatus statusEnCours = getStatusByValue(15);
+            ReservationStatus statusTerminee = getStatusByValue(20);
+
+            // 1. Mettre à jour les réservations "à venir" → "En cours" ou "Terminée"
+            List<Reservation> reservationsAVenir = reservationRepository
+                .findByReservationStatusId(statusAVenir.getId_Reservation_status());
+            
+            for (Reservation reservation : reservationsAVenir) {
+                boolean updated = false;
+                
+                if (reservation.getStartDateTime().isBefore(now) || reservation.getStartDateTime().isEqual(now)) {
+                    if (reservation.getEndDateTime().isAfter(now)) {
+                        // La réservation est en cours
+                        reservation.setReservationStatus(statusEnCours);
+                        updated = true;
+                        System.out.println("✅ Réservation ID {} : 'à venir' → 'En cours'", reservation.getId_Reservation());
+                    } else {
+                        // La réservation est terminée
+                        reservation.setReservationStatus(statusTerminee);
+                        updated = true;
+                        System.out.println("✅ Réservation ID {} : 'à venir' → 'Terminée'", reservation.getId_Reservation());
+                    }
+                }
+                
+                if (updated) {
+                    reservationRepository.save(reservation);
+                    updatedCount++;
+                }
+            }
+
+            // 2. Mettre à jour les réservations "En cours" → "Terminée"
+            List<Reservation> reservationsEnCours = reservationRepository
+                .findByReservationStatusId(statusEnCours.getId_Reservation_status());
+            
+            for (Reservation reservation : reservationsEnCours) {
+                if (reservation.getEndDateTime().isBefore(now) || reservation.getEndDateTime().isEqual(now)) {
+                    reservation.setReservationStatus(statusTerminee);
+                    reservationRepository.save(reservation);
+                    updatedCount++;
+                    System.out.println("✅ Réservation ID {} : 'En cours' → 'Terminée'", reservation.getId_Reservation());
+                }
+            }
+
+            System.out.println("✨ Mise à jour manuelle terminée : {} réservation(s) mise(s) à jour", updatedCount);
+            return updatedCount;
+            
+        } catch (Exception e) {
+            System.err.println("❌ Erreur lors de la mise à jour manuelle des statuts : " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors de la mise à jour des statuts: " + e.getMessage());
+        }
+    }
+
+   
+    public void updateReservationStatusById(int reservationId) {
+        Optional<Reservation> reservationOpt = reservationRepository.findById(reservationId);
+        
+        if (reservationOpt.isPresent()) {
+            Reservation reservation = reservationOpt.get();
+            updateReservationStatus(reservation);
+            reservationRepository.save(reservation);
+            System.out.println("✅ Statut mis à jour pour la réservation ID: " + reservationId +
+                             " → " + reservation.getReservationStatus().getLabel());
+        } else {
+            throw new RuntimeException("Réservation non trouvée avec l'ID: " + reservationId);
         }
     }
 }

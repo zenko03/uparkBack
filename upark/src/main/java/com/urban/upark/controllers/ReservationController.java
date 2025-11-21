@@ -209,4 +209,49 @@ public class ReservationController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    /**
+     * Met à jour manuellement tous les statuts de réservations
+     * Utile pour le débogage et pour forcer la mise à jour immédiate
+     */
+    @PostMapping("/update-all-statuses")
+    public ResponseEntity<String> updateAllReservationStatuses() {
+        try {
+            int updatedCount = reservationService.updateAllReservationStatuses();
+            return ResponseEntity.ok("Statuts mis à jour pour " + updatedCount + " réservation(s)");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Erreur lors de la mise à jour des statuts: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Met à jour le statut d'une réservation spécifique en fonction de la date/heure actuelle
+     * Utile pour le débogage
+     */
+    @PostMapping("/{id}/update-status")
+    public ResponseEntity<String> updateReservationStatus(@PathVariable int id) {
+        try {
+            Optional<Reservation> reservationOpt = reservationService.findById(id);
+            if (reservationOpt.isPresent()) {
+                Reservation reservation = reservationOpt.get();
+                String oldStatus = reservation.getReservationStatus().getLabel();
+                
+                reservationService.updateReservationStatusById(id);
+                
+                // Récupérer la réservation mise à jour
+                Optional<Reservation> updatedReservationOpt = reservationService.findById(id);
+                if (updatedReservationOpt.isPresent()) {
+                    String newStatus = updatedReservationOpt.get().getReservationStatus().getLabel();
+                    return ResponseEntity.ok("Réservation ID " + id + ": " + oldStatus + " → " + newStatus);
+                }
+                return ResponseEntity.ok("Statut de la réservation ID " + id + " mis à jour");
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Erreur lors de la mise à jour du statut: " + e.getMessage());
+        }
+    }
 }

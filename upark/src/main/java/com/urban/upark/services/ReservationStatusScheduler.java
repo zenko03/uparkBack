@@ -61,7 +61,15 @@ public class ReservationStatusScheduler {
                     reservation.setReservationStatus(statusEnCours);
                     reservationRepository.save(reservation);
                     updatedCount++;
-                    log.info("✅ Réservation ID {} : 'à venir' → 'En cours'", reservation.getId_Reservation());
+                    log.info("✅ Réservation ID {} : 'à venir' → 'En cours' (Début: {}, Fin: {})",
+                            reservation.getId_Reservation(), reservation.getStartDateTime(), reservation.getEndDateTime());
+                } else {
+                    // Si la date de fin est aussi passée, passer directement à "Terminée"
+                    reservation.setReservationStatus(statusTerminee);
+                    reservationRepository.save(reservation);
+                    updatedCount++;
+                    log.info("✅ Réservation ID {} : 'à venir' → 'Terminée' (période entièrement passée)",
+                            reservation.getId_Reservation());
                 }
             }
 
