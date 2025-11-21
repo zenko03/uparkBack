@@ -19,10 +19,14 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
+
+    private static final Logger log = LoggerFactory.getLogger(ReservationService.class);
 
     private final ReservationRepository reservationRepository;
     private final ParkingRepository parkingRepository;
@@ -681,17 +685,18 @@ public class ReservationService {
             for (Reservation reservation : reservationsAVenir) {
                 boolean updated = false;
                 
-                if (reservation.getStartDateTime().isBefore(now) || reservation.getStartDateTime().isEqual(now)) {
+                        if (reservation.getStartDateTime().isBefore(now) || reservation.getStartDateTime().isEqual(now)) {
                     if (reservation.getEndDateTime().isAfter(now)) {
                         // La réservation est en cours
                         reservation.setReservationStatus(statusEnCours);
                         updated = true;
-                        System.out.println("✅ Réservation ID {} : 'à venir' → 'En cours'", reservation.getId_Reservation());
+                        log.info("✅ Réservation ID {} : 'à venir' → 'En cours' (Début: {}, Fin: {})",
+                                reservation.getId_Reservation(), reservation.getStartDateTime(), reservation.getEndDateTime());
                     } else {
                         // La réservation est terminée
                         reservation.setReservationStatus(statusTerminee);
                         updated = true;
-                        System.out.println("✅ Réservation ID {} : 'à venir' → 'Terminée'", reservation.getId_Reservation());
+                        log.info("✅ Réservation ID {} : 'à venir' → 'Terminée' (période entièrement passée)", reservation.getId_Reservation());
                     }
                 }
                 
@@ -710,15 +715,15 @@ public class ReservationService {
                     reservation.setReservationStatus(statusTerminee);
                     reservationRepository.save(reservation);
                     updatedCount++;
-                    System.out.println("✅ Réservation ID {} : 'En cours' → 'Terminée'", reservation.getId_Reservation());
+                    log.info("✅ Réservation ID {} : 'En cours' → 'Terminée'", reservation.getId_Reservation());
                 }
             }
 
-            System.out.println("✨ Mise à jour manuelle terminée : {} réservation(s) mise(s) à jour", updatedCount);
+            log.info("✨ Mise à jour manuelle terminée : {} réservation(s) mise(s) à jour", updatedCount);
             return updatedCount;
             
         } catch (Exception e) {
-            System.err.println("❌ Erreur lors de la mise à jour manuelle des statuts : " + e.getMessage());
+            log.error("❌ Erreur lors de la mise à jour manuelle des statuts : {}", e.getMessage(), e);
             e.printStackTrace();
             throw new RuntimeException("Erreur lors de la mise à jour des statuts: " + e.getMessage());
         }
