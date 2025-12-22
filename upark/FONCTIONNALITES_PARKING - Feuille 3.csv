@@ -1,0 +1,119 @@
+Fonctionnalité,Composant,Tâche,Type,Priorité,État
+1. Gestion Parkings Propriétaire,Backend,Ajouter endpoint GET /api/parkings/user/{userId},Modification,Haute,À faire
+,,Ajouter endpoint PUT /api/parkings/{id}/toggle-active,Modification,Haute,À faire
+,,Ajouter méthode findByUserId dans ParkingService,Modification,Haute,À faire
+,,Ajouter méthode findByUser_IdUsers dans ParkingRepository,Modification,Haute,À faire
+,,"Ajouter champs isActive, createdAt, updatedAt au modèle Parking",Modification,Haute,À faire
+,,Créer modèle ParkingImage.java,Création,Haute,À faire
+,,Créer endpoint POST /api/parkings/{id}/images (upload),Création,Haute,À faire
+,,Créer endpoint DELETE /api/parkings/images/{id},Création,Haute,À faire
+,,Configurer stockage fichiers (local ou cloud S3/Azure),Configuration,Haute,À faire
+,Base de données,"Ajouter colonnes is_active, created_at, updated_at à table Parking",Modification,Haute,À faire
+,,Créer table Parking_images,Création,Haute,À faire
+,Frontend,Créer écran MyParkings.jsx,Création,Haute,À faire
+,,Créer écran AddEditParking.jsx,Création,Haute,À faire
+,,Ajouter sélection/upload photos dans AddEditParking.jsx,Modification,Haute,À faire
+,,Ajouter carousel photos dans MyParkings.jsx,Modification,Haute,À faire
+,,Créer service ownerService.js,Création,Haute,À faire
+2. Gestion Publications,Backend,Créer AnnouncementsController.java,Création,Haute,À faire
+,,Créer AnnouncementsService.java,Création,Haute,À faire
+,,Créer AnnouncementsRepository.java,Création,Haute,À faire
+,,"Ajouter champs isPublished, Id_Parking au modèle Announcements",Modification,Haute,À faire
+,Base de données,"Ajouter colonnes is_published, Id_Parking à table Announcements",Modification,Haute,À faire
+,Frontend,Créer écran MyAnnouncements.jsx,Création,Haute,À faire
+,,Créer écran CreateAnnouncement.jsx,Création,Haute,À faire
+,,Ajouter upload photos dans CreateAnnouncement.jsx,Modification,Haute,À faire
+,,Créer service announcementService.js,Création,Haute,À faire
+3. Demandes de Réservation,Backend,Créer modèle ReservationRequest.java,Création,Haute,À faire
+,,Créer ReservationRequestController.java,Création,Haute,À faire
+,,Créer ReservationRequestService.java,Création,Haute,À faire
+,,Créer ReservationRequestRepository.java,Création,Haute,À faire
+,Base de données,Créer table Reservation_requests,Création,Haute,À faire
+,Frontend,Créer écran ReservationRequests.jsx,Création,Haute,À faire
+,,Modifier écran Reservation.jsx (workflow demande),Modification,Haute,À faire
+,,Créer service reservationRequestService.js,Création,Haute,À faire
+4. Tableau de Bord Utilisateur,Backend,Créer UserDashboardController.java,Création,Moyenne,À faire
+,,Créer UserDashboardService.java,Création,Moyenne,À faire
+,,Créer DTO UserDashboardStats.java,Création,Moyenne,À faire
+,Frontend,Créer écran UserDashboard.jsx,Création,Moyenne,À faire
+,,"Créer composants StatCard, ActivityItem, EarningsChart",Création,Moyenne,À faire
+,,Créer service dashboardService.js,Création,Moyenne,À faire
+5. Notation Utilisateurs,Backend,Créer modèle UserNote.java,Création,Moyenne,À faire
+,,Créer UserNoteController.java,Création,Moyenne,À faire
+,,Créer UserNoteService.java,Création,Moyenne,À faire
+,,Créer UserNoteRepository.java,Création,Moyenne,À faire
+,,"Ajouter champs averageRating, totalRatings au modèle Users",Modification,Moyenne,À faire
+,Base de données,Créer table User_note,Création,Moyenne,À faire
+,,"Ajouter colonnes average_rating, total_ratings à table Users",Modification,Moyenne,À faire
+,Frontend,Créer composant RatingModal.jsx,Création,Moyenne,À faire
+,,Créer composant ReviewCard.jsx,Création,Moyenne,À faire
+,,Modifier écran ReservationList.jsx (bouton noter),Modification,Moyenne,À faire
+,,Modifier écran ParkingDetails.jsx (affichage avis),Modification,Moyenne,À faire
+,,Créer service ratingService.js,Création,Moyenne,À faire
+6. Paiement Stripe,Backend,Ajouter dépendance stripe-java dans pom.xml,Configuration,Haute,À faire
+,,Configurer clé API Stripe dans application.properties,Configuration,Haute,À faire
+,,Créer PaymentService.java,Création,Haute,À faire
+,,Créer PaymentController.java,Création,Haute,À faire
+,,"Créer DTOs (PaymentIntentResponse, PaymentConfirmRequest, RefundRequest)",Création,Haute,À faire
+,,"Ajouter champs paymentIntentId, paymentStatus au modèle Reservation",Modification,Haute,À faire
+,Base de données,"Ajouter colonnes payment_intent_id, payment_status à table Reservation",Modification,Haute,À faire
+,Frontend,Ajouter dépendance @stripe/stripe-react-native,Configuration,Haute,À faire
+,,Configurer Stripe Publishable Key,Configuration,Haute,À faire
+,,Créer écran PaymentScreen.jsx,Création,Haute,À faire
+,,Modifier écran ReservationConfirmation.jsx (choix paiement),Modification,Haute,À faire
+,,Créer service paymentService.js,Création,Haute,À faire
+7. QR Code Validation,Backend,Ajouter dépendances ZXing dans pom.xml,Configuration,Moyenne,À faire
+,,Créer QRCodeService.java,Création,Moyenne,À faire
+,,Ajouter endpoints QR code dans ReservationController,Modification,Moyenne,À faire
+,,"Ajouter champs qrCodeToken, isValidated, validatedAt au modèle Reservation",Modification,Moyenne,À faire
+,Base de données,"Ajouter colonnes qr_code_token, is_validated, validated_at à table Reservation",Modification,Moyenne,À faire
+,Frontend,Ajouter dépendances react-native-qrcode-svg et react-native-camera,Configuration,Moyenne,À faire
+,,Créer écran QRCodeDisplay.jsx,Création,Moyenne,À faire
+,,Créer écran QRCodeScanner.jsx,Création,Moyenne,À faire
+,,Modifier écran ReservationList.jsx (bouton QR code),Modification,Moyenne,À faire
+,,Créer service qrcodeService.js,Création,Moyenne,À faire
+8. Authentification Sociale,Backend,Ajouter dépendance spring-boot-starter-oauth2-client,Configuration,Moyenne,À faire
+,,"Configurer OAuth2 (Google, Facebook, Apple) dans application.properties",Configuration,Moyenne,À faire
+,,Ajouter endpoints OAuth dans AuthenticationController,Modification,Moyenne,À faire
+,,Ajouter méthodes OAuth dans AuthenticationService,Modification,Moyenne,À faire
+,,"Ajouter champs oauthProvider, oauthId, profilePictureUrl au modèle Users",Modification,Moyenne,À faire
+,Base de données,"Ajouter colonnes oauth_provider, oauth_id, profile_picture_url à table Users",Modification,Moyenne,À faire
+,Frontend,"Ajouter dépendances OAuth (Google, Facebook, Apple)",Configuration,Moyenne,À faire
+,,Configurer OAuth providers (credentials),Configuration,Moyenne,À faire
+,,Créer composant SocialLoginButtons.jsx,Création,Moyenne,À faire
+,,Modifier écrans Login.jsx et Registration.jsx,Modification,Moyenne,À faire
+,,Ajouter méthodes OAuth dans authService.js,Modification,Moyenne,À faire
+9. Notifications Push,Backend,Ajouter dépendance firebase-admin,Configuration,Moyenne,À faire
+,,Configurer Firebase credentials,Configuration,Moyenne,À faire
+,,Créer modèle DeviceToken.java,Création,Moyenne,À faire
+,,Créer modèle Notification.java,Création,Moyenne,À faire
+,,Créer NotificationService.java,Création,Moyenne,À faire
+,,Créer NotificationController.java,Création,Moyenne,À faire
+,,Créer DeviceTokenRepository.java,Création,Moyenne,À faire
+,,Créer NotificationRepository.java,Création,Moyenne,À faire
+,,Intégrer notifications dans workflow réservations,Modification,Moyenne,À faire
+,Base de données,Créer table Device_tokens,Création,Moyenne,À faire
+,,Créer table Notifications,Création,Moyenne,À faire
+,Frontend,"Ajouter dépendances Firebase (app, messaging)",Configuration,Moyenne,À faire
+,,"Configurer Firebase (google-services.json, GoogleService-Info.plist)",Configuration,Moyenne,À faire
+,,Créer service notificationService.js,Création,Moyenne,À faire
+,,Créer écran Notifications.jsx,Création,Moyenne,À faire
+,,Modifier App.tsx (initialisation Firebase),Modification,Moyenne,À faire
+10. Litiges et Remboursements,Backend,Créer modèle Dispute.java,Création,Basse,À faire
+,,Créer DisputeController.java,Création,Basse,À faire
+,,Créer DisputeService.java,Création,Basse,À faire
+,,Créer DisputeRepository.java,Création,Basse,À faire
+,Base de données,Créer table Disputes,Création,Basse,À faire
+,Frontend,Créer écran ReportIssue.jsx,Création,Basse,À faire
+,,Créer écran MyDisputes.jsx,Création,Basse,À faire
+,,Modifier écran ReservationList.jsx (bouton signaler),Modification,Basse,À faire
+,,Créer service disputeService.js,Création,Basse,À faire
+11. Fonctionnalités MVP Manquantes,Backend,Créer endpoint POST /api/auth/forgot-password,Création,Haute,À faire
+,,Créer endpoint POST /api/auth/reset-password,Création,Haute,À faire
+,,Créer service EmailService.java pour envoi emails,Création,Haute,À faire
+,,Ajouter champ resetToken au modèle Users,Modification,Haute,À faire
+,Base de données,Ajouter colonnes reset_token et reset_token_expiry à table Users,Modification,Haute,À faire
+,Frontend,Créer écran ForgotPassword.jsx,Création,Haute,À faire
+,,Créer écran ResetPassword.jsx,Création,Haute,À faire
+,,Afficher carousel photos dans ParkingDetails.jsx,Modification,Haute,À faire
+,,Ajouter lien "Mot de passe oublié" dans Login.jsx,Modification,Haute,À faire
