@@ -18,7 +18,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/reservations")
+@RequestMapping("/api/v1/reservations")
 @RequiredArgsConstructor
 public class ReservationController {
 

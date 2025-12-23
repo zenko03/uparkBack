@@ -31,16 +31,14 @@ public class SecurityConfiguration {
                 // OPTIONS requests must be first for CORS preflight
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // Public endpoints (most specific first)
-                .requestMatchers("/api/reservations/test-public").permitAll()
-                .requestMatchers("/api/reservations/calculate-price").permitAll()
-                .requestMatchers("/api/reservations/check-availability").permitAll()
-                // General public endpoints
+                .requestMatchers("/api/v1/reservations/test-public").permitAll()
+                .requestMatchers("/api/v1/reservations/calculate-price").permitAll()
+                .requestMatchers("/api/v1/reservations/check-availability").permitAll()
+                // Authentication endpoints (public)
                 .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/api/parkings/**").permitAll()
-                .requestMatchers("/api/vehicles/**").permitAll()
-                .requestMatchers("/api/parkings/search").permitAll()
-                .requestMatchers("/api/parkings/search/**").permitAll()
-                .requestMatchers("/api/parkings/*/availability").permitAll()
+                // Other public endpoints
+                .requestMatchers("/api/v1/parkings/**").permitAll()
+                .requestMatchers("/api/v1/vehicles/**").permitAll()
                 // All other requests need authentication
                 .anyRequest().authenticated()
             )
@@ -63,7 +61,8 @@ public class SecurityConfiguration {
             "Content-Type",
             "Accept",
             "X-Requested-With",
-            "Cache-Control"
+            "Cache-Control",
+            "X-App-Version"
         ));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(true);
