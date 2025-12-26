@@ -1,13 +1,19 @@
-FROM maven:3.8.4-openjdk-17 AS build
-COPY . /app
-WORKDIR /app
-RUN mvn clean package -DskipTests
+# Utiliser Java 17
+FROM eclipse-temurin:17
 
-FROM eclipse-temurin:17-jdk
+# Créer le répertoire de travail
 WORKDIR /app
 
-COPY --from=build /app/target/upark-0.0.1-SNAPSHOT.jar app.jar
+# Copier seulement les fichiers Maven pour accélérer le build
+COPY pom.xml .
+COPY mvnw .
+COPY .mvn .mvn
 
+# Pré-télécharger les dépendances Maven
+RUN ./mvnw dependency:go-offline
+
+# Exposer le port Spring Boot
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Démarrer Spring Boot avec DevTools
+CMD ["./mvnw", "spring-boot:run"]

@@ -45,6 +45,27 @@ public class Parking {
     @Column(name = "localisation", nullable = false, columnDefinition = "GEOGRAPHY")
     private String localisation;
 
+    @Column(name = "is_active", nullable = false)
+    @Builder.Default
+    private boolean isActive = true;
+
+    @Column(name = "created_at", updatable = false)
+    private java.time.LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private java.time.LocalDateTime updatedAt;
+
+    @jakarta.persistence.PrePersist
+    protected void onCreate() {
+        createdAt = java.time.LocalDateTime.now();
+        updatedAt = java.time.LocalDateTime.now();
+    }
+
+    @jakarta.persistence.PreUpdate
+    protected void onUpdate() {
+        updatedAt = java.time.LocalDateTime.now();
+    }
+
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "Id_Users")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password", "commissionPartners"})

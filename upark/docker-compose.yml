@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  backend:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src:/app/src
+      - ./pom.xml:/app/pom.xml
+      - ./.mvn:/app/.mvn
+    environment:
+      - SPRING_DEVTOOLS_RESTART_ENABLED=true

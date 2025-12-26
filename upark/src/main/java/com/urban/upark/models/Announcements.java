@@ -26,6 +26,14 @@ public class Announcements {
 
     @Column(name = "creation_date", nullable = false)
     private LocalDateTime creationDate;
+
+    @Column(name = "is_published", nullable = false)
+    @Builder.Default
+    private boolean isPublished = false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "Id_Parking")
+    private Parking parking;
     
     @OneToMany(mappedBy = "announcements")
     @JsonIgnore
