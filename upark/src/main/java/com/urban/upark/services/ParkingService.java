@@ -53,11 +53,37 @@ public class ParkingService {
         return parkingRepository.findById(id);
     }
 
+    public List<Parking> findByUserId(int userId) {
+        return parkingRepository.findByUserId(userId);
+    }
+
+    @Transactional
+    public Parking toggleActive(int id) {
+        parkingRepository.toggleActive(id);
+        return parkingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Parking not found"));
+    }
+
     @Transactional
     public Parking save(Parking parking) {
-        // If the parking has an ID, it's an update - use regular save
+        // If the parking has an ID, it's an update
         if (parking.getId_Parking() > 0) {
-            return parkingRepository.save(parking);
+            String sql = "UPDATE parking SET label = :label, hourly_rate = :hourlyRate, " +
+                         "description = :description, localisation = ST_GeogFromText(:localisation), " +
+                         "id_users = :userId, is_active = :isActive, updated_at = NOW() " +
+                         "WHERE id_parking = :id";
+            
+            entityManager.createNativeQuery(sql)
+                    .setParameter("label", parking.getLabel())
+                    .setParameter("hourlyRate", parking.getHourlyRate())
+                    .setParameter("description", parking.getDescription())
+                    .setParameter("localisation", parking.getLocalisation())
+                    .setParameter("userId", parking.getUser().getId_Users())
+                    .setParameter("isActive", parking.isActive())
+                    .setParameter("id", parking.getId_Parking())
+                    .executeUpdate();
+            
+            return parkingRepository.findById(parking.getId_Parking()).orElse(parking);
         }
         
         // For new parking, use native query to handle geography

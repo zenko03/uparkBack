@@ -145,4 +145,13 @@ public class ParkingController {
         ParkingAvailabilityResponse availability = parkingService.getParkingAvailability(id, start, end);
         return ResponseEntity.ok(availability);
     }
+    @GetMapping("/user/{userId}")
+    public List<Parking> getParkingsByUserId(@PathVariable int userId) {
+        return parkingService.findByUserId(userId);
+    }
+
+    @PutMapping("/{id}/toggle-active")
+    public ResponseEntity<Parking> toggleParkingActive(@PathVariable int id) {
+        return ResponseEntity.ok(parkingService.toggleActive(id));
+    }
 }
