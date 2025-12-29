@@ -3,6 +3,8 @@ package com.urban.upark.controllers;
 import com.urban.upark.models.Parking;
 import com.urban.upark.services.ParkingService;
 import com.urban.upark.dto.parking.ParkingAvailabilityResponse;
+import com.urban.upark.dto.parking.ParkingCreateRequest;
+import com.urban.upark.dto.parking.ParkingUpdateRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -54,22 +56,21 @@ public class ParkingController {
     }
 
     @PostMapping
-    public Parking createParking(@RequestBody Parking parking) {
-        return parkingService.save(parking);
+    public ResponseEntity<Parking> createParking(@RequestBody ParkingCreateRequest request) {
+        try {
+            Parking parking = parkingService.createParkingWithVehicles(request);
+            return ResponseEntity.ok(parking);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Parking> updateParking(@PathVariable int id, @RequestBody Parking parkingDetails) {
-        Optional<Parking> parking = parkingService.findById(id);
-        if (parking.isPresent()) {
-            Parking updatedParking = parking.get();
-            updatedParking.setLabel(parkingDetails.getLabel());
-            updatedParking.setHourlyRate(parkingDetails.getHourlyRate());
-            updatedParking.setDescription(parkingDetails.getDescription());
-            updatedParking.setLocalisation(parkingDetails.getLocalisation());
-            updatedParking.setUser(parkingDetails.getUser());
-            return ResponseEntity.ok(parkingService.save(updatedParking));
-        } else {
+    public ResponseEntity<Parking> updateParking(@PathVariable int id, @RequestBody ParkingUpdateRequest request) {
+        try {
+            Parking updatedParking = parkingService.updateParkingWithVehicles(id, request);
+            return ResponseEntity.ok(updatedParking);
+        } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -148,6 +149,20 @@ public class ParkingController {
     @GetMapping("/user/{userId}")
     public List<Parking> getParkingsByUserId(@PathVariable int userId) {
         return parkingService.findByUserId(userId);
+    }
+
+    /**
+     * Obtenir les véhicules associés à un parking
+     * Ex: /api/parkings/3/vehicles
+     */
+    @GetMapping("/{id}/vehicles")
+    public ResponseEntity<List<com.urban.upark.models.ParkingVehicles>> getParkingVehicles(@PathVariable int id) {
+        try {
+            List<com.urban.upark.models.ParkingVehicles> vehicles = parkingService.getParkingVehicles(id);
+            return ResponseEntity.ok(vehicles);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/{id}/toggle-active")

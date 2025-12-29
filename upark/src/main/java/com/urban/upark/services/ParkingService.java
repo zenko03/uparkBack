@@ -3,7 +3,9 @@ package com.urban.upark.services;
 import com.urban.upark.models.AvailabilitiesDate;
 import com.urban.upark.models.AvailabilitiesFrequence;
 import com.urban.upark.models.Parking;
+import com.urban.upark.models.ParkingVehicles;
 import com.urban.upark.models.Vehicles;
+import com.urban.upark.models.Users;
 import com.urban.upark.models.AnnouncementsVehicles;
 import com.urban.upark.repositories.ParkingRepository;
 import com.urban.upark.repositories.ParkingVehiclesRepository;
@@ -11,8 +13,11 @@ import com.urban.upark.repositories.AnnouncementsVehiclesRepository;
 import com.urban.upark.repositories.AvailabilitiesDateRepository;
 import com.urban.upark.repositories.AvailabilitiesFrequenceRepository;
 import com.urban.upark.repositories.VehiclesRepository;
+import com.urban.upark.repositories.UsersRepository;
 import com.urban.upark.dto.parking.ParkingAvailabilityResponse;
 import com.urban.upark.dto.parking.VehicleAvailability;
+import com.urban.upark.dto.parking.ParkingCreateRequest;
+import com.urban.upark.dto.parking.ParkingUpdateRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +46,7 @@ public class ParkingService {
     private final AvailabilitiesFrequenceRepository availabilitiesFrequenceRepository;
     private final AnnouncementsVehiclesRepository announcementsVehiclesRepository;
     private final VehiclesRepository vehiclesRepository;
+    private final UsersRepository usersRepository;
     
     @PersistenceContext
     private EntityManager entityManager;
@@ -108,6 +114,119 @@ public class ParkingService {
 
     public void deleteById(int id) {
         parkingRepository.deleteById(id);
+    }
+
+    /**
+     * Créer un nouveau parking avec ses véhicules associés
+     */
+    @Transactional
+    public Parking createParkingWithVehicles(ParkingCreateRequest request) {
+        // Récupérer l'utilisateur
+        Users user = usersRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec ID: " + request.getUserId()));
+
+        // Créer le parking
+        Parking parking = Parking.builder()
+                .label(request.getLabel())
+                .hourlyRate(request.getHourlyRate())
+                .description(request.getDescription())
+                .localisation(request.getLocalisation())
+                .user(user)
+                .isActive(request.getIsActive() != null ? request.getIsActive() : true)
+                .build();
+
+        // Sauvegarder le parking (utilise la méthode save existante)
+        Parking savedParking = save(parking);
+
+        // Sauvegarder les véhicules associés si fournis
+        if (request.getVehicles() != null && !request.getVehicles().isEmpty()) {
+            saveParkingVehicles(savedParking.getId_Parking(), request.getVehicles());
+        }
+
+        return savedParking;
+    }
+
+    /**
+     * Mettre à jour un parking existant avec ses véhicules
+     */
+    @Transactional
+    public Parking updateParkingWithVehicles(int parkingId, ParkingUpdateRequest request) {
+        // Vérifier que le parking existe
+        Parking existingParking = parkingRepository.findById(parkingId)
+                .orElseThrow(() -> new RuntimeException("Parking non trouvé avec ID: " + parkingId));
+
+        // Mettre à jour les champs du parking
+        String sql = "UPDATE parking SET label = :label, hourly_rate = :hourlyRate, " +
+                     "description = :description, localisation = ST_GeogFromText(:localisation), " +
+                     "is_active = :isActive, updated_at = NOW() " +
+                     "WHERE id_parking = :id";
+        
+        entityManager.createNativeQuery(sql)
+                .setParameter("label", request.getLabel())
+                .setParameter("hourlyRate", request.getHourlyRate())
+                .setParameter("description", request.getDescription())
+                .setParameter("localisation", request.getLocalisation())
+                .setParameter("isActive", request.getIsActive() != null ? request.getIsActive() : true)
+                .setParameter("id", parkingId)
+                .executeUpdate();
+
+        // Mettre à jour les véhicules associés si fournis
+        if (request.getVehicles() != null) {
+            // Supprimer les anciennes associations
+            List<ParkingVehicles> existingVehicles = parkingVehiclesRepository.findByParkingId(parkingId);
+            existingVehicles.forEach(pv -> parkingVehiclesRepository.deleteById(pv.getId_Parking_vehicles()));
+
+            // Créer les nouvelles associations
+            if (!request.getVehicles().isEmpty()) {
+                saveParkingVehicles(parkingId, request.getVehicles());
+            }
+        }
+
+        return parkingRepository.findById(parkingId).orElse(existingParking);
+    }
+
+    /**
+     * Méthode privée pour sauvegarder les véhicules d'un parking
+     */
+    private void saveParkingVehicles(int parkingId, List<?> vehicleDtos) {
+        Parking parking = parkingRepository.findById(parkingId)
+                .orElseThrow(() -> new RuntimeException("Parking non trouvé"));
+
+        for (Object dto : vehicleDtos) {
+            // Cast générique pour supporter les deux types de DTO
+            int vehicleId;
+            int count;
+            
+            if (dto instanceof ParkingCreateRequest.VehicleCountDto) {
+                ParkingCreateRequest.VehicleCountDto vehicleDto = (ParkingCreateRequest.VehicleCountDto) dto;
+                vehicleId = vehicleDto.getVehicleId();
+                count = vehicleDto.getCount();
+            } else if (dto instanceof ParkingUpdateRequest.VehicleCountDto) {
+                ParkingUpdateRequest.VehicleCountDto vehicleDto = (ParkingUpdateRequest.VehicleCountDto) dto;
+                vehicleId = vehicleDto.getVehicleId();
+                count = vehicleDto.getCount();
+            } else {
+                continue;
+            }
+
+            Vehicles vehicle = vehiclesRepository.findById(vehicleId)
+                    .orElseThrow(() -> new RuntimeException("Type de véhicule non trouvé avec ID: " + vehicleId));
+
+            ParkingVehicles parkingVehicle = ParkingVehicles.builder()
+                    .parking(parking)
+                    .vehicle(vehicle)
+                    .numbers(count)
+                    .build();
+
+            parkingVehiclesRepository.save(parkingVehicle);
+        }
+    }
+
+    /**
+     * Récupérer les véhicules associés à un parking
+     */
+    public List<ParkingVehicles> getParkingVehicles(int parkingId) {
+        return parkingVehiclesRepository.findByParkingId(parkingId);
     }
 
     /**

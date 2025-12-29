@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Data
 @Builder
@@ -31,6 +32,7 @@ public class Parking {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonProperty("Id_Parking")
     private int Id_Parking;
 
     @Column(nullable = false)
@@ -47,6 +49,7 @@ public class Parking {
 
     @Column(name = "is_active", nullable = false)
     @Builder.Default
+    @JsonProperty("isActive")
     private boolean isActive = true;
 
     @Column(name = "created_at", updatable = false)

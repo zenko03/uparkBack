@@ -42,10 +42,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (requestURI.startsWith("/api/v1/auth/") ||
             requestURI.startsWith("/api/auth/") ||
             requestURI.startsWith("/api/parkings") ||  // Tous les endpoints parkings sont publics
+            requestURI.startsWith("/api/v1/parkings") ||  // Version v1 des parkings
             requestURI.startsWith("/api/vehicles") ||
+            requestURI.startsWith("/api/v1/vehicles") ||  // Version v1 des vehicles
             requestURI.startsWith("/api/reservations/test-public") ||
+            requestURI.startsWith("/api/v1/reservations/test-public") ||
             requestURI.startsWith("/api/reservations/calculate-price") ||
-            requestURI.startsWith("/api/reservations/check-availability")) {
+            requestURI.startsWith("/api/v1/reservations/calculate-price") ||
+            requestURI.startsWith("/api/reservations/check-availability") ||
+            requestURI.startsWith("/api/v1/reservations/check-availability")) {
             System.out.println("✅ Endpoint public - pas de vérification JWT");
             filterChain.doFilter(request, response);
             return;
