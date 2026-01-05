@@ -7,6 +7,8 @@ import com.urban.upark.dto.parking.ParkingCreateRequest;
 import com.urban.upark.dto.parking.ParkingUpdateRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.persistence.EntityManager;
@@ -146,9 +148,48 @@ public class ParkingController {
         ParkingAvailabilityResponse availability = parkingService.getParkingAvailability(id, start, end);
         return ResponseEntity.ok(availability);
     }
+    /**
+     * Obtenir les parkings de l'utilisateur connecté (depuis JWT)
+     * Ex: GET /api/v1/parkings/my-parkings
+     * Nécessite un token JWT valide
+     */
+    @GetMapping("/my-parkings")
+    public ResponseEntity<List<Parking>> getMyParkings() {
+        try {
+            // Récupérer l'utilisateur depuis le JWT
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            
+            // Récupérer les parkings de cet utilisateur
+            List<Parking> parkings = parkingService.findByUsername(username);
+            return ResponseEntity.ok(parkings);
+        } catch (Exception e) {
+            return ResponseEntity.status(401).build(); // Unauthorized
+        }
+    }
+
+    /**
+     * @deprecated Utiliser /my-parkings à la place (sécurisé par JWT)
+     * Cet endpoint reste pour compatibilité mais nécessite maintenant l'authentification
+     */
     @GetMapping("/user/{userId}")
-    public List<Parking> getParkingsByUserId(@PathVariable int userId) {
-        return parkingService.findByUserId(userId);
+    @Deprecated
+    public ResponseEntity<List<Parking>> getParkingsByUserId(@PathVariable int userId) {
+        try {
+            // Vérifier que l'utilisateur demande bien ses propres parkings
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            
+            // Récupérer l'utilisateur connecté pour comparer les IDs
+            List<Parking> userParkings = parkingService.findByUsername(username);
+            if (!userParkings.isEmpty() && userParkings.get(0).getUser().getId_Users() != userId) {
+                return ResponseEntity.status(403).build(); // Forbidden - pas ses parkings
+            }
+            
+            return ResponseEntity.ok(parkingService.findByUserId(userId));
+        } catch (Exception e) {
+            return ResponseEntity.status(401).build();
+        }
     }
 
     /**

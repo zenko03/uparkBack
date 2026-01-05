@@ -2,6 +2,7 @@ package com.urban.upark.repositories;
 
 import com.urban.upark.models.AvailabilitiesDate;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -21,4 +22,11 @@ public interface AvailabilitiesDateRepository extends JpaRepository<Availabiliti
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate
     );
+    
+    @Query("SELECT ad FROM AvailabilitiesDate ad WHERE ad.announcementsVehicles.Id_Announcements_vehicles = :announcementVehicleId")
+    List<AvailabilitiesDate> findByAnnouncementVehicleId(@Param("announcementVehicleId") int announcementVehicleId);
+    
+    @Modifying
+    @Query("DELETE FROM AvailabilitiesDate ad WHERE ad.announcementsVehicles.Id_Announcements_vehicles = :announcementVehicleId")
+    void deleteByAnnouncementVehicleId(@Param("announcementVehicleId") int announcementVehicleId);
 }

@@ -1,5 +1,6 @@
 package com.urban.upark.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -39,9 +42,25 @@ public class ReservationRequest {
     @Column(name = "state")
     private Short state;
 
+    @Column(name = "accepted_at")
+    private LocalDateTime acceptedAt;
+
+    @Column(name = "expires_at")
+    private LocalDateTime expiresAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_announcement")
+    @JsonIgnoreProperties({"reservationRequests", "parking", "announcementsVehicles"})
     private Announcements announcement;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_requester")
+    @JsonIgnoreProperties({"reservationRequests", "reservations", "parkings", "password"})
+    private Users requester;
+
+    @OneToMany(mappedBy = "reservationRequest", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"reservationRequest"})
+    private List<ReservationRequestVehicles> selectedVehicles = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {

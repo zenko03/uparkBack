@@ -77,4 +77,18 @@ public class Parking {
     @OneToMany(mappedBy = "parking")
     @JsonIgnore
     private List<ParkingVehicles> parkingVehicles;
+    
+    /**
+     * Extrait la latitude depuis le champ GEOGRAPHY en utilisant PostGIS ST_Y
+     */
+    @org.hibernate.annotations.Formula("ST_Y(localisation::geometry)")
+    @JsonProperty("latitude")
+    private Double latitude;
+    
+    /**
+     * Extrait la longitude depuis le champ GEOGRAPHY en utilisant PostGIS ST_X
+     */
+    @org.hibernate.annotations.Formula("ST_X(localisation::geometry)")
+    @JsonProperty("longitude")
+    private Double longitude;
 }

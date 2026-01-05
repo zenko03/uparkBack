@@ -39,12 +39,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         System.out.println("🔍 JWT Filter - URI: " + requestURI);
         
         // Vérifier si c'est un endpoint public (ORDRE IMPORTANT: plus spécifique d'abord)
-        if (requestURI.startsWith("/api/v1/auth/") ||
+        // D'abord vérifier les endpoints TOUJOURS PROTÉGÉS
+        if (requestURI.contains("/my-parkings") || 
+            requestURI.contains("/user/")) {
+            System.out.println("🔐 Endpoint protégé - vérification JWT requise");
+            // Continue avec la vérification JWT plus bas
+        }
+        // Ensuite vérifier les endpoints publics
+        else if (requestURI.startsWith("/api/v1/auth/") ||
             requestURI.startsWith("/api/auth/") ||
-            requestURI.startsWith("/api/parkings") ||  // Tous les endpoints parkings sont publics
-            requestURI.startsWith("/api/v1/parkings") ||  // Version v1 des parkings
+            // Vehicles: tous publics
             requestURI.startsWith("/api/vehicles") ||
-            requestURI.startsWith("/api/v1/vehicles") ||  // Version v1 des vehicles
+            requestURI.startsWith("/api/v1/vehicles") ||
+            // Parkings: seuls GET publics (POST/PUT/DELETE protégés)
+            (request.getMethod().equals("GET") && 
+             (requestURI.startsWith("/api/parkings") || requestURI.startsWith("/api/v1/parkings"))) ||
+            // Reservations publiques
             requestURI.startsWith("/api/reservations/test-public") ||
             requestURI.startsWith("/api/v1/reservations/test-public") ||
             requestURI.startsWith("/api/reservations/calculate-price") ||
@@ -54,6 +64,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             System.out.println("✅ Endpoint public - pas de vérification JWT");
             filterChain.doFilter(request, response);
             return;
+        }
+        else {
+            System.out.println("🔐 Endpoint protégé - vérification JWT requise");
         }
         
         System.out.println("🔐 Endpoint protégé - vérification JWT requise");

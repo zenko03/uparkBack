@@ -1,5 +1,6 @@
 package com.urban.upark.controllers;
 
+import com.urban.upark.dto.CreateAnnouncementDTO;
 import com.urban.upark.models.Announcements;
 import com.urban.upark.services.AnnouncementsService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,16 @@ public class AnnouncementsController {
         return announcementsService.findAll();
     }
 
+    @GetMapping("/published")
+    public List<Announcements> getPublishedAnnouncements() {
+        return announcementsService.findPublished();
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<Announcements> getUserAnnouncements(@PathVariable int userId) {
+        return announcementsService.findByUserId(userId);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Announcements> getAnnouncementById(@PathVariable int id) {
         return announcementsService.findById(id)
@@ -39,6 +50,19 @@ public class AnnouncementsController {
             announcement.setCreationDate(LocalDateTime.now());
         }
         return announcementsService.save(announcement);
+    }
+
+    /**
+     * Créer une annonce complète avec véhicules et disponibilités
+     */
+    @PostMapping("/complete")
+    public ResponseEntity<Announcements> createCompleteAnnouncement(@RequestBody CreateAnnouncementDTO dto) {
+        try {
+            Announcements announcement = announcementsService.createCompleteAnnouncement(dto);
+            return ResponseEntity.ok(announcement);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")

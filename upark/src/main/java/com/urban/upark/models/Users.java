@@ -52,6 +52,20 @@ public class Users implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    // OAuth2 fields
+    @Column(name = "oauth_provider", length = 20)
+    private String oauthProvider; // 'google', 'facebook'
+
+    @Column(name = "oauth_id")
+    private String oauthId; // ID unique du provider
+
+    @Column(name = "profile_picture_url", columnDefinition = "TEXT")
+    private String profilePictureUrl;
+
+    @Column(name = "email_verified")
+    @Builder.Default
+    private Boolean emailVerified = false;
     
     @OneToMany(mappedBy = "user")
     @JsonIgnore

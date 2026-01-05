@@ -2,6 +2,7 @@ package com.urban.upark.repositories;
 
 import com.urban.upark.models.AnnouncementsVehicles;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -33,4 +34,21 @@ public interface AnnouncementsVehiclesRepository extends JpaRepository<Announcem
         @Param("parkingId") int parkingId, 
         @Param("vehicleTypeId") int vehicleTypeId
     );
+    
+    @Query("SELECT av FROM AnnouncementsVehicles av WHERE av.announcements.Id_Announcements = :announcementId")
+    List<AnnouncementsVehicles> findByAnnouncementId(@Param("announcementId") int announcementId);
+    
+    @Query("SELECT av FROM AnnouncementsVehicles av " +
+           "JOIN FETCH av.parkingVehicles pv " +
+           "JOIN FETCH pv.vehicle v " +
+           "WHERE av.announcements.Id_Announcements = :announcementId " +
+           "AND v.Id_Vehicles = :vehicleTypeId")
+    AnnouncementsVehicles findByAnnouncementIdAndVehicleTypeId(
+        @Param("announcementId") int announcementId, 
+        @Param("vehicleTypeId") int vehicleTypeId
+    );
+    
+    @Modifying
+    @Query("DELETE FROM AnnouncementsVehicles av WHERE av.announcements.Id_Announcements = :announcementId")
+    void deleteByAnnouncementId(@Param("announcementId") int announcementId);
 }

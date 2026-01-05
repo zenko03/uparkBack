@@ -11,4 +11,9 @@ import java.util.List;
 public interface AnnouncementsRepository extends JpaRepository<Announcements, Integer> {
     @org.springframework.data.jpa.repository.Query("SELECT a FROM Announcements a WHERE a.parking.Id_Parking = :parkingId")
     List<Announcements> findByParkingId(@Param("parkingId") int parkingId);
+    
+    List<Announcements> findByIsPublishedTrue();
+    
+    @org.springframework.data.jpa.repository.Query("SELECT a FROM Announcements a WHERE a.parking.user.Id_Users = :userId")
+    List<Announcements> findByUserId(@Param("userId") int userId);
 }

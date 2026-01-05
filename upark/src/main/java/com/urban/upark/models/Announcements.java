@@ -31,7 +31,7 @@ public class Announcements {
     @Builder.Default
     private boolean isPublished = false;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "Id_Parking")
     private Parking parking;
     

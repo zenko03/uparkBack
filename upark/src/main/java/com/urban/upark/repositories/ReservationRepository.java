@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
@@ -100,4 +101,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     // Trouver les réservations par statut
     @Query("SELECT r FROM Reservation r WHERE r.reservationStatus.Id_Reservation_status = :statusId")
     List<Reservation> findByReservationStatusId(@Param("statusId") Integer statusId);
+    
+    /**
+     * Récupérer les réservations d'un utilisateur avec les informations du parking
+     * Utilise la vue SQL v_user_reservations pour des performances optimales
+     */
+    @Query(value = "SELECT * FROM v_user_reservations WHERE id_users = :userId ORDER BY creation_date DESC", nativeQuery = true)
+    List<Map<String, Object>> findUserReservationsFromView(@Param("userId") int userId);
 }

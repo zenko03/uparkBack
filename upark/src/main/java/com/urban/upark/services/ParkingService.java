@@ -63,6 +63,12 @@ public class ParkingService {
         return parkingRepository.findByUserId(userId);
     }
 
+    public List<Parking> findByUsername(String username) {
+        Users user = usersRepository.findByUserName(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+        return parkingRepository.findByUserId(user.getId_Users());
+    }
+
     @Transactional
     public Parking toggleActive(int id) {
         parkingRepository.toggleActive(id);

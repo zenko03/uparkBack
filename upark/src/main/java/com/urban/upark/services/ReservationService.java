@@ -16,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
@@ -305,17 +306,79 @@ public class ReservationService {
 
     /**
      * Convertir une réservation en ReservationResponse avec les infos du parking
+     * Utilise la vue SQL v_user_reservations pour des performances optimales
      */
     public List<ReservationResponse> findByUserIdWithParkingInfo(int userId) {
-        List<Reservation> reservations = reservationRepository.findByUserIdWithParkingInfo(userId);
+        System.out.println("📋 Récupération des réservations pour l'utilisateur " + userId);
         
-        return reservations.stream()
-            .map(this::convertToResponse)
+        List<Map<String, Object>> results = reservationRepository.findUserReservationsFromView(userId);
+        System.out.println("📊 Nombre de résultats de la vue: " + results.size());
+        
+        return results.stream()
+            .map(this::mapViewToResponse)
             .collect(Collectors.toList());
     }
 
     /**
-     * Convertir Reservation en ReservationResponse
+     * Mapper une ligne de la vue v_user_reservations vers ReservationResponse
+     */
+    private ReservationResponse mapViewToResponse(Map<String, Object> row) {
+        try {
+            // Extraire les informations du parking
+            ReservationResponse.ParkingInfo parkingInfo = null;
+            Integer parkingId = (Integer) row.get("parking_id");
+            
+            if (parkingId != null && parkingId > 0) {
+                parkingInfo = ReservationResponse.ParkingInfo.builder()
+                    .id(parkingId)
+                    .name((String) row.get("parking_name"))
+                    .address((String) row.get("parking_address"))
+                    .city("") // Peut être ajouté plus tard
+                    .zipCode("") // Peut être ajouté plus tard
+                    .build();
+                
+                System.out.println("  ✅ Parking trouvé: " + parkingInfo.getName());
+            } else {
+                System.out.println("  ⚠️ Parking non trouvé pour la réservation");
+            }
+            
+            // Construire la réponse
+            return ReservationResponse.builder()
+                .id((Integer) row.get("id_reservation"))
+                .totalPrice((BigDecimal) row.get("total_price"))
+                .creationDate(convertToLocalDateTime(row.get("creation_date")))
+                .paymentDate(convertToLocalDateTime(row.get("payment_date")))
+                .startDateTime(convertToLocalDateTime(row.get("start_datetime")))
+                .endDateTime(convertToLocalDateTime(row.get("end_datetime")))
+                .paymentMethod((String) row.get("payment_method"))
+                .status((String) row.get("status_label"))
+                .parking(parkingInfo)
+                .build();
+        } catch (Exception e) {
+            System.err.println("❌ Erreur lors du mapping de la vue: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors du mapping de la réservation", e);
+        }
+    }
+    
+    /**
+     * Convertir un Object (provenant de la vue SQL) en LocalDateTime
+     */
+    private LocalDateTime convertToLocalDateTime(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof LocalDateTime) {
+            return (LocalDateTime) value;
+        }
+        if (value instanceof java.sql.Timestamp) {
+            return ((java.sql.Timestamp) value).toLocalDateTime();
+        }
+        return null;
+    }
+
+    /**
+     * Convertir Reservation en ReservationResponse (ancienne méthode - gardée pour compatibilité)
      */
     private ReservationResponse convertToResponse(Reservation reservation) {
         // Mettre à jour le statut
@@ -385,7 +448,7 @@ public class ReservationService {
         return reservationRepository.findReservationsByDateRange(statusId, startDate, endDate);
     }
     
-    private void updateReservationStatus(Reservation reservation) {
+    public void updateReservationStatus(Reservation reservation) {
         LocalDateTime now = LocalDateTime.now();
         
         // Statuts selon le fichier SQL :
