@@ -267,8 +267,7 @@ CREATE VIEW v_global_user_note AS
 SELECT id_users, AVG(average) FROM v_global_parking_note 
 GROUP BY id_users;
 
--- Vue pour récupérer les réservations avec les informations du parking
--- Modifiée pour gérer le cas où reservation_vehicles n'existe pas encore
+
 CREATE OR REPLACE VIEW v_user_reservations AS
 SELECT 
     r.id_reservation,
@@ -304,6 +303,23 @@ GROUP BY
     r.end_datetime,
     r.payment_method,
     r.id_users;
+
+
+CREATE TABLE parking_images (
+    id_parking_image SERIAL PRIMARY KEY,
+    id_parking INTEGER NOT NULL REFERENCES Parking(Id_Parking) ON DELETE CASCADE,
+    file_path TEXT NOT NULL,
+    file_url TEXT NOT NULL,
+    file_size INTEGER,
+    is_primary BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    CONSTRAINT fk_parking_image FOREIGN KEY (id_parking) REFERENCES Parking(Id_Parking)
+);
+
+-- Index pour performance
+CREATE INDEX idx_parking_images_parking ON parking_images(id_parking);
+CREATE INDEX idx_parking_images_primary ON parking_images(id_parking, is_primary);
 
 
 ALTER TABLE reservation_requests 
