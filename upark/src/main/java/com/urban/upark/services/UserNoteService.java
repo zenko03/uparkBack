@@ -35,6 +35,6 @@ public class UserNoteService {
     }
 
     public List<UserNote> findByParkingId(int parkingId) {
-        return userNoteRepository.findByParkingId_Parking(parkingId);
+        return userNoteRepository.findByParkingId(parkingId);
     }
 }
