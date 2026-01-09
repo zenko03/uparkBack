@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -79,6 +80,14 @@ public class Parking {
     private List<ParkingVehicles> parkingVehicles;
     
     /**
+     * Relation avec les images du parking
+     */
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_parking", referencedColumnName = "Id_Parking")
+    @JsonProperty("images")
+    private List<ParkingImage> images;
+    
+    /**
      * Extrait la latitude depuis le champ GEOGRAPHY en utilisant PostGIS ST_Y
      */
     @org.hibernate.annotations.Formula("ST_Y(localisation::geometry)")
@@ -91,4 +100,27 @@ public class Parking {
     @org.hibernate.annotations.Formula("ST_X(localisation::geometry)")
     @JsonProperty("longitude")
     private Double longitude;
+    
+    /**
+     * Retourne l'URL de l'image principale (isPrimary = true)
+     * Si aucune image principale, retourne la première image disponible
+     * Si aucune image, retourne null
+     */
+    @Transient
+    @JsonProperty("primaryImageUrl")
+    public String getPrimaryImageUrl() {
+        if (images == null || images.isEmpty()) {
+            return null;
+        }
+        
+        // Chercher l'image marquée comme principale
+        return images.stream()
+            .filter(img -> img.getIsPrimary() != null && img.getIsPrimary())
+            .findFirst()
+            .map(ParkingImage::getFileUrl)
+            .orElseGet(() -> {
+                // Fallback: retourner la première image si aucune n'est marquée comme principale
+                return images.get(0).getFileUrl();
+            });
+    }
 }

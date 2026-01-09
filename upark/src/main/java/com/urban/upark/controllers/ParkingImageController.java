@@ -1,5 +1,6 @@
 package com.urban.upark.controllers;
 
+import com.urban.upark.dto.parking.ImageUploadRequest;
 import com.urban.upark.dto.parking.ParkingImageDTO;
 import com.urban.upark.models.ParkingImage;
 import com.urban.upark.services.ParkingImageService;
@@ -15,6 +16,25 @@ import java.util.List;
 public class ParkingImageController {
 
     private final ParkingImageService parkingImageService;
+
+    /**
+     * Upload une image en base64 vers Supabase et sauvegarder les métadonnées
+     * @param parkingId ID du parking
+     * @param request Requête avec image base64
+     * @return Image uploadée et sauvegardée
+     */
+    @PostMapping("/{parkingId}/upload")
+    public ResponseEntity<ParkingImage> uploadImage(
+            @PathVariable Integer parkingId,
+            @RequestBody ImageUploadRequest request) {
+        try {
+            ParkingImage savedImage = parkingImageService.uploadAndSaveImage(parkingId, request);
+            return ResponseEntity.ok(savedImage);
+        } catch (RuntimeException e) {
+            System.err.println("❌ Erreur upload: " + e.getMessage());
+            return ResponseEntity.status(500).build();
+        }
+    }
 
     /**
      * Sauvegarder une image de parking

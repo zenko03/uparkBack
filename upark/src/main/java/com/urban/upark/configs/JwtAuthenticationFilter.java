@@ -48,6 +48,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Ensuite vérifier les endpoints publics
         else if (requestURI.startsWith("/api/v1/auth/") ||
             requestURI.startsWith("/api/auth/") ||
+            // Image proxy: toujours public
+            requestURI.startsWith("/api/images/") ||
             // Vehicles: tous publics
             requestURI.startsWith("/api/vehicles") ||
             requestURI.startsWith("/api/v1/vehicles") ||

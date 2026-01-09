@@ -3,7 +3,7 @@ package com.urban.upark.models;
 import jakarta.persistence.*;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Data
 @Builder
@@ -59,8 +59,9 @@ public class ParkingImage {
         updatedAt = java.time.LocalDateTime.now();
     }
 
+    // Ignorer complètement la relation inverse pour éviter les boucles de sérialisation JSON
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_parking", insertable = false, updatable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "parkingVehicles", "user"})
+    @JsonIgnore
     private Parking parking;
 }

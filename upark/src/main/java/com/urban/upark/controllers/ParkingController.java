@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 
@@ -60,20 +61,40 @@ public class ParkingController {
     @PostMapping
     public ResponseEntity<Parking> createParking(@RequestBody ParkingCreateRequest request) {
         try {
+            System.out.println("➕ Création parking - User ID: " + request.getUserId());
             Parking parking = parkingService.createParkingWithVehicles(request);
+            System.out.println("✅ Parking créé avec ID: " + parking.getId_Parking());
             return ResponseEntity.ok(parking);
         } catch (RuntimeException e) {
+            System.err.println("❌ Erreur création parking: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Parking> updateParking(@PathVariable int id, @RequestBody ParkingUpdateRequest request) {
+    public ResponseEntity<?> updateParking(@PathVariable int id, @RequestBody ParkingUpdateRequest request) {
         try {
+            System.out.println("📝 Mise à jour parking ID: " + id);
+            System.out.println("📋 Données reçues: " + request);
             Parking updatedParking = parkingService.updateParkingWithVehicles(id, request);
+            System.out.println("✅ Parking mis à jour: " + updatedParking.getId_Parking());
             return ResponseEntity.ok(updatedParking);
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            System.err.println("❌ Erreur mise à jour parking " + id + ": " + e.getMessage());
+            System.err.println("❌ Type d'erreur: " + e.getClass().getName());
+            e.printStackTrace();
+            
+            // Retourner le message d'erreur réel pour déboguer
+            if (e.getMessage() != null && e.getMessage().contains("non trouvé")) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            // Pour toutes les autres erreurs, retourner 500 avec le message
+            return ResponseEntity.status(500).body(Map.of(
+                "error", e.getClass().getSimpleName(),
+                "message", e.getMessage() != null ? e.getMessage() : "Erreur inconnue"
+            ));
         }
     }
 

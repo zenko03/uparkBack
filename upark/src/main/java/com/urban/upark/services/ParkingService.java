@@ -157,38 +157,58 @@ public class ParkingService {
      */
     @Transactional
     public Parking updateParkingWithVehicles(int parkingId, ParkingUpdateRequest request) {
-        // Vérifier que le parking existe
-        Parking existingParking = parkingRepository.findById(parkingId)
-                .orElseThrow(() -> new RuntimeException("Parking non trouvé avec ID: " + parkingId));
-
-        // Mettre à jour les champs du parking
-        String sql = "UPDATE parking SET label = :label, hourly_rate = :hourlyRate, " +
-                     "description = :description, localisation = ST_GeogFromText(:localisation), " +
-                     "is_active = :isActive, updated_at = NOW() " +
-                     "WHERE id_parking = :id";
+        System.out.println("🔍 [ParkingService] updateParkingWithVehicles - Parking ID: " + parkingId);
+        System.out.println("📋 [ParkingService] Request: " + request);
         
-        entityManager.createNativeQuery(sql)
-                .setParameter("label", request.getLabel())
-                .setParameter("hourlyRate", request.getHourlyRate())
-                .setParameter("description", request.getDescription())
-                .setParameter("localisation", request.getLocalisation())
-                .setParameter("isActive", request.getIsActive() != null ? request.getIsActive() : true)
-                .setParameter("id", parkingId)
-                .executeUpdate();
+        try {
+            // Vérifier que le parking existe
+            System.out.println("🔍 [ParkingService] Recherche du parking...");
+            Parking existingParking = parkingRepository.findById(parkingId)
+                    .orElseThrow(() -> new RuntimeException("Parking non trouvé avec ID: " + parkingId));
+            System.out.println("✅ [ParkingService] Parking trouvé: " + existingParking.getLabel());
 
-        // Mettre à jour les véhicules associés si fournis
-        if (request.getVehicles() != null) {
-            // Supprimer les anciennes associations
-            List<ParkingVehicles> existingVehicles = parkingVehiclesRepository.findByParkingId(parkingId);
-            existingVehicles.forEach(pv -> parkingVehiclesRepository.deleteById(pv.getId_Parking_vehicles()));
+            // Mettre à jour les champs du parking
+            System.out.println("🔄 [ParkingService] Mise à jour des champs du parking...");
+            String sql = "UPDATE parking SET label = :label, hourly_rate = :hourlyRate, " +
+                         "description = :description, localisation = ST_GeogFromText(:localisation), " +
+                         "is_active = :isActive, updated_at = NOW() " +
+                         "WHERE id_parking = :id";
+            
+            int updatedRows = entityManager.createNativeQuery(sql)
+                    .setParameter("label", request.getLabel())
+                    .setParameter("hourlyRate", request.getHourlyRate())
+                    .setParameter("description", request.getDescription())
+                    .setParameter("localisation", request.getLocalisation())
+                    .setParameter("isActive", request.getIsActive() != null ? request.getIsActive() : true)
+                    .setParameter("id", parkingId)
+                    .executeUpdate();
+            System.out.println("✅ [ParkingService] Parking mis à jour. Lignes affectées: " + updatedRows);
 
-            // Créer les nouvelles associations
-            if (!request.getVehicles().isEmpty()) {
-                saveParkingVehicles(parkingId, request.getVehicles());
+            // Mettre à jour les véhicules associés si fournis
+            if (request.getVehicles() != null) {
+                System.out.println("🚗 [ParkingService] Mise à jour des véhicules (" + request.getVehicles().size() + " véhicule(s))...");
+                
+                // Supprimer les anciennes associations
+                List<ParkingVehicles> existingVehicles = parkingVehiclesRepository.findByParkingId(parkingId);
+                System.out.println("🗑️ [ParkingService] Suppression de " + existingVehicles.size() + " ancienne(s) association(s)...");
+                existingVehicles.forEach(pv -> parkingVehiclesRepository.deleteById(pv.getId_Parking_vehicles()));
+
+                // Créer les nouvelles associations
+                if (!request.getVehicles().isEmpty()) {
+                    System.out.println("➕ [ParkingService] Création des nouvelles associations...");
+                    saveParkingVehicles(parkingId, request.getVehicles());
+                }
             }
-        }
 
-        return parkingRepository.findById(parkingId).orElse(existingParking);
+            System.out.println("✅ [ParkingService] Mise à jour terminée avec succès");
+            return parkingRepository.findById(parkingId).orElse(existingParking);
+            
+        } catch (Exception e) {
+            System.err.println("❌ [ParkingService] ERREUR lors de la mise à jour: " + e.getClass().getName());
+            System.err.println("❌ [ParkingService] Message: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     /**

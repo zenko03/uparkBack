@@ -30,6 +30,8 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(auth -> auth
                 // OPTIONS requests must be first for CORS preflight
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                // Image proxy endpoint (public)
+                .requestMatchers("/api/images/**").permitAll()
                 // Public endpoints (most specific first)
                 .requestMatchers("/api/v1/reservations/test-public").permitAll()
                 .requestMatchers("/api/v1/reservations/calculate-price").permitAll()
