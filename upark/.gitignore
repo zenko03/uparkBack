@@ -19,6 +19,14 @@ target/
 *.iml
 *.ipr
 
+### SECRETS - NE PAS COMMITTER ###
+.env
+.env.local
+.env.production
+application-local.properties
+*.key
+*.pem
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
