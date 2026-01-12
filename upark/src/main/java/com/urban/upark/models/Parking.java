@@ -80,6 +80,13 @@ public class Parking {
     private List<ParkingVehicles> parkingVehicles;
     
     /**
+     * Relation avec les annonces du parking
+     */
+    @OneToMany(mappedBy = "parking", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"parking", "announcementsVehicles"})
+    private List<Announcements> announcements;
+    
+    /**
      * Relation avec les images du parking
      */
     @OneToMany(fetch = FetchType.LAZY)
@@ -122,5 +129,24 @@ public class Parking {
                 // Fallback: retourner la première image si aucune n'est marquée comme principale
                 return images.get(0).getFileUrl();
             });
+    }
+    
+    /**
+     * Retourne l'ID de l'annonce active/publiée pour ce parking
+     * Si aucune annonce publiée, retourne null
+     */
+    @Transient
+    @JsonProperty("Id_Announcements")
+    public Integer getIdAnnouncements() {
+        if (announcements == null || announcements.isEmpty()) {
+            return null;
+        }
+        
+        // Retourner l'annonce publiée
+        return announcements.stream()
+            .filter(Announcements::isPublished)
+            .findFirst()
+            .map(Announcements::getId_Announcements)
+            .orElse(null);
     }
 }

@@ -2,18 +2,23 @@ package com.urban.upark.controllers;
 
 import com.urban.upark.models.Reservation;
 import com.urban.upark.services.ReservationService;
+import com.urban.upark.services.QRCodeService;
 import com.urban.upark.dto.reservation.ReservationRequest;
 import com.urban.upark.dto.reservation.ReservationResponse;
 import com.urban.upark.dto.reservation.PriceCalculationRequest;
 import com.urban.upark.dto.reservation.ReservationDetailDTO;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final QRCodeService qrCodeService;
 
     @GetMapping
     public List<Reservation> getAllReservations() {
@@ -253,5 +259,188 @@ public class ReservationController {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Erreur lors de la mise à jour du statut: " + e.getMessage());
         }
+    }
+
+    // ========================================
+    // ENDPOINTS QR CODE
+    // ========================================
+
+    /**
+     * Récupérer le token QR d'une réservation
+     * GET /api/v1/reservations/{id}/qr-token
+     */
+    @GetMapping("/{id}/qr-token")
+    public ResponseEntity<?> getQRToken(@PathVariable int id) {
+        try {
+            Optional<Reservation> reservationOpt = reservationService.findById(id);
+            
+            if (reservationOpt.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            Reservation reservation = reservationOpt.get();
+            
+            // Vérifier si la réservation a déjà un token QR
+            if (reservation.getQrCodeToken() == null || reservation.getQrCodeToken().isEmpty()) {
+                return ResponseEntity.badRequest()
+                    .body("Cette réservation n'a pas encore de QR Code généré");
+            }
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("reservationId", reservation.getId_Reservation());
+            response.put("qrToken", reservation.getQrCodeToken());
+            response.put("isValidated", reservation.getIsValidated() != null ? reservation.getIsValidated() : false);
+            response.put("validatedAt", reservation.getValidatedAt());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.err.println("❌ Erreur récupération QR token: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Erreur lors de la récupération du QR Code");
+        }
+    }
+
+    /**
+     * Générer une image QR Code pour une réservation
+     * GET /api/v1/reservations/{id}/qr-image
+     */
+    @GetMapping("/{id}/qr-image")
+    public ResponseEntity<byte[]> getQRCodeImage(@PathVariable int id) {
+        try {
+            Optional<Reservation> reservationOpt = reservationService.findById(id);
+            
+            if (reservationOpt.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            Reservation reservation = reservationOpt.get();
+            
+            if (reservation.getQrCodeToken() == null || reservation.getQrCodeToken().isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
+            
+            // Générer l'image QR Code
+            byte[] qrImage = qrCodeService.generateQRCodeImage(reservation.getQrCodeToken());
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_PNG);
+            headers.setContentLength(qrImage.length);
+            
+            return ResponseEntity.ok()
+                .headers(headers)
+                .body(qrImage);
+        } catch (Exception e) {
+            System.err.println("❌ Erreur génération image QR: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    /**
+     * Valider un QR Code scanné
+     * POST /api/v1/reservations/validate-qr
+     * Body: { "qrToken": "..." }
+     */
+    @PostMapping("/validate-qr")
+    public ResponseEntity<?> validateQRCode(@RequestBody Map<String, String> request) {
+        try {
+            String qrToken = request.get("qrToken");
+            
+            if (qrToken == null || qrToken.isEmpty()) {
+                return ResponseEntity.badRequest().body("Token QR manquant");
+            }
+            
+            // Valider le format du token
+            if (!qrCodeService.isValidQRTokenFormat(qrToken)) {
+                return ResponseEntity.badRequest().body("Format de QR Code invalide");
+            }
+            
+            // Rechercher la réservation par token
+            Optional<Reservation> reservationOpt = reservationService.findByQRToken(qrToken);
+            
+            if (reservationOpt.isEmpty()) {
+                return ResponseEntity.status(404).body("QR Code non trouvé ou invalide");
+            }
+            
+            Reservation reservation = reservationOpt.get();
+            
+            // Vérifier si déjà validé
+            if (reservation.getIsValidated() != null && reservation.getIsValidated()) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "QR Code déjà validé");
+                response.put("validatedAt", reservation.getValidatedAt());
+                return ResponseEntity.ok(response);
+            }
+            
+            // Marquer comme validé
+            reservation.setIsValidated(true);
+            reservation.setValidatedAt(LocalDateTime.now());
+            reservationService.save(reservation);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "QR Code validé avec succès");
+            response.put("reservationId", reservation.getId_Reservation());
+            response.put("parkingName", extractParkingName(reservation));
+            response.put("startDateTime", reservation.getStartDateTime());
+            response.put("endDateTime", reservation.getEndDateTime());
+            response.put("validatedAt", reservation.getValidatedAt());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.err.println("❌ Erreur validation QR: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Erreur lors de la validation du QR Code");
+        }
+    }
+
+    /**
+     * Vérifier le statut de validation d'un QR Code
+     * GET /api/v1/reservations/check-qr/{qrToken}
+     */
+    @GetMapping("/check-qr/{qrToken}")
+    public ResponseEntity<?> checkQRCodeStatus(@PathVariable String qrToken) {
+        try {
+            Optional<Reservation> reservationOpt = reservationService.findByQRToken(qrToken);
+            
+            if (reservationOpt.isEmpty()) {
+                return ResponseEntity.status(404).body("QR Code non trouvé");
+            }
+            
+            Reservation reservation = reservationOpt.get();
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("reservationId", reservation.getId_Reservation());
+            response.put("isValidated", reservation.getIsValidated() != null ? reservation.getIsValidated() : false);
+            response.put("validatedAt", reservation.getValidatedAt());
+            response.put("startDateTime", reservation.getStartDateTime());
+            response.put("endDateTime", reservation.getEndDateTime());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.err.println("❌ Erreur vérification QR: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Erreur lors de la vérification du QR Code");
+        }
+    }
+
+    /**
+     * Méthode utilitaire pour extraire le nom du parking depuis une réservation
+     */
+    private String extractParkingName(Reservation reservation) {
+        try {
+            if (reservation.getReservationVehicles() != null && !reservation.getReservationVehicles().isEmpty()) {
+                var rv = reservation.getReservationVehicles().get(0);
+                if (rv.getAnnouncementsVehicles() != null && 
+                    rv.getAnnouncementsVehicles().getParkingVehicles() != null &&
+                    rv.getAnnouncementsVehicles().getParkingVehicles().getParking() != null) {
+                    return rv.getAnnouncementsVehicles().getParkingVehicles().getParking().getLabel();
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("⚠️ Erreur extraction nom parking: " + e.getMessage());
+        }
+        return "Parking";
     }
 }

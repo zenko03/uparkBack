@@ -39,6 +39,7 @@ public class ReservationService {
     private final ParkingVehiclesRepository parkingVehiclesRepository;
     private final AvailabilitiesFrequenceRepository availabilitiesFrequenceRepository;
     private final CommissionReceivedService commissionReceivedService;
+    private final QRCodeService qrCodeService;
 
     public List<Reservation> findAll() {
         return reservationRepository.findAll();
@@ -256,6 +257,13 @@ public class ReservationService {
         Reservation savedReservation = reservationRepository.save(reservation);
         System.out.println("✅ Reservation saved with ID: " + savedReservation.getId_Reservation());
         System.out.println("📊 Initial status: " + savedReservation.getReservationStatus().getLabel());
+        
+        // Générer le token QR Code pour validation à l'entrée
+        String qrToken = qrCodeService.generateFormattedQRToken(savedReservation.getId_Reservation());
+        savedReservation.setQrCodeToken(qrToken);
+        savedReservation.setIsValidated(false);
+        savedReservation = reservationRepository.save(savedReservation);
+        System.out.println("🔐 QR Code token generated: " + qrToken);
 
         // Créer les réservations de véhicules
         if (request.getSelectedVehicles() != null && !request.getSelectedVehicles().isEmpty()) {
@@ -805,5 +813,16 @@ public class ReservationService {
         } else {
             throw new RuntimeException("Réservation non trouvée avec l'ID: " + reservationId);
         }
+    }
+    
+    // ========================================
+    // MÉTHODES QR CODE
+    // ========================================
+    
+    /**
+     * Trouver une réservation par son token QR
+     */
+    public Optional<Reservation> findByQRToken(String qrToken) {
+        return reservationRepository.findByQrCodeToken(qrToken);
     }
 }

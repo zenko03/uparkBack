@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +40,28 @@ public class OAuthService {
      */
     public OAuthUserInfo verifyGoogleToken(String idToken) {
         try {
+            System.out.println("🔍 Vérification token Google...");
+            System.out.println("📋 Client ID attendu: " + googleClientId);
+            
+            // Décoder le token AVANT vérification pour diagnostiquer
+            GoogleIdToken unverifiedToken = GoogleIdToken.parse(GsonFactory.getDefaultInstance(), idToken);
+            if (unverifiedToken != null) {
+                GoogleIdToken.Payload unverifiedPayload = unverifiedToken.getPayload();
+                System.out.println("📊 Token aud (audience): " + unverifiedPayload.getAudience());
+                System.out.println("📊 Token azp (authorized party): " + unverifiedPayload.get("azp"));
+                System.out.println("📊 Token iss (issuer): " + unverifiedPayload.getIssuer());
+                
+                long exp = unverifiedPayload.getExpirationTimeSeconds();
+                long now = System.currentTimeMillis() / 1000;
+                System.out.println("⏰ Expiration: " + exp + " | Now: " + now + " | Restant: " + (exp - now) + "s");
+                
+                if (exp < now) {
+                    System.err.println("❌ TOKEN EXPIRÉ ! Demandez un nouveau token.");
+                    throw new RuntimeException("Token expiré - veuillez vous reconnecter");
+                }
+            }
+            
+            // Créer le vérificateur Google avec le Web Client ID configuré
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
                     new NetHttpTransport(),
                     GsonFactory.getDefaultInstance()
@@ -46,32 +69,42 @@ public class OAuthService {
             .setAudience(Collections.singletonList(googleClientId))
             .build();
 
+            // Vérifier le token avec validation de signature complète
             GoogleIdToken token = verifier.verify(idToken);
-            if (token != null) {
-                GoogleIdToken.Payload payload = token.getPayload();
-                
-                String userId = payload.getSubject();
-                String email = payload.getEmail();
-                boolean emailVerified = payload.getEmailVerified();
-                String name = (String) payload.get("name");
-                String familyName = (String) payload.get("family_name");
-                String givenName = (String) payload.get("given_name");
-                String pictureUrl = (String) payload.get("picture");
-
-                return OAuthUserInfo.builder()
-                        .oauthId(userId)
-                        .email(email)
-                        .emailVerified(emailVerified)
-                        .name(familyName != null ? familyName : name)
-                        .firstName(givenName != null ? givenName : "")
-                        .profilePictureUrl(pictureUrl)
-                        .provider("google")
-                        .build();
-            } else {
-                throw new RuntimeException("Token Google invalide");
+            
+            if (token == null) {
+                System.err.println("❌ verifier.verify() a retourné null");
+                System.err.println("❌ Raisons possibles: signature invalide, problème réseau Google, certificats");
+                throw new RuntimeException("Échec de vérification du token Google");
             }
+
+            System.out.println("✅ Token vérifié avec succès !");
+            
+            // Extraire les informations utilisateur du token vérifié
+            GoogleIdToken.Payload payload = token.getPayload();
+            
+            String userId = payload.getSubject();
+            String email = payload.getEmail();
+            boolean emailVerified = payload.getEmailVerified();
+            String name = (String) payload.get("name");
+            String familyName = (String) payload.get("family_name");
+            String givenName = (String) payload.get("given_name");
+            String pictureUrl = (String) payload.get("picture");
+
+            System.out.println("✅ Token vérifié - Utilisateur: " + email);
+            
+            return OAuthUserInfo.builder()
+                    .oauthId(userId)
+                    .email(email)
+                    .emailVerified(emailVerified)
+                    .name(familyName != null ? familyName : name)
+                    .firstName(givenName != null ? givenName : "")
+                    .profilePictureUrl(pictureUrl)
+                    .provider("google")
+                    .build();
         } catch (Exception e) {
-            throw new RuntimeException("Erreur lors de la vérification du token Google: " + e.getMessage(), e);
+            System.err.println("❌ Erreur vérification token Google: " + e.getMessage());
+            throw new RuntimeException("Token Google invalide: " + e.getMessage(), e);
         }
     }
 

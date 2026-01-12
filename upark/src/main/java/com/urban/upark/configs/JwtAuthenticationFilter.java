@@ -76,15 +76,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader=request.getHeader("Authorization");
         final String jwt;
         final String username;
+        
         if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+            System.out.println("❌ Pas de header Authorization ou ne commence pas par Bearer");
             filterChain.doFilter(request, response);
             return;
         }
+        
         jwt=authHeader.substring(7);
-        username= jwtService.extractUsername(jwt);
+        System.out.println("🔑 Token JWT extrait: " + jwt.substring(0, Math.min(20, jwt.length())) + "...");
+        
+        try {
+            username = jwtService.extractUsername(jwt);
+            System.out.println("👤 Username extrait du token: " + username);
+        } catch (Exception e) {
+            System.err.println("❌ Erreur extraction username du token: " + e.getMessage());
+            e.printStackTrace();
+            filterChain.doFilter(request, response);
+            return;
+        }
+        
         if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null){
             UserDetails userDetails=this.userDetailsService.loadUserByUsername(username);
+            System.out.println("👤 UserDetails chargé: " + userDetails.getUsername());
+            
             if (jwtService.isTokenValid(jwt, userDetails)) {
+                System.out.println("✅ Token JWT valide - authentification réussie");
                 UsernamePasswordAuthenticationToken authToken=new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
@@ -93,6 +110,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+            } else {
+                System.err.println("❌ Token JWT invalide ou expiré");
             }
         }
         filterChain.doFilter(request, response);

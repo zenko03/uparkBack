@@ -19,7 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -34,6 +36,8 @@ public class ReservationRequestService {
     private final ReservationVehiclesRepository reservationVehiclesRepository;
     private final ReservationRequestVehiclesRepository reservationRequestVehiclesRepository;
     private final ReservationService reservationService;
+    private final QRCodeService qrCodeService;
+    private final NotificationService notificationService;
 
     public List<ReservationRequest> findAll() {
         return reservationRequestRepository.findAll();
@@ -142,9 +146,30 @@ public class ReservationRequestService {
         request.setAcceptedAt(LocalDateTime.now());
         request.setExpiresAt(LocalDateTime.now().plusHours(24)); // 24h pour payer
 
-        return reservationRequestRepository.save(request);
+        ReservationRequest savedRequest = reservationRequestRepository.save(request);
         
-        // TODO: Envoyer notification au client "Demande acceptée, payez dans 24h"
+        // Envoyer notification au client "Demande acceptée, payez dans 24h"
+        try {
+            Integer requesterId = request.getRequester().getId_Users();
+            String parkingName = request.getAnnouncement().getParking().getLabel();
+            
+            Map<String, String> notificationData = new HashMap<>();
+            notificationData.put("type", "reservation_accepted");
+            notificationData.put("requestId", requestId.toString());
+            notificationData.put("parkingName", parkingName);
+            
+            notificationService.sendPushNotification(
+                requesterId,
+                "Demande acceptée ✅",
+                "Votre demande pour " + parkingName + " a été acceptée. Payez dans 24h pour confirmer.",
+                "reservation_accepted",
+                notificationData
+            );
+        } catch (Exception e) {
+            System.err.println("❌ Erreur envoi notification acceptation: " + e.getMessage());
+        }
+        
+        return savedRequest;
     }
 
     // Refuser une demande
@@ -158,7 +183,30 @@ public class ReservationRequestService {
         }
 
         request.setState((short) 25); // 25 = Refusée
-        return reservationRequestRepository.save(request);
+        ReservationRequest savedRequest = reservationRequestRepository.save(request);
+        
+        // Envoyer notification au client "Demande refusée"
+        try {
+            Integer requesterId = request.getRequester().getId_Users();
+            String parkingName = request.getAnnouncement().getParking().getLabel();
+            
+            Map<String, String> notificationData = new HashMap<>();
+            notificationData.put("type", "reservation_rejected");
+            notificationData.put("requestId", requestId.toString());
+            notificationData.put("parkingName", parkingName);
+            
+            notificationService.sendPushNotification(
+                requesterId,
+                "Demande refusée ❌",
+                "Votre demande pour " + parkingName + " a été refusée par le propriétaire.",
+                "reservation_rejected",
+                notificationData
+            );
+        } catch (Exception e) {
+            System.err.println("❌ Erreur envoi notification refus: " + e.getMessage());
+        }
+        
+        return savedRequest;
     }
 
     // Finaliser réservation après paiement (NOUVEAU)
@@ -199,6 +247,13 @@ public class ReservationRequestService {
         System.out.println("✅ Réservation créée avec ID: " + savedReservation.getId_Reservation() + 
                          " - Statut: " + (savedReservation.getReservationStatus() != null ? 
                          savedReservation.getReservationStatus().getLabel() : "NON DÉFINI"));
+
+        // 🔐 Générer le QR Code token pour la réservation
+        String qrToken = qrCodeService.generateFormattedQRToken(savedReservation.getId_Reservation());
+        savedReservation.setQrCodeToken(qrToken);
+        savedReservation.setIsValidated(false);
+        savedReservation = reservationRepository.save(savedReservation);
+        System.out.println("🔐 QR Code token généré: " + qrToken);
 
         // Créer les ReservationVehicles à partir de l'annonce
         createReservationVehiclesFromAnnouncement(savedReservation, request);

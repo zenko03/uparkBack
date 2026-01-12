@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   backend:
     build: .
@@ -8,5 +7,7 @@ services:
       - ./src:/app/src
       - ./pom.xml:/app/pom.xml
       - ./.mvn:/app/.mvn
+    env_file:
+      - .env
     environment:
       - SPRING_DEVTOOLS_RESTART_ENABLED=true

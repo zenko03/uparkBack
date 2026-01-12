@@ -56,6 +56,16 @@ public class Reservation {
     @Column(name = "payment_method")
     private String paymentMethod;
 
+    @Column(name = "qr_code_token", unique = true, length = 255)
+    private String qrCodeToken;
+
+    @Column(name = "is_validated")
+    private Boolean isValidated = false;
+
+    @Column(name = "validated_at")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime validatedAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Id_Users")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password"})

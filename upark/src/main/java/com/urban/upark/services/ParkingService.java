@@ -56,7 +56,8 @@ public class ParkingService {
     }
 
     public Optional<Parking> findById(int id) {
-        return parkingRepository.findById(id);
+        // Charger le parking avec ses annonces pour que getIdAnnouncements() fonctionne
+        return parkingRepository.findByIdWithAnnouncements(id);
     }
 
     public List<Parking> findByUserId(int userId) {

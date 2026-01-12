@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
@@ -108,4 +109,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
      */
     @Query(value = "SELECT * FROM v_user_reservations WHERE id_users = :userId ORDER BY creation_date DESC", nativeQuery = true)
     List<Map<String, Object>> findUserReservationsFromView(@Param("userId") int userId);
+    
+    // ========================================
+    // MÉTHODES QR CODE
+    // ========================================
+    
+    /**
+     * Trouver une réservation par son token QR
+     */
+    @Query("SELECT r FROM Reservation r WHERE r.qrCodeToken = :qrToken")
+    Optional<Reservation> findByQrCodeToken(@Param("qrToken") String qrToken);
 }

@@ -41,6 +41,12 @@ public interface ParkingRepository extends JpaRepository<Parking, Integer> {
 
     @Query("SELECT p FROM Parking p WHERE p.user.Id_Users = :userId")
     List<Parking> findByUserId(@Param("userId") int userId);
+    
+    /**
+     * Récupère un parking avec ses annonces chargées (pour éviter le lazy loading)
+     */
+    @Query("SELECT p FROM Parking p LEFT JOIN FETCH p.announcements WHERE p.Id_Parking = :id")
+    java.util.Optional<Parking> findByIdWithAnnouncements(@Param("id") int id);
 
     @Modifying
     @Transactional

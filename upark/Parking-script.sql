@@ -156,11 +156,15 @@ CREATE TABLE Reservation(
    start_datetime TIMESTAMP NOT NULL,
    end_datetime TIMESTAMP NOT NULL,
    payment_method VARCHAR(50),
+   qr_code_token VARCHAR(255),
+   is_validated BOOLEAN DEFAULT FALSE,
+   validated_at TIMESTAMP,
    Id_Users INTEGER,
    Id_Reservation_status INTEGER,
    PRIMARY KEY(Id_Reservation),
    FOREIGN KEY(Id_Users) REFERENCES Users(Id_Users),
-   FOREIGN KEY(Id_Reservation_status) REFERENCES Reservation_status(Id_Reservation_status)
+   FOREIGN KEY(Id_Reservation_status) REFERENCES Reservation_status(Id_Reservation_status),
+   UNIQUE(qr_code_token)
 );
 
 CREATE TABLE Reservation_vehicles(
@@ -384,4 +388,133 @@ ON Users(email);
 UPDATE Users 
 SET email_verified = TRUE 
 WHERE oauth_provider IS NULL AND password IS NOT NULL;
+
+-- ========================================
+-- MIGRATION: QR Code Validation
+-- ========================================
+-- À exécuter dans Supabase SQL Editor pour ajouter le support QR Code
+
+-- 1. Ajouter la colonne qr_code_token (token unique pour validation)
+ALTER TABLE Reservation 
+ADD COLUMN IF NOT EXISTS qr_code_token VARCHAR(255);
+
+-- 2. Ajouter la colonne is_validated (statut de validation)
+ALTER TABLE Reservation 
+ADD COLUMN IF NOT EXISTS is_validated BOOLEAN DEFAULT FALSE;
+
+-- 3. Ajouter la colonne validated_at (date/heure de validation)
+ALTER TABLE Reservation 
+ADD COLUMN IF NOT EXISTS validated_at TIMESTAMP;
+
+-- 4. Ajouter contrainte UNIQUE sur qr_code_token
+ALTER TABLE Reservation 
+ADD CONSTRAINT IF NOT EXISTS reservation_qr_code_unique UNIQUE (qr_code_token);
+
+-- 5. Créer un index pour recherche rapide par token QR
+CREATE INDEX IF NOT EXISTS idx_reservation_qr_code 
+ON Reservation(qr_code_token) 
+WHERE qr_code_token IS NOT NULL;
+
+-- 6. Créer un index pour les réservations validées
+CREATE INDEX IF NOT EXISTS idx_reservation_validated 
+ON Reservation(is_validated, validated_at) 
+WHERE is_validated = TRUE;
+
+-- ========================================
+-- MIGRATION: Notifications Push (FCM)
+-- ========================================
+-- À exécuter dans Supabase SQL Editor pour ajouter le support Notifications Push
+
+-- 1. Table Device_tokens (stockage des tokens FCM par appareil)
+CREATE TABLE IF NOT EXISTS Device_tokens (
+   Id_Device_token SERIAL,
+   token TEXT NOT NULL,
+   platform VARCHAR(10) NOT NULL CHECK (platform IN ('android', 'ios')),
+   device_info TEXT,
+   is_active BOOLEAN DEFAULT TRUE,
+   created_at TIMESTAMP DEFAULT NOW(),
+   updated_at TIMESTAMP DEFAULT NOW(),
+   Id_Users INTEGER NOT NULL,
+   PRIMARY KEY(Id_Device_token),
+   FOREIGN KEY(Id_Users) REFERENCES Users(Id_Users) ON DELETE CASCADE,
+   UNIQUE(Id_Users, token)
+);
+
+-- 2. Table Notifications (historique des notifications envoyées)
+CREATE TABLE IF NOT EXISTS Notifications (
+   Id_Notification SERIAL,
+   title VARCHAR(255) NOT NULL,
+   message TEXT NOT NULL,
+   type VARCHAR(50) NOT NULL CHECK (type IN ('reservation_accepted', 'reservation_rejected', 'reservation_cancelled', 'payment_confirmed', 'payment_failed', 'new_request', 'reminder', 'system')),
+   data JSONB,
+   read BOOLEAN DEFAULT FALSE,
+   sent_at TIMESTAMP DEFAULT NOW(),
+   read_at TIMESTAMP,
+   Id_Users INTEGER NOT NULL,
+   Id_Reservation INTEGER,
+   id_reservation_request BIGINT,
+   PRIMARY KEY(Id_Notification),
+   FOREIGN KEY(Id_Users) REFERENCES Users(Id_Users) ON DELETE CASCADE,
+   FOREIGN KEY(Id_Reservation) REFERENCES Reservation(Id_Reservation) ON DELETE SET NULL,
+   FOREIGN KEY(id_reservation_request) REFERENCES reservation_requests(id) ON DELETE SET NULL
+);
+
+-- 3. Index pour performance sur Device_tokens
+CREATE INDEX IF NOT EXISTS idx_device_tokens_user 
+ON Device_tokens(Id_Users, is_active) 
+WHERE is_active = TRUE;
+
+CREATE INDEX IF NOT EXISTS idx_device_tokens_platform 
+ON Device_tokens(platform, is_active) 
+WHERE is_active = TRUE;
+
+-- 4. Index pour performance sur Notifications
+CREATE INDEX IF NOT EXISTS idx_notifications_user_read_sent 
+ON Notifications(Id_Users, read, sent_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_notifications_type 
+ON Notifications(type, sent_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_notifications_reservation 
+ON Notifications(Id_Reservation) 
+WHERE Id_Reservation IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_notifications_request 
+ON Notifications(id_reservation_request) 
+WHERE id_reservation_request IS NOT NULL;
+
+-- 5. Fonction pour nettoyer les anciennes notifications (90 jours)
+CREATE OR REPLACE FUNCTION delete_old_notifications()
+RETURNS void AS $$
+BEGIN
+    DELETE FROM Notifications 
+    WHERE sent_at < NOW() - INTERVAL '90 days';
+END;
+$$ LANGUAGE plpgsql;
+
+-- 6. Fonction pour marquer automatiquement updated_at sur Device_tokens
+CREATE OR REPLACE FUNCTION update_device_token_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_device_token_timestamp
+BEFORE UPDATE ON Device_tokens
+FOR EACH ROW
+EXECUTE FUNCTION update_device_token_timestamp();
+
+-- 7. Vue pour statistiques notifications par utilisateur
+CREATE OR REPLACE VIEW v_user_notification_stats AS
+SELECT 
+    Id_Users,
+    COUNT(*) AS total_notifications,
+    COUNT(*) FILTER (WHERE read = FALSE) AS unread_count,
+    COUNT(*) FILTER (WHERE type = 'reservation_accepted') AS accepted_count,
+    COUNT(*) FILTER (WHERE type = 'new_request') AS new_request_count,
+    MAX(sent_at) AS last_notification_at
+FROM Notifications
+GROUP BY Id_Users;
 
