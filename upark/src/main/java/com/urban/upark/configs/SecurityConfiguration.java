@@ -55,6 +55,11 @@ public class SecurityConfiguration {
                 // Public endpoints
                 .requestMatchers("/api/v1/vehicles/**").permitAll()
                 .requestMatchers("/api/v1/announcements/published").permitAll()
+                // User notes: GET public (statistiques), POST/DELETE authentifie
+                .requestMatchers(HttpMethod.GET, "/api/v1/user-notes/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/user-notes").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/v1/user-notes/**").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/user-notes/**").authenticated()
                 // All other requests need authentication
                 .anyRequest().authenticated()
             )

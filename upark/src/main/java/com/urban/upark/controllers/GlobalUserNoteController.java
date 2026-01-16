@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/global-user-notes")
+@RequestMapping("/api/v1/global-user-notes")
 @RequiredArgsConstructor
 public class GlobalUserNoteController {
 

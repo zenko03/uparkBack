@@ -19,6 +19,41 @@ public class NotificationController {
     private final NotificationService notificationService;
     
     /**
+     * ENDPOINT DE TEST - Envoyer une notification push à un utilisateur
+     * Utiliser via Postman pour tester
+     */
+    @PostMapping("/test-push")
+    public ResponseEntity<Map<String, String>> testPushNotification(@RequestBody Map<String, Object> request) {
+        try {
+            Integer userId = (Integer) request.get("userId");
+            String title = (String) request.getOrDefault("title", "🔔 Test Notification");
+            String message = (String) request.getOrDefault("message", "Ceci est une notification de test!");
+            
+            if (userId == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "userId requis"));
+            }
+            
+            System.out.println("📤 TEST: Envoi notification à user " + userId);
+            
+            Map<String, String> data = new HashMap<>();
+            data.put("type", "system");
+            data.put("timestamp", String.valueOf(System.currentTimeMillis()));
+            
+            notificationService.sendPushNotification(userId, title, message, "system", data);
+            
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "Notification envoyée à l'utilisateur " + userId);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.err.println("❌ Erreur test push: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+    
+    /**
      * Récupérer les notifications d'un utilisateur
      */
     @GetMapping("/user/{userId}")

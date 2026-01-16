@@ -57,7 +57,7 @@ async function sendPushNotification(token: string, title: string, body: string, 
           priority: 'high',
           notification: {
             sound: 'default',
-            priority: 'high',
+            channel_id: 'default',
           },
         },
         apns: {
@@ -100,7 +100,7 @@ async function sendPushNotification(token: string, title: string, body: string, 
 }
 
 // Handler principal de la Edge Function
-serve(async (req) => {
+serve(async (req: Request) => {
   try {
     // Vérifier l'authentification (token Supabase)
     const authHeader = req.headers.get('Authorization');
@@ -129,10 +129,10 @@ serve(async (req) => {
       JSON.stringify({ success: true, result }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('❌ Erreur Edge Function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }

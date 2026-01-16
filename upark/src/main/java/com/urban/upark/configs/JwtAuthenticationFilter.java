@@ -56,6 +56,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Parkings: seuls GET publics (POST/PUT/DELETE protégés)
             (request.getMethod().equals("GET") && 
              (requestURI.startsWith("/api/parkings") || requestURI.startsWith("/api/v1/parkings"))) ||
+            // User notes: GET publics (statistiques et avis), POST/DELETE protégés
+            (request.getMethod().equals("GET") && 
+             (requestURI.startsWith("/api/user-notes") || requestURI.startsWith("/api/v1/user-notes"))) ||
             // Reservations publiques
             requestURI.startsWith("/api/reservations/test-public") ||
             requestURI.startsWith("/api/v1/reservations/test-public") ||

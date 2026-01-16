@@ -11,3 +11,6 @@ services:
       - .env
     environment:
       - SPRING_DEVTOOLS_RESTART_ENABLED=true
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4

@@ -32,8 +32,8 @@ public class NotificationService {
     @Value("${supabase.url:https://fbpefbjoxzkxombdcqif.supabase.co}")
     private String supabaseUrl;
     
-    @Value("${supabase.anon.key:}")
-    private String supabaseAnonKey;
+    @Value("${supabase.key:}")
+    private String supabaseServiceKey;
     
     /**
      * Envoyer une notification push à un utilisateur
@@ -100,7 +100,7 @@ public class NotificationService {
         // Headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + supabaseAnonKey);
+        headers.set("Authorization", "Bearer " + supabaseServiceKey);
         
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
         
