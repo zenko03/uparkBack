@@ -18,10 +18,7 @@ public class NotificationController {
     
     private final NotificationService notificationService;
     
-    /**
-     * ENDPOINT DE TEST - Envoyer une notification push à un utilisateur
-     * Utiliser via Postman pour tester
-     */
+    
     @PostMapping("/test-push")
     public ResponseEntity<Map<String, String>> testPushNotification(@RequestBody Map<String, Object> request) {
         try {

@@ -18,9 +18,6 @@ public class SupabaseStorageService {
 
     /**
      * Upload un fichier vers Supabase Storage
-     * @param imageBase64 Image encodée en base64
-     * @param fileName Nom du fichier (avec chemin: userId/parkingId/filename.jpg)
-     * @return URL publique du fichier uploadé
      */
     public String uploadFile(String imageBase64, String fileName) {
         try {
@@ -52,13 +49,13 @@ public class SupabaseStorageService {
             if (response.getStatusCode().is2xxSuccessful()) {
                 // Construire l'URL publique
                 String publicUrl = supabaseUrl + "/storage/v1/object/public/parking-images/" + fileName;
-                System.out.println("✅ Image uploadée vers Supabase: " + publicUrl);
+                System.out.println(" Image uploadée vers Supabase: " + publicUrl);
                 return publicUrl;
             } else {
                 throw new RuntimeException("Erreur upload Supabase: " + response.getStatusCode());
             }
         } catch (Exception e) {
-            System.err.println("❌ Erreur upload Supabase: " + e.getMessage());
+            System.err.println("Erreur upload Supabase: " + e.getMessage());
             throw new RuntimeException("Erreur lors de l'upload vers Supabase", e);
         }
     }

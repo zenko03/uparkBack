@@ -34,6 +34,17 @@ public class NotificationService {
     
     @Value("${supabase.key:}")
     private String supabaseServiceKey;
+
+    @Transactional
+    public void sendbulknotifications(String title, String message, String type, Map<String, String> data) {
+        if(usersRepository.findAllActiveUsers().isEmpty()){
+            System.out.println("⚠️ Aucun utilisateur actif trouvé pour l'envoi de notifications.");
+            return;
+        }
+        for(Users user : usersRepository.findAllActiveUsers()){
+            sendPushNotification(user.getId_Users(), title, message, type, data);
+        }
+    }
     
     /**
      * Envoyer une notification push à un utilisateur

@@ -41,9 +41,6 @@ public class ParkingImageService {
 
     /**
      * Upload une image en base64 vers Supabase et sauvegarder les métadonnées
-     * @param parkingId ID du parking
-     * @param request Requête contenant l'image base64, fileName, userId, isPrimary
-     * @return Image sauvegardée avec URL Supabase
      */
     @Transactional
     public ParkingImage uploadAndSaveImage(Integer parkingId, ImageUploadRequest request) {

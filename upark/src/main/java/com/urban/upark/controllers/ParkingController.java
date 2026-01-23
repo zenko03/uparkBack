@@ -81,7 +81,7 @@ public class ParkingController {
             System.out.println("✅ Parking mis à jour: " + updatedParking.getId_Parking());
             return ResponseEntity.ok(updatedParking);
         } catch (RuntimeException e) {
-            System.err.println("❌ Erreur mise à jour parking " + id + ": " + e.getMessage());
+            System.err.println("❌z Erreur mise à jour parking " + id + ": " + e.getMessage());
             System.err.println("❌ Type d'erreur: " + e.getClass().getName());
             e.printStackTrace();
             

@@ -1,5 +1,6 @@
 package com.urban.upark.repositories;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.urban.upark.models.Users;
@@ -7,6 +8,8 @@ import com.urban.upark.models.Users;
 public interface UsersRepository extends JpaRepository<Users,Integer>{
     
     Optional<Users> findByUserName(String userName);
+
+    List<Users> findAllActiveUsers();
     
     // OAuth2 queries
     Optional<Users> findByEmail(String email);
