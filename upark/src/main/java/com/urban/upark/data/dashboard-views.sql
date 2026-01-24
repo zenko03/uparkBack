@@ -78,14 +78,20 @@ SELECT
     p.hourly_rate,
     p.description,
     
-    -- Statistiques réservations (via la chaîne de jointures correcte)
+    -- Statistiques réservations
     COUNT(DISTINCT r.Id_Reservation) AS nombre_reservations,
     SUM(COALESCE(r.total_price, 0)) AS chiffre_affaires,
     AVG(COALESCE(r.total_price, 0)) AS panier_moyen,
     
-    -- Notes et satisfaction
-    AVG(COALESCE(pn.note, 0)) AS note_moyenne,
-    COUNT(pn.Id_Parking_note) AS nombre_notes,
+    -- Notes et satisfaction (✅ CORRIGÉ: user_note au lieu de parking_note)
+    AVG(COALESCE(un.note, 0)) AS note_moyenne,
+    COUNT(un.id) AS nombre_notes,
+    
+    -- Détail des critères de notation
+    AVG(CASE WHEN un.cleanliness THEN 1 ELSE 0 END) * 100 AS taux_proprete,
+    AVG(CASE WHEN un.precision THEN 1 ELSE 0 END) * 100 AS taux_precision,
+    AVG(CASE WHEN un.communication THEN 1 ELSE 0 END) * 100 AS taux_communication,
+    AVG(CASE WHEN un.security THEN 1 ELSE 0 END) * 100 AS taux_securite,
     
     -- Capacité et disponibilité
     SUM(COALESCE(pv.numbers, 0)) AS capacite_totale,
@@ -93,25 +99,26 @@ SELECT
     -- Classement
     ROW_NUMBER() OVER (ORDER BY COUNT(DISTINCT r.Id_Reservation) DESC) AS classement_reservations,
     ROW_NUMBER() OVER (ORDER BY SUM(COALESCE(r.total_price, 0)) DESC) AS classement_ca,
+    ROW_NUMBER() OVER (ORDER BY AVG(COALESCE(un.note, 0)) DESC) AS classement_notes,
     
     -- Propriétaire
     u.name AS proprietaire_nom,
     u.first_name AS proprietaire_prenom
 
 FROM parking p
--- Jointure correcte : Reservation -> Reservation_vehicles -> Announcements_vehicles -> Parking_vehicles -> Parking
+-- Jointure réservations (via chaîne complète)
 LEFT JOIN parking_vehicles pv ON p.Id_Parking = pv.Id_Parking
 LEFT JOIN announcements_vehicles av ON pv.Id_Parking_vehicles = av.Id_Parking_vehicles
 LEFT JOIN reservation_vehicles rv ON av.Id_Announcements_vehicles = rv.Id_Announcements_vehicles
 LEFT JOIN reservation r ON rv.Id_Reservation = r.Id_Reservation
--- Autres jointures
-LEFT JOIN parking_note pn ON p.Id_Parking = pn.Id_Parking
+-- user_note au lieu de parking_note
+LEFT JOIN user_note un ON p.Id_Parking = un.id_parking
+-- Propriétaire
 LEFT JOIN users u ON p.Id_Users = u.Id_Users
 GROUP BY 
     p.Id_Parking, p.label, p.hourly_rate, p.description, 
     u.name, u.first_name
 ORDER BY nombre_reservations DESC;
-
 -- =====================================================================
 -- VIEW 4 : UTILISATEURS ACTIFS
 -- =====================================================================
@@ -208,8 +215,8 @@ CREATE INDEX IF NOT EXISTS idx_reservation_users ON reservation(Id_Users);
 
 -- Index pour les parkings
 CREATE INDEX IF NOT EXISTS idx_parking_users ON parking(Id_Users);
-CREATE INDEX IF NOT EXISTS idx_parking_note_parking ON parking_note(Id_Parking);
-
+CREATE INDEX IF NOT EXISTS idx_user_note_parking ON user_note(id_parking);
+CREATE INDEX IF NOT EXISTS idx_user_note_user ON user_note(id_user);
 -- Index pour les tables de liaison
 CREATE INDEX IF NOT EXISTS idx_parking_vehicles_parking ON parking_vehicles(Id_Parking);
 CREATE INDEX IF NOT EXISTS idx_announcements_vehicles_parking_vehicles ON announcements_vehicles(Id_Parking_vehicles);
