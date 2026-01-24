@@ -9,6 +9,9 @@ COPY pom.xml .
 COPY mvnw .
 COPY .mvn .mvn
 
+# Ajouter les permissions d'exécution
+RUN chmod +x mvnw
+
 # Pré-télécharger les dépendances Maven
 RUN ./mvnw dependency:go-offline
 
