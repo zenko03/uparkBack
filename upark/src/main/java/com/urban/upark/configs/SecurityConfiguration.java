@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
         private final JwtAuthenticationFilter jwtAuthFilter;
@@ -54,12 +56,18 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.GET, "/api/v1/parkings/{id}/availability").permitAll()
                 // Public endpoints
                 .requestMatchers("/api/v1/vehicles/**").permitAll()
+                .requestMatchers("/api/vehicles/**").permitAll()
                 .requestMatchers("/api/v1/announcements/published").permitAll()
                 // User notes: GET public (statistiques), POST/DELETE authentifie
                 .requestMatchers(HttpMethod.GET, "/api/v1/user-notes/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/user-notes").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/v1/user-notes/**").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/user-notes/**").authenticated()
+                // Dashboard endpoints (admin only - should add role check later)
+                .requestMatchers("/api/dashboard/**").permitAll()
+                // Disputes endpoints (protected - users can only access their own)
+                .requestMatchers("/api/v1/disputes/**").authenticated()
+                .requestMatchers("/api/v1/dispute-proofs/**").authenticated()
                 // All other requests need authentication
                 .anyRequest().authenticated()
             )
