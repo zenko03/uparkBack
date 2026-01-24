@@ -1,24 +1,21 @@
 package com.urban.upark.controllers;
 
+import com.urban.upark.dto.dispute.DisputeProofUploadRequest;
 import com.urban.upark.models.DisputeProof;
 import com.urban.upark.services.DisputeProofService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/dispute-proofs")
+@RequestMapping("/api/v1/dispute-proofs")
 @CrossOrigin(origins = "*")
+@RequiredArgsConstructor
 public class DisputeProofController {
 
     private final DisputeProofService disputeProofService;
-
-    @Autowired
-    public DisputeProofController(DisputeProofService disputeProofService) {
-        this.disputeProofService = disputeProofService;
-    }
 
     @GetMapping
     public List<DisputeProof> getAllDisputeProofs() {
@@ -55,5 +52,24 @@ public class DisputeProofController {
     public ResponseEntity<Void> deleteDisputeProof(@PathVariable Long id) {
         disputeProofService.deleteDisputeProof(id);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Upload une preuve en base64 vers Supabase et sauvegarder
+     * @param disputeId ID du litige
+     * @param request Requête avec image base64
+     * @return Preuve uploadée et sauvegardée
+     */
+    @PostMapping("/{disputeId}/upload")
+    public ResponseEntity<DisputeProof> uploadProof(
+            @PathVariable Long disputeId,
+            @RequestBody DisputeProofUploadRequest request) {
+        try {
+            DisputeProof savedProof = disputeProofService.uploadAndSaveProof(disputeId, request);
+            return ResponseEntity.ok(savedProof);
+        } catch (RuntimeException e) {
+            System.err.println("❌ Erreur upload preuve: " + e.getMessage());
+            return ResponseEntity.status(500).build();
+        }
     }
 }

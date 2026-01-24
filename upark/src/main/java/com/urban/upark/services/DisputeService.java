@@ -22,6 +22,14 @@ public class DisputeService {
         return disputeRepository.findAll();
     }
 
+    public List<Dispute> getDisputesByUserId(Long userId) {
+        return disputeRepository.findByUserId(userId);
+    }
+
+    public List<Dispute> getDisputesByReservationId(Long reservationId) {
+        return disputeRepository.findByReservationId(reservationId);
+    }
+
     public Optional<Dispute> getDisputeById(Long id) {
         return disputeRepository.findById(id);
     }
@@ -34,6 +42,9 @@ public class DisputeService {
         return disputeRepository.findById(id).map(dispute -> {
             dispute.setMotif(disputeDetails.getMotif());
             dispute.setDescription(disputeDetails.getDescription());
+            if (disputeDetails.getReservation() != null) {
+                dispute.setReservation(disputeDetails.getReservation());
+            }
             return disputeRepository.save(dispute);
         }).orElse(null);
     }

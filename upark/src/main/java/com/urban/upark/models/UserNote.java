@@ -49,7 +49,7 @@ public class UserNote {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_user")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password", "commissionPartners", "reservations", "parkings"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password", "commissionPartners", "reservations", "parkings", "role", "authorities"})
     private Users user;
 
     @PrePersist

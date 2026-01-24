@@ -9,7 +9,6 @@ public interface UsersRepository extends JpaRepository<Users,Integer>{
     
     Optional<Users> findByUserName(String userName);
 
-    List<Users> findAllActiveUsers();
     
     // OAuth2 queries
     Optional<Users> findByEmail(String email);

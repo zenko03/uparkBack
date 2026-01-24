@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/disputes")
+@RequestMapping("/api/v1/disputes")
 @CrossOrigin(origins = "*")
 public class DisputeController {
 
@@ -23,6 +23,16 @@ public class DisputeController {
     @GetMapping
     public List<Dispute> getAllDisputes() {
         return disputeService.getAllDisputes();
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<Dispute> getDisputesByUserId(@PathVariable Long userId) {
+        return disputeService.getDisputesByUserId(userId);
+    }
+
+    @GetMapping("/reservation/{reservationId}")
+    public List<Dispute> getDisputesByReservationId(@PathVariable Long reservationId) {
+        return disputeService.getDisputesByReservationId(reservationId);
     }
 
     @GetMapping("/{id}")
