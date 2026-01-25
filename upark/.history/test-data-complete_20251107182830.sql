@@ -446,13 +446,13 @@ RÉSUMÉ DES DONNÉES DE TEST:
  VÉHICULES (7 types):
 Voiture, Moto, Utilitaire léger, Camionnette, Citadine, SUV, Vélo électrique
 
-📋 RÉSERVATIONS (10):
+ RÉSERVATIONS (10):
 - 3 Terminées
 - 2 En cours
 - 3 Confirmées
 - 2 En attente
 
-💰 COMMISSIONS:
+ COMMISSIONS:
 - Globale: 10%
 - Par véhicule: 5% à 15%
 - Partenaire: 5%

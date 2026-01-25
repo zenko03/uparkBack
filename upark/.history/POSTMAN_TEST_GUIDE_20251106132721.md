@@ -1,4 +1,4 @@
-# 📋 **GUIDE COMPLET DE TEST POSTMAN - UPARK FRONT OFFICE**
+#  **GUIDE COMPLET DE TEST POSTMAN - UPARK FRONT OFFICE**
 
 ##  **PRÉREQUIS**
 
@@ -90,7 +90,7 @@ Authorization: Bearer {{token}}
 
 ---
 
-## 📍 **ÉTAPE 3 : DÉTAIL D'UN PARKING (Interface reservation.png)**
+##  **ÉTAPE 3 : DÉTAIL D'UN PARKING (Interface reservation.png)**
 
 ### 3.1 **Obtenir les détails d'un parking**
 ```http
@@ -198,7 +198,7 @@ Authorization: Bearer {{token}}
 
 ---
 
-## 📋 **ÉTAPE 6 : LISTE DES RÉSERVATIONS (Interface listeResa.png)**
+##  **ÉTAPE 6 : LISTE DES RÉSERVATIONS (Interface listeResa.png)**
 
 ### 6.1 **Lister les réservations d'un utilisateur**
 ```http
@@ -305,7 +305,7 @@ Authorization: Bearer {{token}}
 
 ---
 
-## 🎯 **FLOW COMPLET TEST**
+##  **FLOW COMPLET TEST**
 
 1. **Connexion** → Obtenir token JWT
 2. **Recherche** → Trouver parking "Analakely"

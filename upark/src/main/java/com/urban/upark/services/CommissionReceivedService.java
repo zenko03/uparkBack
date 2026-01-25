@@ -59,7 +59,7 @@ public class CommissionReceivedService {
                     .multiply(commissionRate)
                     .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
 
-            System.out.println("💰 Calculating commission:");
+            System.out.println(" Calculating commission:");
             System.out.println("  - Reservation price: " + reservation.getTotalPrice());
             System.out.println("  - Commission rate: " + commissionRate + "%");
             System.out.println("  - Commission amount: " + commissionAmount);

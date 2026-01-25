@@ -159,7 +159,7 @@ public class ParkingService {
     @Transactional
     public Parking updateParkingWithVehicles(int parkingId, ParkingUpdateRequest request) {
         System.out.println("🔍 [ParkingService] updateParkingWithVehicles - Parking ID: " + parkingId);
-        System.out.println("📋 [ParkingService] Request: " + request);
+        System.out.println(" [ParkingService] Request: " + request);
         
         try {
             // Vérifier que le parking existe

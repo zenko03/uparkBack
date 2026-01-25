@@ -276,7 +276,7 @@ public class ReservationService {
         }
 
         // Créer la commission pour cette réservation
-        System.out.println("💰 Creating commission for reservation...");
+        System.out.println(" Creating commission for reservation...");
         commissionReceivedService.createCommissionForReservation(savedReservation);
 
         return savedReservation;
@@ -317,7 +317,7 @@ public class ReservationService {
      * Utilise la vue SQL v_user_reservations pour des performances optimales
      */
     public List<ReservationResponse> findByUserIdWithParkingInfo(int userId) {
-        System.out.println("📋 Récupération des réservations pour l'utilisateur " + userId);
+        System.out.println(" Récupération des réservations pour l'utilisateur " + userId);
         
         List<Map<String, Object>> results = reservationRepository.findUserReservationsFromView(userId);
         System.out.println("📊 Nombre de résultats de la vue: " + results.size());

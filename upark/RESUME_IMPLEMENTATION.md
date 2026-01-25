@@ -1,6 +1,6 @@
 # Résumé de l'Implémentation - Gestion Dynamique des Statuts de Réservations
 
-## 📋 Objectif
+##  Objectif
 
 Implémenter une gestion automatique et dynamique des statuts de réservations pour éviter qu'ils restent "statiques" après la création. Les statuts doivent évoluer automatiquement en fonction de la date/heure actuelle.
 
@@ -124,7 +124,7 @@ PUT /api/reservations/{id}/status/{statusId}
 - Codes HTTP appropriés (200 OK, 404 Not Found)
 - Réponses JSON structurées
 
-## 🎯 Avantages de l'Implémentation
+##  Avantages de l'Implémentation
 
  **Automatisation complète** : Pas d'intervention manuelle nécessaire
 

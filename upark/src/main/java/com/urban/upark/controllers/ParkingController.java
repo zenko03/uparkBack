@@ -76,7 +76,7 @@ public class ParkingController {
     public ResponseEntity<?> updateParking(@PathVariable int id, @RequestBody ParkingUpdateRequest request) {
         try {
             System.out.println(" Mise à jour parking ID: " + id);
-            System.out.println("📋 Données reçues: " + request);
+            System.out.println(" Données reçues: " + request);
             Parking updatedParking = parkingService.updateParkingWithVehicles(id, request);
             System.out.println(" Parking mis à jour: " + updatedParking.getId_Parking());
             return ResponseEntity.ok(updatedParking);

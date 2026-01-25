@@ -283,7 +283,7 @@ public class ReservationRequestService {
                 return;
             }
             
-            System.out.println("📋 Véhicules sélectionnés trouvés: " + requestVehicles.size() + " type(s)");
+            System.out.println(" Véhicules sélectionnés trouvés: " + requestVehicles.size() + " type(s)");
             
             // Pour chaque type de véhicule sélectionné, créer un ReservationVehicles
             for (ReservationRequestVehicles rrv : requestVehicles) {

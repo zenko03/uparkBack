@@ -30,7 +30,7 @@
 
 ---
 
-## 📋 ÉTAPES À SUIVRE MAINTENANT
+##  ÉTAPES À SUIVRE MAINTENANT
 
 ### ÉTAPE 1 : Exécuter le script SQL dans Supabase
 
@@ -169,7 +169,7 @@ npm run android
 
 ---
 
-## 🎯 PROCHAINES ÉTAPES
+##  PROCHAINES ÉTAPES
 
 1. **Créer l'écran Notifications.jsx** (déjà le squelette existe)
 2. **Ajouter des icônes de badge** pour le nombre de notifications non lues

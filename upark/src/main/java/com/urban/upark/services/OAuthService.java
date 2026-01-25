@@ -41,7 +41,7 @@ public class OAuthService {
     public OAuthUserInfo verifyGoogleToken(String idToken) {
         try {
             System.out.println("🔍 Vérification token Google...");
-            System.out.println("📋 Client ID attendu: " + googleClientId);
+            System.out.println(" Client ID attendu: " + googleClientId);
             
             // Décoder le token AVANT vérification pour diagnostiquer
             GoogleIdToken unverifiedToken = GoogleIdToken.parse(GsonFactory.getDefaultInstance(), idToken);

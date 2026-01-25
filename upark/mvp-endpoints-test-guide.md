@@ -1,6 +1,6 @@
-# 📋 GUIDE COMPLET DE TESTS DES ENDPOINTS MVP UPARK
+#  GUIDE COMPLET DE TESTS DES ENDPOINTS MVP UPARK
 
-## 🎯 OBJECTIF
+##  OBJECTIF
 Tester tous les endpoints du MVP Upark (Front Office + Back Office) avec les données de test complètes.
 
 ##  PRÉREQUIS
