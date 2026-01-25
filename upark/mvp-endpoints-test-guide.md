@@ -3,7 +3,7 @@
 ## 🎯 OBJECTIF
 Tester tous les endpoints du MVP Upark (Front Office + Back Office) avec les données de test complètes.
 
-## 🚀 PRÉREQUIS
+##  PRÉREQUIS
 
 ### 1. Préparation de la base de données
 ```bash
@@ -708,7 +708,7 @@ Authorization: Bearer {admin_token}
 
 ## 📊 RÉSULTATS ATTENDUS
 
-### ✅ CRITÈRES DE SUCCÈS
+###  CRITÈRES DE SUCCÈS
 
 1. **Tous les endpoints répondent** (Code 200/201/400/404)
 2. **Authentification fonctionnelle** (JWT valide)
@@ -746,7 +746,7 @@ Authorization: Bearer {admin_token}
 
 ---
 
-## 📝 CHECKLIST FINALE
+##  CHECKLIST FINALE
 
 - [ ] Base de données nettoyée et peuplée
 - [ ] Serveur Spring Boot démarré

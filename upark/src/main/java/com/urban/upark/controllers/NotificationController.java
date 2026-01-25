@@ -23,7 +23,7 @@ public class NotificationController {
     public ResponseEntity<Map<String, String>> testPushNotification(@RequestBody Map<String, Object> request) {
         try {
             Integer userId = (Integer) request.get("userId");
-            String title = (String) request.getOrDefault("title", "🔔 Test Notification");
+            String title = (String) request.getOrDefault("title", " Test Notification");
             String message = (String) request.getOrDefault("message", "Ceci est une notification de test!");
             
             if (userId == null) {
@@ -44,7 +44,7 @@ public class NotificationController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            System.err.println("❌ Erreur test push: " + e.getMessage());
+            System.err.println("Erreur: Erreur test push: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
@@ -61,7 +61,7 @@ public class NotificationController {
             List<Notification> notifications = notificationService.getUserNotifications(userId, limit);
             return ResponseEntity.ok(notifications);
         } catch (Exception e) {
-            System.err.println("❌ Erreur récupération notifications: " + e.getMessage());
+            System.err.println("Erreur: Erreur récupération notifications: " + e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }

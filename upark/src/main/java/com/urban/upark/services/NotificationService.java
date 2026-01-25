@@ -38,7 +38,7 @@ public class NotificationService {
     // @Transactional
     // public void sendbulknotifications(String title, String message, String type, Map<String, String> data) {
     //     if(usersRepository.findAllActiveUsers().isEmpty()){
-    //         System.out.println("⚠️ Aucun utilisateur actif trouvé pour l'envoi de notifications.");
+    //         System.out.println(" Aucun utilisateur actif trouvé pour l'envoi de notifications.");
     //         return;
     //     }
     //     for(Users user : usersRepository.findAllActiveUsers()){
@@ -67,13 +67,13 @@ public class NotificationService {
                     .build();
             
             notificationRepository.save(notification);
-            System.out.println("✅ Notification sauvegardée en BDD");
+            System.out.println(" Notification sauvegardée en BDD");
             
             // 2. Récupérer les tokens FCM actifs de l'utilisateur
             List<DeviceToken> tokens = deviceTokenRepository.findActiveTokensByUserId(userId);
             
             if (tokens.isEmpty()) {
-                System.out.println("⚠️ Aucun token FCM trouvé pour user " + userId);
+                System.out.println(" Aucun token FCM trouvé pour user " + userId);
                 return;
             }
             
@@ -81,14 +81,14 @@ public class NotificationService {
             for (DeviceToken deviceToken : tokens) {
                 try {
                     sendViaSupabaseEdgeFunction(deviceToken.getToken(), title, message, data);
-                    System.out.println("✅ Notification envoyée au token: " + deviceToken.getToken().substring(0, 20) + "...");
+                    System.out.println(" Notification envoyée au token: " + deviceToken.getToken().substring(0, 20) + "...");
                 } catch (Exception e) {
-                    System.err.println("❌ Erreur envoi au token " + deviceToken.getToken().substring(0, 20) + ": " + e.getMessage());
+                    System.err.println("Erreur: Erreur envoi au token " + deviceToken.getToken().substring(0, 20) + ": " + e.getMessage());
                 }
             }
             
         } catch (Exception e) {
-            System.err.println("❌ Erreur sendPushNotification: " + e.getMessage());
+            System.err.println("Erreur: Erreur sendPushNotification: " + e.getMessage());
             e.printStackTrace();
         }
     }

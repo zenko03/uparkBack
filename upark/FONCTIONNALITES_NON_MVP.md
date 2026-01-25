@@ -3,7 +3,7 @@
 
 **Date :** 22 décembre 2025  
 **Version :** 1.0  
-**État MVP :** ✅ Terminé et Fonctionnel
+**État MVP :**  Terminé et Fonctionnel
 
 ---
 
@@ -919,7 +919,7 @@ Permettre aux utilisateurs de signaler des problèmes et demander des remboursem
 
 ---
 
-### ✅ NOTES IMPORTANTES
+###  NOTES IMPORTANTES
 
 **Points forts de l'architecture actuelle :**
 - Backend Spring Boot bien structuré avec séparation des responsabilités

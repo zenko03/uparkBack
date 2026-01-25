@@ -166,7 +166,7 @@ public class ParkingService {
             System.out.println("🔍 [ParkingService] Recherche du parking...");
             Parking existingParking = parkingRepository.findById(parkingId)
                     .orElseThrow(() -> new RuntimeException("Parking non trouvé avec ID: " + parkingId));
-            System.out.println("✅ [ParkingService] Parking trouvé: " + existingParking.getLabel());
+            System.out.println(" [ParkingService] Parking trouvé: " + existingParking.getLabel());
 
             // Mettre à jour les champs du parking
             System.out.println("🔄 [ParkingService] Mise à jour des champs du parking...");
@@ -183,11 +183,11 @@ public class ParkingService {
                     .setParameter("isActive", request.getIsActive() != null ? request.getIsActive() : true)
                     .setParameter("id", parkingId)
                     .executeUpdate();
-            System.out.println("✅ [ParkingService] Parking mis à jour. Lignes affectées: " + updatedRows);
+            System.out.println(" [ParkingService] Parking mis à jour. Lignes affectées: " + updatedRows);
 
             // Mettre à jour les véhicules associés si fournis
             if (request.getVehicles() != null) {
-                System.out.println("🚗 [ParkingService] Mise à jour des véhicules (" + request.getVehicles().size() + " véhicule(s))...");
+                System.out.println(" [ParkingService] Mise à jour des véhicules (" + request.getVehicles().size() + " véhicule(s))...");
                 
                 // Supprimer les anciennes associations
                 List<ParkingVehicles> existingVehicles = parkingVehiclesRepository.findByParkingId(parkingId);
@@ -196,17 +196,17 @@ public class ParkingService {
 
                 // Créer les nouvelles associations
                 if (!request.getVehicles().isEmpty()) {
-                    System.out.println("➕ [ParkingService] Création des nouvelles associations...");
+                    System.out.println(" [ParkingService] Création des nouvelles associations...");
                     saveParkingVehicles(parkingId, request.getVehicles());
                 }
             }
 
-            System.out.println("✅ [ParkingService] Mise à jour terminée avec succès");
+            System.out.println(" [ParkingService] Mise à jour terminée avec succès");
             return parkingRepository.findById(parkingId).orElse(existingParking);
             
         } catch (Exception e) {
-            System.err.println("❌ [ParkingService] ERREUR lors de la mise à jour: " + e.getClass().getName());
-            System.err.println("❌ [ParkingService] Message: " + e.getMessage());
+            System.err.println("Erreur: [ParkingService] ERREUR lors de la mise à jour: " + e.getClass().getName());
+            System.err.println("Erreur: [ParkingService] Message: " + e.getMessage());
             e.printStackTrace();
             throw e;
         }
@@ -449,7 +449,7 @@ public class ParkingService {
                 int reservedCapacity = calculateReservedCapacity(announcements, startDateTime, endDateTime);
                 int availableCapacity = Math.max(0, totalCapacity - reservedCapacity);
                 
-                System.out.println("🚗 " + vehicle.getTypes() + " - Capacité proposée: " + totalCapacity 
+                System.out.println(" " + vehicle.getTypes() + " - Capacité proposée: " + totalCapacity 
                     + ", Réservée: " + reservedCapacity + ", Disponible: " + availableCapacity);
                 
                 vehicleAvailabilities.add(VehicleAvailability.builder()

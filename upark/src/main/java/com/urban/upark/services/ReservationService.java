@@ -123,7 +123,7 @@ public class ReservationService {
                 }
             }
         } catch (Exception e) {
-            System.err.println("⚠️ Error extracting parking info for reservation " + reservation.getId_Reservation() + ": " + e.getMessage());
+            System.err.println(" Error extracting parking info for reservation " + reservation.getId_Reservation() + ": " + e.getMessage());
         }
         
         // Retourner un parking vide si non trouvé
@@ -196,7 +196,7 @@ public class ReservationService {
     }
 
     public Reservation createReservation(ReservationRequest request) {
-        System.out.println("📝 Creating reservation...");
+        System.out.println(" Creating reservation...");
         System.out.println("  - Parking ID: " + request.getParkingId());
         System.out.println("  - User ID: " + request.getUserId());
         System.out.println("  - Start: " + request.getStartDateTime());
@@ -255,7 +255,7 @@ public class ReservationService {
         updateReservationStatus(reservation);
 
         Reservation savedReservation = reservationRepository.save(reservation);
-        System.out.println("✅ Reservation saved with ID: " + savedReservation.getId_Reservation());
+        System.out.println(" Reservation saved with ID: " + savedReservation.getId_Reservation());
         System.out.println("📊 Initial status: " + savedReservation.getReservationStatus().getLabel());
         
         // Générer le token QR Code pour validation à l'entrée
@@ -267,12 +267,12 @@ public class ReservationService {
 
         // Créer les réservations de véhicules
         if (request.getSelectedVehicles() != null && !request.getSelectedVehicles().isEmpty()) {
-            System.out.println("🚗 Creating vehicle reservations...");
+            System.out.println(" Creating vehicle reservations...");
             for (VehicleSelection vehicleSelection : request.getSelectedVehicles()) {
                 createReservationVehicles(savedReservation, vehicleSelection, request.getParkingId());
             }
         } else {
-            System.err.println("⚠️ WARNING: No vehicles selected!");
+            System.err.println(" WARNING: No vehicles selected!");
         }
 
         // Créer la commission pour cette réservation
@@ -345,9 +345,9 @@ public class ReservationService {
                     .zipCode("") // Peut être ajouté plus tard
                     .build();
                 
-                System.out.println("  ✅ Parking trouvé: " + parkingInfo.getName());
+                System.out.println("   Parking trouvé: " + parkingInfo.getName());
             } else {
-                System.out.println("  ⚠️ Parking non trouvé pour la réservation");
+                System.out.println("   Parking non trouvé pour la réservation");
             }
             
             // Construire la réponse
@@ -363,7 +363,7 @@ public class ReservationService {
                 .parking(parkingInfo)
                 .build();
         } catch (Exception e) {
-            System.err.println("❌ Erreur lors du mapping de la vue: " + e.getMessage());
+            System.err.println("Erreur: Erreur lors du mapping de la vue: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Erreur lors du mapping de la réservation", e);
         }
@@ -687,7 +687,7 @@ public class ReservationService {
 
     private void createReservationVehicles(Reservation reservation, VehicleSelection vehicleSelection, int parkingId) {
         try {
-            System.out.println("🚗 Creating reservation vehicle: parkingId=" + parkingId + 
+            System.out.println(" Creating reservation vehicle: parkingId=" + parkingId + 
                               ", vehicleTypeId=" + vehicleSelection.getVehicleTypeId() + 
                               ", quantity=" + vehicleSelection.getQuantity());
             
@@ -695,7 +695,7 @@ public class ReservationService {
             List<AnnouncementsVehicles> announcementsVehicles = announcementsVehiclesRepository
                     .findByParkingAndVehicleType(parkingId, vehicleSelection.getVehicleTypeId());
             
-            System.out.println("✅ Found announcementsVehicles (JPQL): " + announcementsVehicles.size());
+            System.out.println(" Found announcementsVehicles (JPQL): " + announcementsVehicles.size());
             
             AnnouncementsVehicles selectedAnnouncementVehicle = null;
             
@@ -703,19 +703,19 @@ public class ReservationService {
                 selectedAnnouncementVehicle = announcementsVehicles.get(0);
             } else {
                 // Solution de secours : utiliser la requête SQL native
-                System.out.println("⚠️ JPQL returned empty, trying native query...");
+                System.out.println(" JPQL returned empty, trying native query...");
                 selectedAnnouncementVehicle = announcementsVehiclesRepository
                         .findByParkingAndVehicleTypeNative(parkingId, vehicleSelection.getVehicleTypeId());
             }
             
             if (selectedAnnouncementVehicle == null) {
-                System.err.println("❌ No AnnouncementsVehicles found for parkingId=" + parkingId + 
+                System.err.println("Erreur: No AnnouncementsVehicles found for parkingId=" + parkingId + 
                                   " and vehicleTypeId=" + vehicleSelection.getVehicleTypeId());
-                System.err.println("❌ This reservation will be created WITHOUT vehicle link!");
+                System.err.println("Erreur: This reservation will be created WITHOUT vehicle link!");
                 return;
             }
             
-            System.out.println("✅ Selected AnnouncementsVehicles ID: " + selectedAnnouncementVehicle.getId_Announcements_vehicles());
+            System.out.println(" Selected AnnouncementsVehicles ID: " + selectedAnnouncementVehicle.getId_Announcements_vehicles());
             
             ReservationVehicles reservationVehicles = ReservationVehicles.builder()
                     .reservation(reservation)
@@ -724,9 +724,9 @@ public class ReservationService {
                     .build();
             
             ReservationVehicles saved = reservationVehiclesRepository.save(reservationVehicles);
-            System.out.println("✅ Saved ReservationVehicles with ID: " + saved.getId_Reservation_vehicles());
+            System.out.println(" Saved ReservationVehicles with ID: " + saved.getId_Reservation_vehicles());
         } catch (Exception e) {
-            System.err.println("❌ Error creating reservation vehicles: " + e.getMessage());
+            System.err.println("Erreur: Error creating reservation vehicles: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -761,13 +761,13 @@ public class ReservationService {
                         // La réservation est en cours
                         reservation.setReservationStatus(statusEnCours);
                         updated = true;
-                        log.info("✅ Réservation ID {} : 'à venir' → 'En cours' (Début: {}, Fin: {})",
+                        log.info(" Réservation ID {} : 'à venir' → 'En cours' (Début: {}, Fin: {})",
                                 reservation.getId_Reservation(), reservation.getStartDateTime(), reservation.getEndDateTime());
                     } else {
                         // La réservation est terminée
                         reservation.setReservationStatus(statusTerminee);
                         updated = true;
-                        log.info("✅ Réservation ID {} : 'à venir' → 'Terminée' (période entièrement passée)", reservation.getId_Reservation());
+                        log.info(" Réservation ID {} : 'à venir' → 'Terminée' (période entièrement passée)", reservation.getId_Reservation());
                     }
                 }
                 
@@ -786,7 +786,7 @@ public class ReservationService {
                     reservation.setReservationStatus(statusTerminee);
                     reservationRepository.save(reservation);
                     updatedCount++;
-                    log.info("✅ Réservation ID {} : 'En cours' → 'Terminée'", reservation.getId_Reservation());
+                    log.info(" Réservation ID {} : 'En cours' → 'Terminée'", reservation.getId_Reservation());
                 }
             }
 
@@ -794,7 +794,7 @@ public class ReservationService {
             return updatedCount;
             
         } catch (Exception e) {
-            log.error("❌ Erreur lors de la mise à jour manuelle des statuts : {}", e.getMessage(), e);
+            log.error("Erreur: Erreur lors de la mise à jour manuelle des statuts : {}", e.getMessage(), e);
             e.printStackTrace();
             throw new RuntimeException("Erreur lors de la mise à jour des statuts: " + e.getMessage());
         }
@@ -808,7 +808,7 @@ public class ReservationService {
             Reservation reservation = reservationOpt.get();
             updateReservationStatus(reservation);
             reservationRepository.save(reservation);
-            System.out.println("✅ Statut mis à jour pour la réservation ID: " + reservationId +
+            System.out.println(" Statut mis à jour pour la réservation ID: " + reservationId +
                              " → " + reservation.getReservationStatus().getLabel());
         } else {
             throw new RuntimeException("Réservation non trouvée avec l'ID: " + reservationId);

@@ -1,6 +1,6 @@
 # 📋 **GUIDE COMPLET DE TEST POSTMAN - UPARK FRONT OFFICE**
 
-## 🚀 **PRÉREQUIS**
+##  **PRÉREQUIS**
 
 ### 1. **Démarrer le serveur backend**
 ```bash
@@ -117,7 +117,7 @@ Authorization: Bearer {{token}}
 
 ---
 
-## 📝 **ÉTAPE 4 : FORMULAIRE RÉSERVATION (Interface reservationForm.png)**
+##  **ÉTAPE 4 : FORMULAIRE RÉSERVATION (Interface reservationForm.png)**
 
 ### 4.1 **Calculer le prix d'une réservation**
 ```http
@@ -163,7 +163,7 @@ Content-Type: application/json
 
 ---
 
-## ✅ **ÉTAPE 5 : CONFIRMATION RÉSERVATION (Interface confirmResa.png)**
+##  **ÉTAPE 5 : CONFIRMATION RÉSERVATION (Interface confirmResa.png)**
 
 ### 5.1 **Créer la réservation**
 ```http
@@ -269,7 +269,7 @@ Authorization: Bearer {{token}}
 
 ---
 
-## ✅ **CHECKLIST DE VALIDATION**
+##  **CHECKLIST DE VALIDATION**
 
 - [ ] Authentification JWT fonctionnelle
 - [ ] Liste parkings avec filtres

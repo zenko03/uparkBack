@@ -66,7 +66,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             requestURI.startsWith("/api/v1/reservations/calculate-price") ||
             requestURI.startsWith("/api/reservations/check-availability") ||
             requestURI.startsWith("/api/v1/reservations/check-availability")) {
-            System.out.println("✅ Endpoint public - pas de vérification JWT");
+            System.out.println(" Endpoint public - pas de vérification JWT");
             filterChain.doFilter(request, response);
             return;
         }
@@ -81,7 +81,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String username;
         
         if(authHeader == null || !authHeader.startsWith("Bearer ")) {
-            System.out.println("❌ Pas de header Authorization ou ne commence pas par Bearer");
+            System.out.println("Erreur: Pas de header Authorization ou ne commence pas par Bearer");
             filterChain.doFilter(request, response);
             return;
         }
@@ -93,7 +93,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             username = jwtService.extractUsername(jwt);
             System.out.println("👤 Username extrait du token: " + username);
         } catch (Exception e) {
-            System.err.println("❌ Erreur extraction username du token: " + e.getMessage());
+            System.err.println("Erreur: Erreur extraction username du token: " + e.getMessage());
             e.printStackTrace();
             filterChain.doFilter(request, response);
             return;
@@ -104,7 +104,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             System.out.println("👤 UserDetails chargé: " + userDetails.getUsername());
             
             if (jwtService.isTokenValid(jwt, userDetails)) {
-                System.out.println("✅ Token JWT valide - authentification réussie");
+                System.out.println(" Token JWT valide - authentification réussie");
                 UsernamePasswordAuthenticationToken authToken=new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
@@ -114,7 +114,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 );
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             } else {
-                System.err.println("❌ Token JWT invalide ou expiré");
+                System.err.println("Erreur: Token JWT invalide ou expiré");
             }
         }
         filterChain.doFilter(request, response);

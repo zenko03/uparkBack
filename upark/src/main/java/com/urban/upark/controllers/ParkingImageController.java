@@ -31,7 +31,7 @@ public class ParkingImageController {
             ParkingImage savedImage = parkingImageService.uploadAndSaveImage(parkingId, request);
             return ResponseEntity.ok(savedImage);
         } catch (RuntimeException e) {
-            System.err.println("❌ Erreur upload: " + e.getMessage());
+            System.err.println("Erreur: Erreur upload: " + e.getMessage());
             return ResponseEntity.status(500).build();
         }
     }

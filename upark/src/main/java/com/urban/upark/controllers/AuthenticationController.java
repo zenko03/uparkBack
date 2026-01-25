@@ -50,10 +50,10 @@ public class AuthenticationController {
         try {
             System.out.println("🔵 Tentative de connexion Google OAuth");
             AuthenticationResponse response = service.loginWithGoogle(request.getToken());
-            System.out.println("✅ Connexion Google réussie pour: " + response.getEmail());
+            System.out.println(" Connexion Google réussie pour: " + response.getEmail());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            System.err.println("❌ Erreur connexion Google: " + e.getMessage());
+            System.err.println("Erreur: Erreur connexion Google: " + e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
@@ -69,10 +69,10 @@ public class AuthenticationController {
         try {
             System.out.println("🔵 Tentative de connexion Facebook OAuth");
             AuthenticationResponse response = service.loginWithFacebook(request.getToken());
-            System.out.println("✅ Connexion Facebook réussie pour: " + response.getEmail());
+            System.out.println(" Connexion Facebook réussie pour: " + response.getEmail());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            System.err.println("❌ Erreur connexion Facebook: " + e.getMessage());
+            System.err.println("Erreur: Erreur connexion Facebook: " + e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }

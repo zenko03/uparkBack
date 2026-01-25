@@ -64,7 +64,7 @@ public class ReservationController {
             Reservation reservation = reservationService.createReservation(request);
             return ResponseEntity.ok(reservation);
         } catch (Exception e) {
-            System.err.println("❌ Error creating reservation: " + e.getMessage());
+            System.err.println("Erreur: Error creating reservation: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -88,7 +88,7 @@ public class ReservationController {
             System.out.println("  - Calculated Price: " + totalPrice);
             return ResponseEntity.ok(totalPrice);
         } catch (Exception e) {
-            System.err.println("❌ Error in calculate-price: " + e.getMessage());
+            System.err.println("Erreur: Error in calculate-price: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
@@ -294,7 +294,7 @@ public class ReservationController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            System.err.println("❌ Erreur récupération QR token: " + e.getMessage());
+            System.err.println("Erreur: Erreur récupération QR token: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Erreur lors de la récupération du QR Code");
         }
@@ -330,7 +330,7 @@ public class ReservationController {
                 .headers(headers)
                 .body(qrImage);
         } catch (Exception e) {
-            System.err.println("❌ Erreur génération image QR: " + e.getMessage());
+            System.err.println("Erreur: Erreur génération image QR: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
@@ -389,7 +389,7 @@ public class ReservationController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            System.err.println("❌ Erreur validation QR: " + e.getMessage());
+            System.err.println("Erreur: Erreur validation QR: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Erreur lors de la validation du QR Code");
         }
@@ -419,7 +419,7 @@ public class ReservationController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            System.err.println("❌ Erreur vérification QR: " + e.getMessage());
+            System.err.println("Erreur: Erreur vérification QR: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Erreur lors de la vérification du QR Code");
         }
@@ -439,7 +439,7 @@ public class ReservationController {
                 }
             }
         } catch (Exception e) {
-            System.err.println("⚠️ Erreur extraction nom parking: " + e.getMessage());
+            System.err.println(" Erreur extraction nom parking: " + e.getMessage());
         }
         return "Parking";
     }

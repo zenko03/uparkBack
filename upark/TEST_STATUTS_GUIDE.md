@@ -306,8 +306,8 @@ POST /api/reservations/{id}/cancel
 # 1. Vérifier les logs de l'application toutes les 5 minutes
 # Rechercher dans les logs:
 🔄 Début de la mise à jour automatique des statuts de réservations
-✅ Réservation ID X : 'à venir' → 'En cours'
-✅ Réservation ID Y : 'En cours' → 'Terminée'
+ Réservation ID X : 'à venir' → 'En cours'
+ Réservation ID Y : 'En cours' → 'Terminée'
 ✨ Mise à jour automatique terminée : N réservation(s) mise(s) à jour
 ```
 

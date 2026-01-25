@@ -87,14 +87,14 @@ async function sendPushNotification(token: string, title: string, body: string, 
     const result = await fcmResponse.json();
 
     if (!fcmResponse.ok) {
-      console.error('❌ Erreur FCM:', result);
+      console.error('Erreur: Erreur FCM:', result);
       throw new Error(result.error?.message || 'Erreur envoi notification');
     }
 
-    console.log('✅ Notification envoyée:', result);
+    console.log(' Notification envoyée:', result);
     return result;
   } catch (error) {
-    console.error('❌ Erreur sendPushNotification:', error);
+    console.error('Erreur: Erreur sendPushNotification:', error);
     throw error;
   }
 }
@@ -130,7 +130,7 @@ serve(async (req: Request) => {
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
   } catch (error: unknown) {
-    console.error('❌ Erreur Edge Function:', error);
+    console.error('Erreur: Erreur Edge Function:', error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }

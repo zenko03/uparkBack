@@ -92,5 +92,5 @@ GROUP BY Id_Users;
 -- 7. Activer Realtime sur la table Notifications (pour synchronisation temps réel)
 ALTER PUBLICATION supabase_realtime ADD TABLE Notifications;
 
--- ✅ SCRIPT TERMINÉ
+--  SCRIPT TERMINÉ
 -- Les tables sont créées et prêtes à l'emploi !

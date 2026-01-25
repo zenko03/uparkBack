@@ -89,7 +89,7 @@ public class ReservationRequestService {
 
         // Créer les ReservationRequestVehicles à partir des véhicules sélectionnés
         if (selectedVehicles != null && !selectedVehicles.isEmpty()) {
-            System.out.println("🚗 Création de " + selectedVehicles.size() + " type(s) de véhicule(s) pour la demande");
+            System.out.println(" Création de " + selectedVehicles.size() + " type(s) de véhicule(s) pour la demande");
             
             for (com.urban.upark.dto.reservation.VehicleSelection vehicleSelection : selectedVehicles) {
                 // Trouver l'AnnouncementsVehicles correspondant
@@ -100,7 +100,7 @@ public class ReservationRequestService {
                         );
                 
                 if (announcementsVehicles == null) {
-                    System.err.println("❌ AnnouncementsVehicles non trouvé pour annonce " + announcementId + 
+                    System.err.println("Erreur: AnnouncementsVehicles non trouvé pour annonce " + announcementId + 
                                      ", type véhicule " + vehicleSelection.getVehicleTypeId());
                     continue;
                 }
@@ -113,7 +113,7 @@ public class ReservationRequestService {
                         .build();
                 
                 reservationRequestVehiclesRepository.save(rrv);
-                System.out.println("  ✅ Type véhicule " + vehicleSelection.getVehicleTypeId() + 
+                System.out.println("   Type véhicule " + vehicleSelection.getVehicleTypeId() + 
                                  " x" + vehicleSelection.getQuantity() + " enregistré");
             }
         }
@@ -160,13 +160,13 @@ public class ReservationRequestService {
             
             notificationService.sendPushNotification(
                 requesterId,
-                "Demande acceptée ✅",
+                "Demande acceptée ",
                 "Votre demande pour " + parkingName + " a été acceptée. Payez dans 24h pour confirmer.",
                 "reservation_accepted",
                 notificationData
             );
         } catch (Exception e) {
-            System.err.println("❌ Erreur envoi notification acceptation: " + e.getMessage());
+            System.err.println("Erreur: Erreur envoi notification acceptation: " + e.getMessage());
         }
         
         return savedRequest;
@@ -197,13 +197,13 @@ public class ReservationRequestService {
             
             notificationService.sendPushNotification(
                 requesterId,
-                "Demande refusée ❌",
+                "Demande refusée Erreur:",
                 "Votre demande pour " + parkingName + " a été refusée par le propriétaire.",
                 "reservation_rejected",
                 notificationData
             );
         } catch (Exception e) {
-            System.err.println("❌ Erreur envoi notification refus: " + e.getMessage());
+            System.err.println("Erreur: Erreur envoi notification refus: " + e.getMessage());
         }
         
         return savedRequest;
@@ -244,7 +244,7 @@ public class ReservationRequestService {
         
         // Sauvegarder la réservation avec le statut défini
         Reservation savedReservation = reservationRepository.save(reservation);
-        System.out.println("✅ Réservation créée avec ID: " + savedReservation.getId_Reservation() + 
+        System.out.println(" Réservation créée avec ID: " + savedReservation.getId_Reservation() + 
                          " - Statut: " + (savedReservation.getReservationStatus() != null ? 
                          savedReservation.getReservationStatus().getLabel() : "NON DÉFINI"));
 
@@ -270,15 +270,15 @@ public class ReservationRequestService {
      */
     private void createReservationVehiclesFromAnnouncement(Reservation reservation, ReservationRequest request) {
         try {
-            System.out.println("🚗 Création des ReservationVehicles pour la réservation " + reservation.getId_Reservation());
+            System.out.println(" Création des ReservationVehicles pour la réservation " + reservation.getId_Reservation());
             
             // Récupérer les véhicules sélectionnés depuis la table reservation_request_vehicles
             List<ReservationRequestVehicles> requestVehicles = reservationRequestVehiclesRepository
                     .findByReservationRequestId(request.getId());
             
             if (requestVehicles == null || requestVehicles.isEmpty()) {
-                System.err.println("⚠️ Aucun véhicule sélectionné trouvé dans la table reservation_request_vehicles pour la demande " + request.getId());
-                System.err.println("⚠️ Fallback: utilisation du premier type disponible de l'annonce");
+                System.err.println(" Aucun véhicule sélectionné trouvé dans la table reservation_request_vehicles pour la demande " + request.getId());
+                System.err.println(" Fallback: utilisation du premier type disponible de l'annonce");
                 createDefaultReservationVehicle(reservation, request);
                 return;
             }
@@ -298,11 +298,11 @@ public class ReservationRequestService {
                         .build();
                 
                 ReservationVehicles saved = reservationVehiclesRepository.save(reservationVehicles);
-                System.out.println("  ✅ ReservationVehicles créé avec ID: " + saved.getId_Reservation_vehicles());
+                System.out.println("   ReservationVehicles créé avec ID: " + saved.getId_Reservation_vehicles());
             }
             
         } catch (Exception e) {
-            System.err.println("❌ Erreur lors de la création des ReservationVehicles: " + e.getMessage());
+            System.err.println("Erreur: Erreur lors de la création des ReservationVehicles: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -324,10 +324,10 @@ public class ReservationRequestService {
                         .numbers(1)
                         .build();
                 reservationVehiclesRepository.save(reservationVehicles);
-                System.out.println("✅ ReservationVehicles par défaut créé");
+                System.out.println(" ReservationVehicles par défaut créé");
             }
         } catch (Exception e) {
-            System.err.println("❌ Erreur fallback: " + e.getMessage());
+            System.err.println("Erreur: Erreur fallback: " + e.getMessage());
         }
     }
 }

@@ -76,11 +76,11 @@ public class DisputeProofService {
             proof.setProofUrl(publicUrl);
             
             DisputeProof savedProof = disputeProofRepository.save(proof);
-            System.out.println("✅ Preuve sauvegardée - ID: " + savedProof.getId());
+            System.out.println(" Preuve sauvegardée - ID: " + savedProof.getId());
             
             return savedProof;
         } catch (Exception e) {
-            System.err.println("❌ Erreur upload preuve: " + e.getMessage());
+            System.err.println("Erreur: Erreur upload preuve: " + e.getMessage());
             throw new RuntimeException("Erreur lors de l'upload de la preuve", e);
         }
     }

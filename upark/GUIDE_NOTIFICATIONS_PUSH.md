@@ -1,32 +1,32 @@
-# 🚀 Guide Complet d'Installation des Notifications Push FCM
+#  Guide Complet d'Installation des Notifications Push FCM
 
-## ✅ CE QUI A ÉTÉ FAIT
+##  CE QUI A ÉTÉ FAIT
 
 ### 1. Frontend React Native
-- ✅ `build.gradle` corrigé (plugin Google Services après dependencies)
-- ✅ Permissions FCM ajoutées dans AndroidManifest.xml
-- ✅ `firebase.js` créé avec toutes les fonctions FCM
-- ✅ `notificationService.js` créé pour communication backend
-- ✅ `App.tsx` modifié pour initialiser FCM au démarrage
+-  `build.gradle` corrigé (plugin Google Services après dependencies)
+-  Permissions FCM ajoutées dans AndroidManifest.xml
+-  `firebase.js` créé avec toutes les fonctions FCM
+-  `notificationService.js` créé pour communication backend
+-  `App.tsx` modifié pour initialiser FCM au démarrage
 
 ### 2. Backend Spring Boot
-- ✅ Modèles `DeviceToken.java` et `Notification.java` créés
-- ✅ Repositories créés avec requêtes optimisées
-- ✅ `NotificationService.java` avec intégration Edge Function
-- ✅ Controllers pour API notifications et tokens
-- ✅ Intégration dans `ReservationRequestService` (acceptation/refus)
-- ✅ Configuration Supabase dans `application.properties`
+-  Modèles `DeviceToken.java` et `Notification.java` créés
+-  Repositories créés avec requêtes optimisées
+-  `NotificationService.java` avec intégration Edge Function
+-  Controllers pour API notifications et tokens
+-  Intégration dans `ReservationRequestService` (acceptation/refus)
+-  Configuration Supabase dans `application.properties`
 
 ### 3. Supabase Edge Function
-- ✅ Fonction `send-push-notification` créée avec API HTTP v1
-- ✅ Gestion OAuth2 + Service Account Firebase
-- ✅ Endpoint: `https://fbpefbjoxzkxombdcqif.supabase.co/functions/v1/send-push-notification`
+-  Fonction `send-push-notification` créée avec API HTTP v1
+-  Gestion OAuth2 + Service Account Firebase
+-  Endpoint: `https://fbpefbjoxzkxombdcqif.supabase.co/functions/v1/send-push-notification`
 
 ### 4. Base de données
-- ✅ Script SQL `init-notifications.sql` créé
-- ✅ Tables `Device_tokens` et `Notifications`
-- ✅ Index pour performance
-- ✅ Fonctions de nettoyage automatique
+-  Script SQL `init-notifications.sql` créé
+-  Tables `Device_tokens` et `Notifications`
+-  Index pour performance
+-  Fonctions de nettoyage automatique
 
 ---
 
@@ -79,7 +79,7 @@ oj8IYIvSbGiEgMjs5Epucg==
 -----END PRIVATE KEY-----
 ```
 
-**⚠️ IMPORTANT** : Copiez la clé privée avec les vrais sauts de ligne (pas les `\n`).
+** IMPORTANT** : Copiez la clé privée avec les vrais sauts de ligne (pas les `\n`).
 
 ### ÉTAPE 3 : Installer les dépendances React Native
 
@@ -186,7 +186,7 @@ npm run android
 - Rebuild l'app : `npm run android`
 
 ### Problème : Notification non envoyée
-- Vérifiez les logs backend : `❌ Aucun token FCM trouvé`
+- Vérifiez les logs backend : `Erreur: Aucun token FCM trouvé`
 - Vérifiez que l'Edge Function Supabase est déployée
 - Vérifiez les secrets Firebase dans Supabase
 
@@ -196,16 +196,16 @@ npm run android
 
 ---
 
-## ✅ CHECKLIST FINALE
+##  CHECKLIST FINALE
 
-- [ ] Script SQL exécuté dans Supabase ✅
-- [ ] Secrets Firebase configurés dans Supabase ✅
-- [ ] Edge Function déployée ✅
-- [ ] Dépendances npm installées ✅
-- [ ] Dépendance Hibernate JSON dans pom.xml ✅
-- [ ] Backend redémarré ✅
-- [ ] App React Native rebuild ✅
-- [ ] Token FCM enregistré ✅
-- [ ] Test notification réussi ✅
+- [ ] Script SQL exécuté dans Supabase 
+- [ ] Secrets Firebase configurés dans Supabase 
+- [ ] Edge Function déployée 
+- [ ] Dépendances npm installées 
+- [ ] Dépendance Hibernate JSON dans pom.xml 
+- [ ] Backend redémarré 
+- [ ] App React Native rebuild 
+- [ ] Token FCM enregistré 
+- [ ] Test notification réussi 
 
-Bonne chance ! 🚀
+Bonne chance ! 

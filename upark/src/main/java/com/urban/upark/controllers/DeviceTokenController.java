@@ -30,11 +30,11 @@ public class DeviceTokenController {
             }
             
             DeviceToken deviceToken = notificationService.registerDeviceToken(userId, token, platform);
-            System.out.println("✅ Token FCM enregistré pour user " + userId);
+            System.out.println(" Token FCM enregistré pour user " + userId);
             
             return ResponseEntity.ok(deviceToken);
         } catch (Exception e) {
-            System.err.println("❌ Erreur enregistrement token: " + e.getMessage());
+            System.err.println("Erreur: Erreur enregistrement token: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }

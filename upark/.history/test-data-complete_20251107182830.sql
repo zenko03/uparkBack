@@ -443,7 +443,7 @@ RÉSUMÉ DES DONNÉES DE TEST:
 7. Ampefiloha Résidentiel - 1500 Ar/h
 8. 67Ha Shopping - 2800 Ar/h
 
-🚗 VÉHICULES (7 types):
+ VÉHICULES (7 types):
 Voiture, Moto, Utilitaire léger, Camionnette, Citadine, SUV, Vélo électrique
 
 📋 RÉSERVATIONS (10):

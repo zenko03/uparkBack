@@ -233,8 +233,8 @@ Content-Type: application/json
 Backend :
 ```
 📤 Envoi notification à user 14
-✅ Notification sauvegardée en BDD
-✅ Notification envoyée au token: xxx...
+ Notification sauvegardée en BDD
+ Notification envoyée au token: xxx...
 ```
 
 Supabase Edge Functions > Logs :
