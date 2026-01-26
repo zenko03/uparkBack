@@ -171,20 +171,36 @@ GROUP BY p.id_users;
 
 -- Vue 4: Revenus hebdomadaires du propriétaire (7 derniers jours)
 CREATE OR REPLACE VIEW public.v_owner_weekly_revenue AS
+WITH daily_revenue AS (
+    SELECT 
+        p.id_users AS owner_id,
+        DATE(r.creation_date) AS jour,
+        EXTRACT(DOW FROM r.creation_date) AS jour_semaine,
+        DATE_TRUNC('week', r.creation_date) AS semaine,
+        COALESCE(SUM(r.total_price), 0) AS revenus_jour,
+        COUNT(r.id_reservation) AS nombre_reservations
+    FROM parking p
+    LEFT JOIN parking_vehicles pv ON p.id_parking = pv.id_parking
+    LEFT JOIN announcements_vehicles av ON pv.id_parking_vehicles = av.id_parking_vehicles
+    LEFT JOIN reservation_vehicles rv ON av.id_announcements_vehicles = rv.id_announcements_vehicles
+    LEFT JOIN reservation r ON rv.id_reservation = r.id_reservation
+    WHERE r.creation_date >= CURRENT_DATE - INTERVAL '14 days'
+    GROUP BY 
+        p.id_users,
+        DATE(r.creation_date),
+        EXTRACT(DOW FROM r.creation_date),
+        DATE_TRUNC('week', r.creation_date)
+)
 SELECT 
-    p.id_users AS owner_id,
-    DATE(r.creation_date) AS jour,
-    EXTRACT(DOW FROM r.creation_date) AS jour_semaine,  -- 0=Dimanche, 6=Samedi
+    dr.owner_id,
+    dr.jour,
+    dr.jour_semaine,
+    dr.revenus_jour,
+    dr.nombre_reservations,
     
-    -- Revenus du jour
-    COALESCE(SUM(r.total_price), 0) AS revenus_jour,
-    
-    -- Nombre de réservations
-    COUNT(r.id_reservation) AS nombre_reservations,
-    
-    -- Revenus semaine courante
-    SUM(COALESCE(r.total_price, 0)) OVER (
-        PARTITION BY p.id_users, DATE_TRUNC('week', r.creation_date)
+    -- Revenus semaine courante (somme de tous les jours de la semaine)
+    SUM(dr.revenus_jour) OVER (
+        PARTITION BY dr.owner_id, dr.semaine
     ) AS revenus_semaine,
     
     -- Revenus semaine précédente
@@ -194,22 +210,12 @@ SELECT
      LEFT JOIN announcements_vehicles av2 ON pv2.id_parking_vehicles = av2.id_parking_vehicles
      LEFT JOIN reservation_vehicles rv2 ON av2.id_announcements_vehicles = rv2.id_announcements_vehicles
      LEFT JOIN reservation r2 ON rv2.id_reservation = r2.id_reservation
-     WHERE p2.id_users = p.id_users
+     WHERE p2.id_users = dr.owner_id
      AND DATE_TRUNC('week', r2.creation_date) = DATE_TRUNC('week', CURRENT_DATE - INTERVAL '1 week')
     ) AS revenus_semaine_precedente
-
-FROM parking p
-LEFT JOIN parking_vehicles pv ON p.id_parking = pv.id_parking
-LEFT JOIN announcements_vehicles av ON pv.id_parking_vehicles = av.id_parking_vehicles
-LEFT JOIN reservation_vehicles rv ON av.id_announcements_vehicles = rv.id_announcements_vehicles
-LEFT JOIN reservation r ON rv.id_reservation = r.id_reservation
-WHERE r.creation_date >= CURRENT_DATE - INTERVAL '14 days'
-GROUP BY 
-    p.id_users,
-    DATE(r.creation_date),
-    EXTRACT(DOW FROM r.creation_date),
-    DATE_TRUNC('week', r.creation_date)
-ORDER BY jour DESC;
+    
+FROM daily_revenue dr
+ORDER BY dr.jour DESC;
 
 
 -- Vue 5: Notifications récentes du propriétaire (filtrée côté app avec WHERE id_users = ?)
