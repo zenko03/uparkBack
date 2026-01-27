@@ -47,6 +47,13 @@ public class AnnouncementsService {
         return announcementsRepository.findByUserId(userId);
     }
 
+    /**
+     * Recherche avancée d'annonces avec filtres
+     */
+    public List<Announcements> searchAnnouncements(String searchText, Integer vehicleTypeId, Integer minPlaces) {
+        return announcementsRepository.searchAnnouncements(searchText, vehicleTypeId, minPlaces);
+    }
+
     @Transactional
     public Announcements save(Announcements announcement) {
         return announcementsRepository.save(announcement);

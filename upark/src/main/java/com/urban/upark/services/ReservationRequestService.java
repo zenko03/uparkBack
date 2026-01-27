@@ -118,6 +118,30 @@ public class ReservationRequestService {
             }
         }
 
+        // Envoyer notification au PROPRIÉTAIRE "Nouvelle demande de réservation"
+        try {
+            Integer ownerId = announcement.getParking().getUser().getId_Users();
+            String requesterName = requester.getUsername();
+            String parkingName = announcement.getParking().getLabel();
+            
+            Map<String, String> notificationData = new HashMap<>();
+            notificationData.put("type", "reservation_request");
+            notificationData.put("requestId", savedRequest.getId().toString());
+            notificationData.put("parkingName", parkingName);
+            notificationData.put("requesterName", requesterName);
+            
+            notificationService.sendPushNotification(
+                ownerId,
+                "Nouvelle demande 📬",
+                requesterName + " souhaite réserver votre parking " + parkingName,
+                "reservation_request",
+                notificationData
+            );
+            System.out.println("📤 Notification envoyée au propriétaire " + ownerId);
+        } catch (Exception e) {
+            System.err.println("Erreur: Erreur envoi notification nouvelle demande: " + e.getMessage());
+        }
+
         return savedRequest;
     }
 
