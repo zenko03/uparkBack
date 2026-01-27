@@ -83,7 +83,7 @@ SELECT
     SUM(COALESCE(r.total_price, 0)) AS chiffre_affaires,
     AVG(COALESCE(r.total_price, 0)) AS panier_moyen,
     
-    -- Notes et satisfaction (✅ CORRIGÉ: user_note au lieu de parking_note)
+    -- Notes et satisfaction ( CORRIGÉ: user_note au lieu de parking_note)
     AVG(COALESCE(un.note, 0)) AS note_moyenne,
     COUNT(un.id) AS nombre_notes,
     

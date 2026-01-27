@@ -57,7 +57,7 @@ POST /api/reservations/{id}/update-status
 Le scheduler exécute automatiquement la mise à jour toutes les 5 minutes. Vérifiez les logs pour voir :
 ```
 🔄 Début de la mise à jour automatique des statuts de réservations
-✅ Réservation ID X : 'à venir' → 'En cours' (Début: ..., Fin: ...)
+ Réservation ID X : 'à venir' → 'En cours' (Début: ..., Fin: ...)
 ✨ Mise à jour automatique terminée : X réservation(s) mise(s) à jour
 ```
 

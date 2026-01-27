@@ -61,14 +61,14 @@ public class ReservationStatusScheduler {
                     reservation.setReservationStatus(statusEnCours);
                     reservationRepository.save(reservation);
                     updatedCount++;
-                    log.info("✅ Réservation ID {} : 'à venir' → 'En cours' (Début: {}, Fin: {})",
+                    log.info(" Réservation ID {} : 'à venir' → 'En cours' (Début: {}, Fin: {})",
                             reservation.getId_Reservation(), reservation.getStartDateTime(), reservation.getEndDateTime());
                 } else {
                     // Si la date de fin est aussi passée, passer directement à "Terminée"
                     reservation.setReservationStatus(statusTerminee);
                     reservationRepository.save(reservation);
                     updatedCount++;
-                    log.info("✅ Réservation ID {} : 'à venir' → 'Terminée' (période entièrement passée)",
+                    log.info(" Réservation ID {} : 'à venir' → 'Terminée' (période entièrement passée)",
                             reservation.getId_Reservation());
                 }
             }
@@ -82,13 +82,13 @@ public class ReservationStatusScheduler {
                 reservation.setReservationStatus(statusTerminee);
                 reservationRepository.save(reservation);
                 updatedCount++;
-                log.info("✅ Réservation ID {} : 'En cours' → 'Terminée'", reservation.getId_Reservation());
+                log.info(" Réservation ID {} : 'En cours' → 'Terminée'", reservation.getId_Reservation());
             }
 
             log.info("✨ Mise à jour automatique terminée : {} réservation(s) mise(s) à jour", updatedCount);
             
         } catch (Exception e) {
-            log.error("❌ Erreur lors de la mise à jour automatique des statuts : {}", e.getMessage(), e);
+            log.error("Erreur: Erreur lors de la mise à jour automatique des statuts : {}", e.getMessage(), e);
         }
     }
 
@@ -102,7 +102,7 @@ public class ReservationStatusScheduler {
     private ReservationStatus getOrCreateStatus(String label, Integer value) {
         return reservationStatusRepository.findByLabel(label)
             .orElseGet(() -> {
-                log.warn("⚠️ Statut '{}' non trouvé, création automatique", label);
+                log.warn(" Statut '{}' non trouvé, création automatique", label);
                 ReservationStatus status = ReservationStatus.builder()
                     .label(label)
                     .value(value)

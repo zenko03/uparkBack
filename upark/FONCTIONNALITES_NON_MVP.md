@@ -1,9 +1,9 @@
-# 📋 PLAN D'IMPLÉMENTATION - FONCTIONNALITÉS NON-MVP
+#  PLAN D'IMPLÉMENTATION - FONCTIONNALITÉS NON-MVP
 ## Projet uPark - Application de Location de Parking
 
 **Date :** 22 décembre 2025  
 **Version :** 1.0  
-**État MVP :** ✅ Terminé et Fonctionnel
+**État MVP :**  Terminé et Fonctionnel
 
 ---
 
@@ -25,7 +25,7 @@
 
 ## Fonctionnalité 1 : Gestion des Parkings Propriétaire
 
-### 🎯 QUOI
+###  QUOI
 Permettre aux propriétaires de gérer leurs propres parkings (créer, modifier, supprimer, activer/désactiver).
 
 ### 🤔 POURQUOI
@@ -85,7 +85,7 @@ Permettre aux propriétaires de gérer leurs propres parkings (créer, modifier,
 
 ## Fonctionnalité 2 : Gestion des Publications
 
-### 🎯 QUOI
+###  QUOI
 Permettre aux propriétaires de créer et gérer des annonces de disponibilité pour leurs parkings.
 
 ### 🤔 POURQUOI
@@ -153,7 +153,7 @@ Permettre aux propriétaires de créer et gérer des annonces de disponibilité 
 
 ## Fonctionnalité 3 : Gestion des Demandes de Réservation
 
-### 🎯 QUOI
+###  QUOI
 Implémenter un système de demandes de réservation nécessitant l'approbation du propriétaire avant confirmation.
 
 ### 🤔 POURQUOI
@@ -231,7 +231,7 @@ Implémenter un système de demandes de réservation nécessitant l'approbation 
 
 ## Fonctionnalité 4 : Tableau de Bord Utilisateur
 
-### 🎯 QUOI
+###  QUOI
 Créer un tableau de bord personnalisé affichant les statistiques et activités de l'utilisateur.
 
 ### 🤔 POURQUOI
@@ -291,7 +291,7 @@ Créer un tableau de bord personnalisé affichant les statistiques et activités
 
 ## Fonctionnalité 5 : Notation des Utilisateurs
 
-### 🎯 QUOI
+###  QUOI
 Permettre aux utilisateurs de se noter mutuellement après une réservation (en plus de la notation des parkings déjà existante).
 
 ### 🤔 POURQUOI
@@ -373,7 +373,7 @@ Permettre aux utilisateurs de se noter mutuellement après une réservation (en 
 
 ## Fonctionnalité 6 : Paiement en Ligne (Stripe)
 
-### 🎯 QUOI
+###  QUOI
 Intégrer Stripe pour permettre le paiement en ligne par carte bancaire.
 
 ### 🤔 POURQUOI
@@ -452,7 +452,7 @@ Intégrer Stripe pour permettre le paiement en ligne par carte bancaire.
 
 ## Fonctionnalité 7 : QR Code pour Validation
 
-### 🎯 QUOI
+###  QUOI
 Générer un QR code unique pour chaque réservation permettant la validation à l'arrivée.
 
 ### 🤔 POURQUOI
@@ -524,7 +524,7 @@ Générer un QR code unique pour chaque réservation permettant la validation à
 
 ## Fonctionnalité 8 : Authentification Sociale
 
-### 🎯 QUOI
+###  QUOI
 Permettre la connexion via Google, Facebook et Apple (iOS).
 
 ### 🤔 POURQUOI
@@ -601,7 +601,7 @@ Permettre la connexion via Google, Facebook et Apple (iOS).
 
 ## Fonctionnalité 9 : Notifications Push
 
-### 🎯 QUOI
+###  QUOI
 Envoyer des notifications push aux utilisateurs pour les événements importants.
 
 ### 🤔 POURQUOI
@@ -709,7 +709,7 @@ Envoyer des notifications push aux utilisateurs pour les événements importants
 
 ## Fonctionnalité 10 : Gestion des Litiges et Remboursements
 
-### 🎯 QUOI
+###  QUOI
 Permettre aux utilisateurs de signaler des problèmes et demander des remboursements.
 
 ### 🤔 POURQUOI
@@ -891,7 +891,7 @@ Permettre aux utilisateurs de signaler des problèmes et demander des remboursem
 
 ---
 
-### 🎯 ORDRE D'IMPLÉMENTATION RECOMMANDÉ
+###  ORDRE D'IMPLÉMENTATION RECOMMANDÉ
 
 **Phase 1 - Fonctionnalités Propriétaire (Priorité HAUTE)**
 1. Gestion des Parkings Propriétaire
@@ -919,7 +919,7 @@ Permettre aux utilisateurs de signaler des problèmes et demander des remboursem
 
 ---
 
-### ✅ NOTES IMPORTANTES
+###  NOTES IMPORTANTES
 
 **Points forts de l'architecture actuelle :**
 - Backend Spring Boot bien structuré avec séparation des responsabilités

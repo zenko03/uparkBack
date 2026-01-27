@@ -37,8 +37,8 @@ Selon les données de test (`test-data-complete.sql`), les statuts sont définis
 **Exemple de log:**
 ```
 🔄 Début de la mise à jour automatique des statuts de réservations
-✅ Réservation ID 5 : 'à venir' → 'En cours'
-✅ Réservation ID 3 : 'En cours' → 'Terminée'
+ Réservation ID 5 : 'à venir' → 'En cours'
+ Réservation ID 3 : 'En cours' → 'Terminée'
 ✨ Mise à jour automatique terminée : 2 réservation(s) mise(s) à jour
 ```
 
@@ -135,15 +135,15 @@ PUT http://localhost:8080/api/reservations/5/status/3
 
 ## Avantages de cette Approche
 
-✅ **Automatisation complète** : Pas besoin d'intervention manuelle pour les transitions normales
+ **Automatisation complète** : Pas besoin d'intervention manuelle pour les transitions normales
 
-✅ **Cohérence des données** : Les statuts reflètent toujours l'état réel des réservations
+ **Cohérence des données** : Les statuts reflètent toujours l'état réel des réservations
 
-✅ **Performance optimisée** : Mise à jour par lot toutes les 5 minutes au lieu de calculs en temps réel
+ **Performance optimisée** : Mise à jour par lot toutes les 5 minutes au lieu de calculs en temps réel
 
-✅ **Flexibilité** : Possibilité d'annulation manuelle ou de mise à jour forcée du statut
+ **Flexibilité** : Possibilité d'annulation manuelle ou de mise à jour forcée du statut
 
-✅ **Évolutivité** : Architecture extensible pour ajouter de nouveaux statuts
+ **Évolutivité** : Architecture extensible pour ajouter de nouveaux statuts
 
 ## Nouveaux Endpoints Disponibles
 
@@ -185,13 +185,13 @@ GET /api/reservations/filter?statusId={statusId}&userId={userId}
 Le scheduler affiche des logs clairs :
 ```
 🔄 Début de la mise à jour automatique des statuts de réservations
-✅ Réservation ID 5 : 'à venir' → 'En cours'
+ Réservation ID 5 : 'à venir' → 'En cours'
 ✨ Mise à jour automatique terminée : 1 réservation(s) mise(s) à jour
 ```
 
 En cas d'erreur :
 ```
-❌ Erreur lors de la mise à jour automatique des statuts : {message}
+Erreur: Erreur lors de la mise à jour automatique des statuts : {message}
 ```
 
 ## Maintenance

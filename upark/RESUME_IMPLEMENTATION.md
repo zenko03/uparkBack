@@ -1,10 +1,10 @@
 # Résumé de l'Implémentation - Gestion Dynamique des Statuts de Réservations
 
-## 📋 Objectif
+##  Objectif
 
 Implémenter une gestion automatique et dynamique des statuts de réservations pour éviter qu'ils restent "statiques" après la création. Les statuts doivent évoluer automatiquement en fonction de la date/heure actuelle.
 
-## ✅ Fichiers Créés
+##  Fichiers Créés
 
 ### 1. ReservationStatusScheduler.java
 **Chemin:** `src/main/java/com/urban/upark/services/ReservationStatusScheduler.java`
@@ -124,23 +124,23 @@ PUT /api/reservations/{id}/status/{statusId}
 - Codes HTTP appropriés (200 OK, 404 Not Found)
 - Réponses JSON structurées
 
-## 🎯 Avantages de l'Implémentation
+##  Avantages de l'Implémentation
 
-✅ **Automatisation complète** : Pas d'intervention manuelle nécessaire
+ **Automatisation complète** : Pas d'intervention manuelle nécessaire
 
-✅ **Performance optimisée** : Mise à jour par lot toutes les 5 minutes
+ **Performance optimisée** : Mise à jour par lot toutes les 5 minutes
 
-✅ **Cohérence des données** : Statuts toujours synchronisés avec la réalité
+ **Cohérence des données** : Statuts toujours synchronisés avec la réalité
 
-✅ **Flexibilité** : Possibilité d'annulation ou de mise à jour manuelle
+ **Flexibilité** : Possibilité d'annulation ou de mise à jour manuelle
 
-✅ **Maintenabilité** : Code bien structuré, commenté et documenté
+ **Maintenabilité** : Code bien structuré, commenté et documenté
 
-✅ **Monitoring** : Logs détaillés pour le suivi et le débogage
+ **Monitoring** : Logs détaillés pour le suivi et le débogage
 
-✅ **Évolutivité** : Architecture extensible pour nouveaux statuts
+ **Évolutivité** : Architecture extensible pour nouveaux statuts
 
-## 📝 Logs de Fonctionnement
+##  Logs de Fonctionnement
 
 ### Scheduler au démarrage
 ```
@@ -149,19 +149,19 @@ PUT /api/reservations/{id}/status/{statusId}
 
 ### Mise à jour réussie
 ```
-✅ Réservation ID 5 : 'à venir' → 'En cours'
-✅ Réservation ID 3 : 'En cours' → 'Terminée'
+ Réservation ID 5 : 'à venir' → 'En cours'
+ Réservation ID 3 : 'En cours' → 'Terminée'
 ✨ Mise à jour automatique terminée : 2 réservation(s) mise(s) à jour
 ```
 
 ### Création de statut manquant
 ```
-⚠️ Statut 'à venir' non trouvé, création automatique
+ Statut 'à venir' non trouvé, création automatique
 ```
 
 ### Erreur
 ```
-❌ Erreur lors de la mise à jour automatique des statuts : {message}
+Erreur: Erreur lors de la mise à jour automatique des statuts : {message}
 ```
 
 ## 🧪 Tests Recommandés
@@ -215,7 +215,7 @@ GET /api/reservations/filter?statusId=1
    - Liste des modifications
    - Points techniques clés
 
-## 🚀 Mise en Production
+##  Mise en Production
 
 ### Checklist
 - [x] Code implémenté et testé
@@ -243,4 +243,4 @@ Pour toute question :
 
 **Date d'implémentation :** 13 novembre 2025  
 **Version :** 1.0.0  
-**Statut :** ✅ Implémentation complète et fonctionnelle
+**Statut :**  Implémentation complète et fonctionnelle

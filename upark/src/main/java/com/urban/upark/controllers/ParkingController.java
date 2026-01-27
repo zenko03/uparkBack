@@ -61,12 +61,12 @@ public class ParkingController {
     @PostMapping
     public ResponseEntity<Parking> createParking(@RequestBody ParkingCreateRequest request) {
         try {
-            System.out.println("➕ Création parking - User ID: " + request.getUserId());
+            System.out.println(" Création parking - User ID: " + request.getUserId());
             Parking parking = parkingService.createParkingWithVehicles(request);
-            System.out.println("✅ Parking créé avec ID: " + parking.getId_Parking());
+            System.out.println(" Parking créé avec ID: " + parking.getId_Parking());
             return ResponseEntity.ok(parking);
         } catch (RuntimeException e) {
-            System.err.println("❌ Erreur création parking: " + e.getMessage());
+            System.err.println("Erreur: Erreur création parking: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
@@ -75,14 +75,14 @@ public class ParkingController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateParking(@PathVariable int id, @RequestBody ParkingUpdateRequest request) {
         try {
-            System.out.println("📝 Mise à jour parking ID: " + id);
-            System.out.println("📋 Données reçues: " + request);
+            System.out.println(" Mise à jour parking ID: " + id);
+            System.out.println(" Données reçues: " + request);
             Parking updatedParking = parkingService.updateParkingWithVehicles(id, request);
-            System.out.println("✅ Parking mis à jour: " + updatedParking.getId_Parking());
+            System.out.println(" Parking mis à jour: " + updatedParking.getId_Parking());
             return ResponseEntity.ok(updatedParking);
         } catch (RuntimeException e) {
-            System.err.println("❌z Erreur mise à jour parking " + id + ": " + e.getMessage());
-            System.err.println("❌ Type d'erreur: " + e.getClass().getName());
+            System.err.println("Erreur:z Erreur mise à jour parking " + id + ": " + e.getMessage());
+            System.err.println("Erreur: Type d'erreur: " + e.getClass().getName());
             e.printStackTrace();
             
             // Retourner le message d'erreur réel pour déboguer

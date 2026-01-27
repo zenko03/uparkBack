@@ -68,7 +68,7 @@ public class DisputeProofController {
             DisputeProof savedProof = disputeProofService.uploadAndSaveProof(disputeId, request);
             return ResponseEntity.ok(savedProof);
         } catch (RuntimeException e) {
-            System.err.println("❌ Erreur upload preuve: " + e.getMessage());
+            System.err.println("Erreur: Erreur upload preuve: " + e.getMessage());
             return ResponseEntity.status(500).build();
         }
     }

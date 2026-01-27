@@ -65,11 +65,11 @@ public class ParkingImageService {
                     .build();
             
             ParkingImage savedImage = parkingImageRepository.save(image);
-            System.out.println("✅ Image sauvegardée - ID: " + savedImage.getIdParkingImage());
+            System.out.println(" Image sauvegardée - ID: " + savedImage.getIdParkingImage());
             
             return savedImage;
         } catch (Exception e) {
-            System.err.println("❌ Erreur upload image: " + e.getMessage());
+            System.err.println("Erreur: Erreur upload image: " + e.getMessage());
             throw new RuntimeException("Erreur lors de l'upload de l'image", e);
         }
     }

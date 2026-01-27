@@ -194,7 +194,7 @@ T0: Création
 ├──── 15/11 09h55 : Scheduler check (pas de changement)
 │
 │
-├──── 15/11 10h05 : Scheduler check ✅ CHANGEMENT
+├──── 15/11 10h05 : Scheduler check  CHANGEMENT
 │     │
 │     │   Status: "En cours" (15)
 │     │   ┌──────────────────────────────────────┐
@@ -203,7 +203,7 @@ T0: Création
 │     │
 │
 │
-├──── 15/11 18h05 : Scheduler check ✅ CHANGEMENT
+├──── 15/11 18h05 : Scheduler check  CHANGEMENT
 │     │
 │     │   Status: "Terminée" (20)
 │     │   ┌──────────────────────────────────────┐
@@ -220,14 +220,14 @@ Fin
 ### 1. Pourquoi un Scheduler toutes les 5 minutes ?
 
 **Avantages :**
-- ✅ Performance : Pas de calcul à chaque requête
-- ✅ Simplicité : Logique centralisée
-- ✅ Fiabilité : Mise à jour garantie même sans consultation
+-  Performance : Pas de calcul à chaque requête
+-  Simplicité : Logique centralisée
+-  Fiabilité : Mise à jour garantie même sans consultation
 
 **Alternative rejetée :** Calcul en temps réel à chaque requête
-- ❌ Surcharge des requêtes GET
-- ❌ Redondance des calculs
-- ❌ Coût CPU élevé
+- Erreur: Surcharge des requêtes GET
+- Erreur: Redondance des calculs
+- Erreur: Coût CPU élevé
 
 ### 2. Pourquoi deux mécanismes de mise à jour ?
 
@@ -244,10 +244,10 @@ Fin
 ### 3. Pourquoi des valeurs numériques (10, 15, 20, 25) ?
 
 **Avantages :**
-- ✅ Tri facile (ORDER BY value)
-- ✅ Comparaison directe (value > 15)
-- ✅ Extensibilité (valeurs intermédiaires possibles)
-- ✅ Performance (index sur integer)
+-  Tri facile (ORDER BY value)
+-  Comparaison directe (value > 15)
+-  Extensibilité (valeurs intermédiaires possibles)
+-  Performance (index sur integer)
 
 ## Séquence de Traitement
 

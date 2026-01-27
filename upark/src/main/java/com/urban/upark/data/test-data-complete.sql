@@ -30,7 +30,7 @@ INSERT INTO Profil_types (types) VALUES
 ('Administrateur');
 
 -- Statuts de réservation (complets et logiques)
--- ⚠️ IMPORTANT: Ne pas créer de doublons (value_ doit être unique)
+--  IMPORTANT: Ne pas créer de doublons (value_ doit être unique)
 INSERT INTO Reservation_status (label, value_) VALUES
 ('à venir', 10),    -- Réservation confirmée mais pas encore commencée
 ('En cours', 15),   -- Réservation active actuellement
@@ -38,7 +38,7 @@ INSERT INTO Reservation_status (label, value_) VALUES
 ('Annulée', 25);     -- Réservation annulée
 
 -- Statuts de paiement
--- ⚠️ IMPORTANT: value_ doit être unique
+--  IMPORTANT: value_ doit être unique
 INSERT INTO Payment_status (label, value_) VALUES
 ('En attente', 10),
 ('Payé', 20),
@@ -425,8 +425,8 @@ INSERT INTO Availabilities_frequence (start_hour, end_hour, Id_Reservation_vehic
 -- véhicules de TOUS les parkings, pour TOUS les jours de la semaine
 -- Horaires: 06:00 - 22:00 (uniforme pour tous)
 -- 
--- ⚠️ DÉCOMMENTER SI VOUS PRÉFÉREZ L'INSERTION AUTOMATIQUE
--- ⚠️ (Attention: commentez l'OPTION 1 ci-dessus pour éviter les doublons)
+--  DÉCOMMENTER SI VOUS PRÉFÉREZ L'INSERTION AUTOMATIQUE
+--  (Attention: commentez l'OPTION 1 ci-dessus pour éviter les doublons)
 /*
 INSERT INTO Availabilities_frequence (start_hour, end_hour, Id_Reservation_vehicles, Id_Announcements_vehicles, Id_Days_week)
 SELECT 

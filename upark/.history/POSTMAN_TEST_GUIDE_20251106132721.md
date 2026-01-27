@@ -1,6 +1,6 @@
-# 📋 **GUIDE COMPLET DE TEST POSTMAN - UPARK FRONT OFFICE**
+#  **GUIDE COMPLET DE TEST POSTMAN - UPARK FRONT OFFICE**
 
-## 🚀 **PRÉREQUIS**
+##  **PRÉREQUIS**
 
 ### 1. **Démarrer le serveur backend**
 ```bash
@@ -90,7 +90,7 @@ Authorization: Bearer {{token}}
 
 ---
 
-## 📍 **ÉTAPE 3 : DÉTAIL D'UN PARKING (Interface reservation.png)**
+##  **ÉTAPE 3 : DÉTAIL D'UN PARKING (Interface reservation.png)**
 
 ### 3.1 **Obtenir les détails d'un parking**
 ```http
@@ -117,7 +117,7 @@ Authorization: Bearer {{token}}
 
 ---
 
-## 📝 **ÉTAPE 4 : FORMULAIRE RÉSERVATION (Interface reservationForm.png)**
+##  **ÉTAPE 4 : FORMULAIRE RÉSERVATION (Interface reservationForm.png)**
 
 ### 4.1 **Calculer le prix d'une réservation**
 ```http
@@ -163,7 +163,7 @@ Content-Type: application/json
 
 ---
 
-## ✅ **ÉTAPE 5 : CONFIRMATION RÉSERVATION (Interface confirmResa.png)**
+##  **ÉTAPE 5 : CONFIRMATION RÉSERVATION (Interface confirmResa.png)**
 
 ### 5.1 **Créer la réservation**
 ```http
@@ -198,7 +198,7 @@ Authorization: Bearer {{token}}
 
 ---
 
-## 📋 **ÉTAPE 6 : LISTE DES RÉSERVATIONS (Interface listeResa.png)**
+##  **ÉTAPE 6 : LISTE DES RÉSERVATIONS (Interface listeResa.png)**
 
 ### 6.1 **Lister les réservations d'un utilisateur**
 ```http
@@ -269,7 +269,7 @@ Authorization: Bearer {{token}}
 
 ---
 
-## ✅ **CHECKLIST DE VALIDATION**
+##  **CHECKLIST DE VALIDATION**
 
 - [ ] Authentification JWT fonctionnelle
 - [ ] Liste parkings avec filtres
@@ -305,7 +305,7 @@ Authorization: Bearer {{token}}
 
 ---
 
-## 🎯 **FLOW COMPLET TEST**
+##  **FLOW COMPLET TEST**
 
 1. **Connexion** → Obtenir token JWT
 2. **Recherche** → Trouver parking "Analakely"

@@ -46,7 +46,7 @@ public class CommissionReceivedService {
             // Récupérer le taux de commission globale (le plus récent)
             List<GlobalCommission> globalCommissions = globalCommissionRepository.findAll();
             if (globalCommissions.isEmpty()) {
-                System.err.println("⚠️ WARNING: No global commission rate configured!");
+                System.err.println(" WARNING: No global commission rate configured!");
                 return null;
             }
 
@@ -59,7 +59,7 @@ public class CommissionReceivedService {
                     .multiply(commissionRate)
                     .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
 
-            System.out.println("💰 Calculating commission:");
+            System.out.println(" Calculating commission:");
             System.out.println("  - Reservation price: " + reservation.getTotalPrice());
             System.out.println("  - Commission rate: " + commissionRate + "%");
             System.out.println("  - Commission amount: " + commissionAmount);
@@ -67,14 +67,14 @@ public class CommissionReceivedService {
             // Récupérer le type de commission par défaut (normalement ID 1 pour "globale")
             Optional<CommissionTypes> commissionTypeOpt = commissionTypesRepository.findById(1);
             if (!commissionTypeOpt.isPresent()) {
-                System.err.println("⚠️ WARNING: Commission type not found!");
+                System.err.println(" WARNING: Commission type not found!");
                 return null;
             }
 
             // Récupérer le statut de paiement "En attente" (normalement ID 1)
             Optional<PaymentStatus> paymentStatusOpt = paymentStatusRepository.findById(1);
             if (!paymentStatusOpt.isPresent()) {
-                System.err.println("⚠️ WARNING: Payment status not found!");
+                System.err.println(" WARNING: Payment status not found!");
                 return null;
             }
 
@@ -88,12 +88,12 @@ public class CommissionReceivedService {
                     .build();
 
             CommissionReceived savedCommission = commissionReceivedRepository.save(commission);
-            System.out.println("✅ Commission created with ID: " + savedCommission.getId_Commission_received());
+            System.out.println(" Commission created with ID: " + savedCommission.getId_Commission_received());
 
             return savedCommission;
 
         } catch (Exception e) {
-            System.err.println("❌ ERROR creating commission: " + e.getMessage());
+            System.err.println("Erreur: ERROR creating commission: " + e.getMessage());
             e.printStackTrace();
             return null;
         }

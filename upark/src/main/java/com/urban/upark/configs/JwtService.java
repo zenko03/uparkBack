@@ -3,6 +3,7 @@ package com.urban.upark.configs;
 import java.security.Key;
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.util.Date;
@@ -17,39 +18,48 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY="MCECbHH3hg6YJjOvZsZQe8M1Qxk2qNg8E4wsF9Z+GpdnrZPx";
+    private static final String SECRET_KEY = "MCECbHH3hg6YJjOvZsZQe8M1Qxk2qNg8E4wsF9Z+GpdnrZPx";
+
+    /**
+     * Durée de validité du token en jours (configurable via application.properties)
+     * Valeur par défaut : 7 jours
+     */
+    @Value("${jwt.token.validity.days:7}")
+    private int tokenValidityDays;
 
     public JwtService() {
         super();
     }
 
     public String extractUsername(String token) {
-        return extractClaim(token,Claims::getSubject);
+        return extractClaim(token, Claims::getSubject);
     }
 
-    public <T> T extractClaim(String token,Function<Claims,T> claimsResolver){
-        final Claims claims=extractAllClaims(token);
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(Map<String,Object> extraClaims,
-                                UserDetails userdetails){
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userdetails) {
+        // Calcul de l'expiration : maintenant + X jours en millisecondes
+        long expirationMillis = System.currentTimeMillis() + (tokenValidityDays * 24L * 60L * 60L * 1000L);
+        
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userdetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() * 1000 * 60 *24))
-                .signWith(getSigningKey(),SignatureAlgorithm.HS256)
+                .setExpiration(new Date(expirationMillis))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String generateToken(UserDetails userDetails){
-        return generateToken(new HashMap<>(),userDetails);
+    public String generateToken(UserDetails userDetails) {
+        return generateToken(new HashMap<>(), userDetails);
     }
 
-    public boolean isTokenValid(String token,UserDetails userDetails){
-        final String username=extractUsername(token);
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
@@ -61,7 +71,7 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    private Claims extractAllClaims(String token){
+    private Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -71,11 +81,14 @@ public class JwtService {
     }
 
     private Key getSigningKey() {
-        // TODO Auto-generated method stub
-        byte[] signingKey =Decoders.BASE64.decode(SECRET_KEY);
+        byte[] signingKey = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(signingKey);
     }
 
-
+    /**
+     * Retourne la durée de validité du token en jours
+     */
+    public int getTokenValidityDays() {
+        return tokenValidityDays;
+    }
 }
-

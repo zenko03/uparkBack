@@ -27,6 +27,18 @@ public class AnnouncementsController {
         return announcementsService.findPublished();
     }
 
+    /**
+     * Recherche avancée d'annonces avec filtres
+     * GET /api/v1/announcements/search?searchText=xxx&vehicleTypeId=1&minPlaces=2
+     */
+    @GetMapping("/search")
+    public List<Announcements> searchAnnouncements(
+            @RequestParam(required = false) String searchText,
+            @RequestParam(required = false) Integer vehicleTypeId,
+            @RequestParam(required = false) Integer minPlaces) {
+        return announcementsService.searchAnnouncements(searchText, vehicleTypeId, minPlaces);
+    }
+
     @GetMapping("/user/{userId}")
     public List<Announcements> getUserAnnouncements(@PathVariable int userId) {
         return announcementsService.findByUserId(userId);
