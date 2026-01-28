@@ -3,17 +3,14 @@ package com.urban.upark.controllers;
 import com.urban.upark.dto.DashboardDTO;
 import com.urban.upark.services.DashboardService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.Map;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/dashboard")
@@ -30,8 +27,6 @@ public class DashboardController {
         DashboardDTO dashboard = dashboardService.getOwnerDashboard(ownerId);
         return ResponseEntity.ok(dashboard);
     }
-
-   
 
     // STATISTIQUES DES COMMISSIONS
     /**
@@ -66,8 +61,6 @@ public class DashboardController {
         }
     }
 
-   
-
     // STATISTIQUES DES RÉSERVATIONS PAR STATUT
     /**
      * ex: /api/dashboard/reservations/status?startDate=2024-01-01&endDate=2024-01-31
@@ -101,7 +94,6 @@ public class DashboardController {
         }
     }
 
-    
     // CLASSEMENT DES PARKINGS
     /**
      * ex: /api/dashboard/parkings/top-reservations?limit=10
@@ -162,12 +154,4 @@ public class DashboardController {
             return ResponseEntity.internalServerError().build();
         }
     }
-
-     @GetMapping("/{ownerId}")
-    public ResponseEntity<DashboardDTO> getDashboard(@PathVariable Integer ownerId) {
-        DashboardDTO dashboard = dashboardService.getOwnerDashboard(ownerId);
-        return ResponseEntity.ok(dashboard);
-    }
-
-   
 }
