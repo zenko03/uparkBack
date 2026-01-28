@@ -9,11 +9,20 @@ COPY pom.xml .
 COPY mvnw .
 COPY .mvn .mvn
 
+# Ajouter les permissions d'exécution
+RUN chmod +x mvnw
+
 # Pré-télécharger les dépendances Maven
 RUN ./mvnw dependency:go-offline
+
+# Copier le code source
+COPY src src
+
+# Build l'application
+RUN ./mvnw package -DskipTests
 
 # Exposer le port Spring Boot
 EXPOSE 8080
 
-# Démarrer Spring Boot avec DevTools
-CMD ["./mvnw", "spring-boot:run"]
+# Démarrer l'application avec le JAR compilé
+CMD ["java", "-jar", "target/upark-0.0.1-SNAPSHOT.jar"]

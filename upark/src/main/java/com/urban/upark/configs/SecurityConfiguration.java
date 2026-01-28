@@ -58,6 +58,9 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/v1/vehicles/**").permitAll()
                 .requestMatchers("/api/vehicles/**").permitAll()
                 .requestMatchers("/api/v1/announcements/published").permitAll()
+                // Reservations (back-office admin)
+                .requestMatchers("/api/reservations/**").authenticated()
+                .requestMatchers("/api/reservation-delay/**").authenticated()
                 // User notes: GET public (statistiques), POST/DELETE authentifie
                 .requestMatchers(HttpMethod.GET, "/api/v1/user-notes/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/user-notes").authenticated()
