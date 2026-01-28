@@ -176,7 +176,11 @@ public class DashboardController {
         }
     }
 
-    
+     @GetMapping("/{ownerId}")
+    public ResponseEntity<DashboardDTO> getDashboard(@PathVariable Integer ownerId) {
+        DashboardDTO dashboard = dashboardService.getOwnerDashboard(ownerId);
+        return ResponseEntity.ok(dashboard);
+    }
 
    
 }
