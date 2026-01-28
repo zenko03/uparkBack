@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/user-notes")
+@RequestMapping("/api/user-notes")
 @RequiredArgsConstructor
 public class UserNoteController {
 
