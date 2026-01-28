@@ -83,7 +83,14 @@ public class NotificationService {
                     sendViaSupabaseEdgeFunction(deviceToken.getToken(), title, message, data);
                     System.out.println(" Notification envoyée au token: " + deviceToken.getToken().substring(0, 20) + "...");
                 } catch (Exception e) {
-                    System.err.println("Erreur: Erreur envoi au token " + deviceToken.getToken().substring(0, 20) + ": " + e.getMessage());
+                    String errorMsg = e.getMessage();
+                    System.err.println("Erreur: Erreur envoi au token " + deviceToken.getToken().substring(0, 20) + ": " + errorMsg);
+                    
+                    // Si le token est invalide (entity not found), le supprimer
+                    if (errorMsg != null && errorMsg.contains("entity was not found")) {
+                        System.out.println(" Token invalide détecté, suppression: " + deviceToken.getToken().substring(0, 20));
+                        deviceTokenRepository.delete(deviceToken);
+                    }
                 }
             }
             
