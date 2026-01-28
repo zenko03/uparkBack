@@ -1,9 +1,8 @@
 package com.urban.upark.controllers;
 
+import com.urban.upark.dto.DashboardDTO;
 import com.urban.upark.services.DashboardService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/dashboard")
@@ -22,26 +25,10 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
 
-    //  Statistiques globales"
-    @GetMapping("/overview")
-    public ResponseEntity<Map<String, Object>> getDashboardOverview() {
-        try {
-            log.info("Requête: GET /api/dashboard/overview");
-            
-            Map<String, Object> overview = dashboardService.getDashboardOverview();
-            
-            if (overview.isEmpty()) {
-                log.warn("Aperçu du tableau de bord vide - vérifier les vues SQL");
-                return ResponseEntity.noContent().build();
-            }
-            
-            log.info("Aperçu du tableau de bord récupéré avec succès");
-            return ResponseEntity.ok(overview);
-            
-        } catch (Exception e) {
-            log.error("Erreur lors de la récupération de l'aperçu du tableau de bord: {}", e.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
+    @GetMapping("/{ownerId}")
+    public ResponseEntity<DashboardDTO> getDashboard(@PathVariable Integer ownerId) {
+        DashboardDTO dashboard = dashboardService.getOwnerDashboard(ownerId);
+        return ResponseEntity.ok(dashboard);
     }
 
    
