@@ -38,6 +38,7 @@ public class ReservationRequestService {
     private final ReservationService reservationService;
     private final QRCodeService qrCodeService;
     private final NotificationService notificationService;
+    private final CommissionReceivedService commissionReceivedService;
 
     public List<ReservationRequest> findAll() {
         return reservationRequestRepository.findAll();
@@ -281,6 +282,15 @@ public class ReservationRequestService {
 
         // Créer les ReservationVehicles à partir de l'annonce
         createReservationVehiclesFromAnnouncement(savedReservation, request);
+
+        // Créer la commission pour cette réservation (cohérence avec createReservation)
+        System.out.println("💰 Création de la commission pour la réservation finalisée...");
+        try {
+            commissionReceivedService.createCommissionForReservation(savedReservation);
+            System.out.println("✅ Commission créée avec succès");
+        } catch (Exception e) {
+            System.err.println("⚠️ Erreur lors de la création de la commission (non-bloquant): " + e.getMessage());
+        }
 
         // Mettre à jour la demande
         request.setState((short) 40); // 40 = Finalisée (réservation créée)
