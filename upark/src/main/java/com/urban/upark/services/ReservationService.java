@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,7 @@ public class ReservationService {
     private final AvailabilitiesFrequenceRepository availabilitiesFrequenceRepository;
     private final CommissionReceivedService commissionReceivedService;
     private final QRCodeService qrCodeService;
+    private final NotificationService notificationService;
 
     public List<Reservation> findAll() {
         return reservationRepository.findAll();
@@ -160,11 +162,44 @@ public class ReservationService {
         if (reservationOpt.isPresent()) {
             Reservation reservation = reservationOpt.get();
             
-            // Récupérer le statut "Annulée" (25)
             ReservationStatus canceledStatus = getStatusByValue(25);
             reservation.setReservationStatus(canceledStatus);
             
             Reservation savedReservation = reservationRepository.save(reservation);
+            
+            // Envoyer notification d'annulation au CLIENT
+            try {
+                Integer clientId = reservation.getUser().getId_Users();
+                String parkingName = "votre parking"; // Par défaut si pas d'info
+                
+                // Essayer de récupérer le nom du parking via les véhicules de réservation
+                try {
+                    List<ReservationVehicles> resVehicles = reservationVehiclesRepository.findByReservationId(id);
+                    if (!resVehicles.isEmpty() && resVehicles.get(0).getAnnouncementsVehicles() != null) {
+                        parkingName = resVehicles.get(0).getAnnouncementsVehicles()
+                                .getAnnouncements().getParking().getLabel();
+                    }
+                } catch (Exception e) {
+                    System.err.println("⚠️ Impossible de récupérer le nom du parking: " + e.getMessage());
+                }
+                
+                Map<String, String> clientNotifData = new HashMap<>();
+                clientNotifData.put("type", "reservation_cancelled");
+                clientNotifData.put("reservationId", String.valueOf(savedReservation.getId_Reservation()));
+                clientNotifData.put("parkingName", parkingName);
+                
+                notificationService.sendPushNotification(
+                    clientId,
+                    "Réservation annulée ❌",
+                    "Votre réservation pour " + parkingName + " a été annulée.",
+                    "reservation_cancelled",
+                    clientNotifData
+                );
+                System.out.println("📤 Notification annulation envoyée au client " + clientId);
+            } catch (Exception e) {
+                System.err.println("Erreur: Erreur envoi notification annulation: " + e.getMessage());
+            }
+            
             return Optional.of(savedReservation);
         }
         

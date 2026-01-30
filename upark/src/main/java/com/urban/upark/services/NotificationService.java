@@ -128,14 +128,22 @@ public class NotificationService {
     
     /**
      * Enregistrer ou mettre à jour un token FCM
+     * IMPORTANT: Désactive le token pour tous les autres utilisateurs avant de l'activer
+     * pour éviter les doubles notifications sur le même appareil
      */
     @Transactional
     public DeviceToken registerDeviceToken(Integer userId, String token, String platform) {
-        // Vérifier si le token existe déjà
+        // 1. DÉSACTIVER ce token pour TOUS les autres utilisateurs
+        // Cela évite les doubles notifications si un autre user était connecté avant
+        deviceTokenRepository.deactivateTokenForOtherUsers(token, userId);
+        System.out.println("🔄 Token désactivé pour les autres utilisateurs (si existait)");
+        
+        // 2. Vérifier si le token existe déjà pour CET utilisateur
         return deviceTokenRepository.findByUserIdAndToken(userId, token)
                 .map(existingToken -> {
                     existingToken.setIsActive(true);
                     existingToken.setUpdatedAt(LocalDateTime.now());
+                    System.out.println("✅ Token réactivé pour user " + userId);
                     return deviceTokenRepository.save(existingToken);
                 })
                 .orElseGet(() -> {
@@ -149,6 +157,7 @@ public class NotificationService {
                             .isActive(true)
                             .build();
                     
+                    System.out.println("✅ Nouveau token créé pour user " + userId);
                     return deviceTokenRepository.save(newToken);
                 });
     }
@@ -211,5 +220,29 @@ public class NotificationService {
     public int cleanupOldNotifications() {
         LocalDateTime cutoffDate = LocalDateTime.now().minusDays(90);
         return notificationRepository.deleteOldNotifications(cutoffDate);
+    }
+    
+    /**
+     * Désactiver un token FCM (lors du logout)
+     */
+    @Transactional
+    public void deactivateDeviceToken(String token, Integer userId) {
+        if (userId != null) {
+            // Désactiver le token pour un utilisateur spécifique
+            deviceTokenRepository.findByUserIdAndToken(userId, token)
+                    .ifPresent(deviceToken -> {
+                        deviceToken.setIsActive(false);
+                        deviceTokenRepository.save(deviceToken);
+                        System.out.println("🔴 Token désactivé pour user " + userId);
+                    });
+        } else {
+            // Désactiver le token quel que soit l'utilisateur
+            deviceTokenRepository.findByToken(token)
+                    .ifPresent(deviceToken -> {
+                        deviceToken.setIsActive(false);
+                        deviceTokenRepository.save(deviceToken);
+                        System.out.println("🔴 Token désactivé (sans userId)");
+                    });
+        }
     }
 }

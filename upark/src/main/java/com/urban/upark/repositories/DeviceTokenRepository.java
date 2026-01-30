@@ -2,6 +2,7 @@ package com.urban.upark.repositories;
 
 import com.urban.upark.models.DeviceToken;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -34,4 +35,18 @@ public interface DeviceTokenRepository extends JpaRepository<DeviceToken, Intege
      */
     @Query("SELECT dt FROM DeviceToken dt WHERE dt.platform = :platform AND dt.isActive = true")
     List<DeviceToken> findActiveTokensByPlatform(@Param("platform") String platform);
+    
+    /**
+     * Récupérer un token par sa valeur
+     */
+    @Query("SELECT dt FROM DeviceToken dt WHERE dt.token = :token")
+    Optional<DeviceToken> findByToken(@Param("token") String token);
+    
+    /**
+     * Désactiver un token pour TOUS les autres utilisateurs (sauf userId)
+     * Utilisé lors de la connexion pour éviter les doubles notifications
+     */
+    @Modifying
+    @Query("UPDATE DeviceToken dt SET dt.isActive = false WHERE dt.token = :token AND dt.user.Id_Users != :userId")
+    void deactivateTokenForOtherUsers(@Param("token") String token, @Param("userId") Integer userId);
 }

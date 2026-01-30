@@ -135,7 +135,7 @@ public class ReservationRequestService {
                 ownerId,
                 "Nouvelle demande 📬",
                 requesterName + " souhaite réserver votre parking " + parkingName,
-                "reservation_request",
+                "new_request",  // Changé pour correspondre à la contrainte CHECK de la BDD
                 notificationData
             );
             System.out.println("📤 Notification envoyée au propriétaire " + ownerId);
@@ -295,6 +295,52 @@ public class ReservationRequestService {
         // Mettre à jour la demande
         request.setState((short) 40); // 40 = Finalisée (réservation créée)
         reservationRequestRepository.save(request);
+
+        // Envoyer notification de confirmation de paiement au CLIENT
+        try {
+            Integer clientId = request.getRequester().getId_Users();
+            String parkingName = request.getAnnouncement().getParking().getLabel();
+            
+            Map<String, String> clientNotifData = new HashMap<>();
+            clientNotifData.put("type", "payment_confirmed");
+            clientNotifData.put("reservationId", String.valueOf(savedReservation.getId_Reservation()));
+            clientNotifData.put("parkingName", parkingName);
+            clientNotifData.put("qrToken", savedReservation.getQrCodeToken());
+            
+            notificationService.sendPushNotification(
+                clientId,
+                "Paiement confirmé ✅",
+                "Votre réservation pour " + parkingName + " est confirmée ! QR Code prêt.",
+                "payment_confirmed",
+                clientNotifData
+            );
+            System.out.println("📤 Notification paiement confirmé envoyée au client " + clientId);
+        } catch (Exception e) {
+            System.err.println("Erreur: Erreur envoi notification paiement client: " + e.getMessage());
+        }
+
+        // Envoyer notification au PROPRIÉTAIRE
+        try {
+            Integer ownerId = request.getAnnouncement().getParking().getUser().getId_Users();
+            String clientName = request.getRequester().getUsername();
+            String parkingName = request.getAnnouncement().getParking().getLabel();
+            
+            Map<String, String> ownerNotifData = new HashMap<>();
+            ownerNotifData.put("type", "payment_confirmed");
+            ownerNotifData.put("reservationId", String.valueOf(savedReservation.getId_Reservation()));
+            ownerNotifData.put("clientName", clientName);
+            
+            notificationService.sendPushNotification(
+                ownerId,
+                "Paiement reçu 💰",
+                clientName + " a payé pour la réservation de " + parkingName,
+                "payment_confirmed",
+                ownerNotifData
+            );
+            System.out.println("📤 Notification paiement confirmé envoyée au propriétaire " + ownerId);
+        } catch (Exception e) {
+            System.err.println("Erreur: Erreur envoi notification paiement propriétaire: " + e.getMessage());
+        }
 
         return savedReservation;
     }

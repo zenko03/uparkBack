@@ -39,4 +39,27 @@ public class DeviceTokenController {
             return ResponseEntity.badRequest().build();
         }
     }
+    
+    /**
+     * Désactiver un token FCM (lors du logout)
+     */
+    @DeleteMapping("/deactivate")
+    public ResponseEntity<Map<String, String>> deactivateToken(@RequestBody Map<String, Object> request) {
+        try {
+            String token = (String) request.get("token");
+            Integer userId = request.get("userId") != null ? (Integer) request.get("userId") : null;
+            
+            if (token == null || token.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Token requis"));
+            }
+            
+            notificationService.deactivateDeviceToken(token, userId);
+            System.out.println("🔴 Token FCM désactivé" + (userId != null ? " pour user " + userId : ""));
+            
+            return ResponseEntity.ok(Map.of("status", "success", "message", "Token désactivé"));
+        } catch (Exception e) {
+            System.err.println("Erreur: Erreur désactivation token: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 }
