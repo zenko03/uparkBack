@@ -133,7 +133,7 @@ public class ReservationRequestService {
             
             notificationService.sendPushNotification(
                 ownerId,
-                "Nouvelle demande 📬",
+                "Nouvelle demande de réservation",
                 requesterName + " souhaite réserver votre parking " + parkingName,
                 "new_request",  // Changé pour correspondre à la contrainte CHECK de la BDD
                 notificationData
@@ -185,7 +185,7 @@ public class ReservationRequestService {
             
             notificationService.sendPushNotification(
                 requesterId,
-                "Demande acceptée ",
+                "Demande acceptée",
                 "Votre demande pour " + parkingName + " a été acceptée. Payez dans 24h pour confirmer.",
                 "reservation_accepted",
                 notificationData
@@ -222,7 +222,7 @@ public class ReservationRequestService {
             
             notificationService.sendPushNotification(
                 requesterId,
-                "Demande refusée Erreur:",
+                "Demande refusée",
                 "Votre demande pour " + parkingName + " a été refusée par le propriétaire.",
                 "reservation_rejected",
                 notificationData
@@ -309,7 +309,7 @@ public class ReservationRequestService {
             
             notificationService.sendPushNotification(
                 clientId,
-                "Paiement confirmé ✅",
+                "Paiement confirmé",
                 "Votre réservation pour " + parkingName + " est confirmée ! QR Code prêt.",
                 "payment_confirmed",
                 clientNotifData
@@ -332,7 +332,7 @@ public class ReservationRequestService {
             
             notificationService.sendPushNotification(
                 ownerId,
-                "Paiement reçu 💰",
+                "Paiement reçu",
                 clientName + " a payé pour la réservation de " + parkingName,
                 "payment_confirmed",
                 ownerNotifData

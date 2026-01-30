@@ -190,7 +190,7 @@ public class ReservationService {
                 
                 notificationService.sendPushNotification(
                     clientId,
-                    "Réservation annulée ❌",
+                    "Réservation annulée",
                     "Votre réservation pour " + parkingName + " a été annulée.",
                     "reservation_cancelled",
                     clientNotifData
