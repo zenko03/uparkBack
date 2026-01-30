@@ -30,6 +30,13 @@ public class Announcements {
     @Column(name = "is_published", nullable = false)
     @Builder.Default
     private boolean isPublished = false;
+    
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+    
+    @Column(name = "is_deleted", nullable = false)
+    @Builder.Default
+    private boolean isDeleted = false;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "Id_Parking")
@@ -38,4 +45,18 @@ public class Announcements {
     @OneToMany(mappedBy = "announcements")
     @JsonIgnore
     private List<AnnouncementsVehicles> announcementsVehicles;
+    
+    public void togglePublished() {
+        this.isPublished = !this.isPublished;
+    }
+    
+    public void softDelete() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+    }
+    
+    public void restore() {
+        this.isDeleted = false;
+        this.deletedAt = null;
+    }
 }

@@ -117,7 +117,7 @@ public class ReservationService {
                         return ReservationDetailDTO.ParkingInfo.builder()
                                 .idParking(parking.getId_Parking())
                                 .name(parking.getLabel())
-                                .address(parking.getLocalisation())
+                                .address(parking.getAddress())
                                 .idOwner(owner != null ? owner.getId_Users() : 0)
                                 .ownerName(owner != null ? owner.getFirst_name() + " " + owner.getName() : "")
                                 .build();
@@ -346,6 +346,71 @@ public class ReservationService {
         
         return reservations;
     }
+    
+    /**
+     * Récupérer les réservations sur les parkings d'un propriétaire
+     * Utilise la vue SQL v_owner_reservations pour des performances optimales
+     */
+    public List<ReservationResponse> findByParkingOwnerIdWithDetails(int ownerId) {
+        System.out.println("📊 Récupération des réservations pour le propriétaire " + ownerId);
+        
+        List<Map<String, Object>> results = reservationRepository.findOwnerReservationsFromView(ownerId);
+        System.out.println("📊 Nombre de résultats de la vue: " + results.size());
+        
+        return results.stream()
+            .map(this::mapOwnerViewToResponse)
+            .collect(Collectors.toList());
+    }
+    
+    /**
+     * Mapper une ligne de la vue v_owner_reservations vers ReservationResponse
+     */
+    private ReservationResponse mapOwnerViewToResponse(Map<String, Object> row) {
+        try {
+            // Extraire les informations du parking
+            ReservationResponse.ParkingInfo parkingInfo = null;
+            Integer parkingId = (Integer) row.get("parking_id");
+            
+            if (parkingId != null && parkingId > 0) {
+                parkingInfo = ReservationResponse.ParkingInfo.builder()
+                    .id(parkingId)
+                    .name((String) row.get("parking_name"))
+                    .address((String) row.get("parking_address"))
+                    .city("")
+                    .zipCode("")
+                    .build();
+            }
+            
+            LocalDateTime startDT = convertToLocalDateTime(row.get("start_datetime"));
+            LocalDateTime endDT = convertToLocalDateTime(row.get("end_datetime"));
+            
+            // Construire la réponse avec les infos client
+            ReservationResponse response = ReservationResponse.builder()
+                .id((Integer) row.get("id_reservation"))
+                .totalPrice((BigDecimal) row.get("total_price"))
+                .creationDate(convertToLocalDateTime(row.get("creation_date")))
+                .paymentDate(convertToLocalDateTime(row.get("payment_date")))
+                .startDateTime(startDT)
+                .endDateTime(endDT)
+                .paymentMethod((String) row.get("payment_method"))
+                .status((String) row.get("status_label"))
+                .parking(parkingInfo)
+                // Champs directs pour le frontend
+                .parkingId(parkingId)
+                .parkingName((String) row.get("parking_name"))
+                .parkingAddress((String) row.get("parking_address"))
+                // Infos du client (spécifique au propriétaire)
+                .clientId((Integer) row.get("client_id"))
+                .clientName((String) row.get("client_name"))
+                .build();
+            
+            return response;
+        } catch (Exception e) {
+            System.err.println("❌ Erreur lors du mapping de la vue owner: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors du mapping de la réservation", e);
+        }
+    }
 
     /**
      * Convertir une réservation en ReservationResponse avec les infos du parking
@@ -385,18 +450,23 @@ public class ReservationService {
                 System.out.println("   Parking non trouvé pour la réservation");
             }
             
+            LocalDateTime startDT = convertToLocalDateTime(row.get("start_datetime"));
+            LocalDateTime endDT = convertToLocalDateTime(row.get("end_datetime"));
+            
             // Construire la réponse
-            return ReservationResponse.builder()
+            ReservationResponse response = ReservationResponse.builder()
                 .id((Integer) row.get("id_reservation"))
                 .totalPrice((BigDecimal) row.get("total_price"))
                 .creationDate(convertToLocalDateTime(row.get("creation_date")))
                 .paymentDate(convertToLocalDateTime(row.get("payment_date")))
-                .startDateTime(convertToLocalDateTime(row.get("start_datetime")))
-                .endDateTime(convertToLocalDateTime(row.get("end_datetime")))
+                .startDateTime(startDT)
+                .endDateTime(endDT)
                 .paymentMethod((String) row.get("payment_method"))
                 .status((String) row.get("status_label"))
                 .parking(parkingInfo)
                 .build();
+            
+            return response;
         } catch (Exception e) {
             System.err.println("Erreur: Erreur lors du mapping de la vue: " + e.getMessage());
             e.printStackTrace();
@@ -417,6 +487,11 @@ public class ReservationService {
         if (value instanceof java.sql.Timestamp) {
             return ((java.sql.Timestamp) value).toLocalDateTime();
         }
+        if (value instanceof java.time.Instant) {
+            // Convertir Instant en LocalDateTime en UTC
+            return LocalDateTime.ofInstant((java.time.Instant) value, java.time.ZoneOffset.UTC);
+        }
+        System.err.println("⚠️ Type non supporté pour conversion en LocalDateTime: " + value.getClass());
         return null;
     }
 
@@ -435,7 +510,7 @@ public class ReservationService {
             parkingInfo = ReservationResponse.ParkingInfo.builder()
                 .id(parking.getId_Parking())
                 .name(parking.getLabel())
-                .address(parking.getLocalisation())
+                .address(parking.getAddress())
                 .city("") // À compléter si besoin
                 .zipCode("") // À compléter si besoin
                 .build();
@@ -492,7 +567,8 @@ public class ReservationService {
     }
     
     public void updateReservationStatus(Reservation reservation) {
-        LocalDateTime now = LocalDateTime.now();
+        // Utiliser UTC pour les comparaisons (cohérent avec la base TIMESTAMPTZ)
+        LocalDateTime now = LocalDateTime.now(java.time.ZoneOffset.UTC);
         
         // Statuts selon le fichier SQL :
         // 'à venir' (10) : Réservation confirmée mais pas encore commencée

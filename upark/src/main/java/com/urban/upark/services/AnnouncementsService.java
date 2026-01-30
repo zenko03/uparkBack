@@ -1,11 +1,13 @@
 package com.urban.upark.services;
 
 import com.urban.upark.dto.AnnouncementVehicleDTO;
+import com.urban.upark.dto.AnnouncementWithRatingDTO;
 import com.urban.upark.dto.AvailabilityDateDTO;
 import com.urban.upark.dto.AvailabilityFrequenceDTO;
 import com.urban.upark.dto.CreateAnnouncementDTO;
 import com.urban.upark.models.*;
 import com.urban.upark.repositories.AnnouncementsRepository;
+import com.urban.upark.repositories.GlobalParkingNoteRepository;
 import com.urban.upark.repositories.ParkingRepository;
 import com.urban.upark.repositories.ParkingVehiclesRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +30,7 @@ public class AnnouncementsService {
     private final AnnouncementsVehiclesService announcementsVehiclesService;
     private final AvailabilitiesDateService availabilitiesDateService;
     private final AvailabilitiesFrequenceService availabilitiesFrequenceService;
+    private final GlobalParkingNoteRepository globalParkingNoteRepository;
 
     public List<Announcements> findAll() {
         return announcementsRepository.findAll();
@@ -41,6 +46,34 @@ public class AnnouncementsService {
 
     public List<Announcements> findPublished() {
         return announcementsRepository.findByIsPublishedTrue();
+    }
+
+    /**
+     * Récupère les annonces publiées avec la note moyenne de chaque parking
+     * Optimisé : une seule requête pour toutes les moyennes
+     */
+    public List<AnnouncementWithRatingDTO> findPublishedWithRatings() {
+        // 1. Récupérer toutes les annonces publiées
+        List<Announcements> announcements = announcementsRepository.findByIsPublishedTrue();
+        
+        // 2. Récupérer toutes les moyennes en une seule requête (Map: parkingId -> average)
+        Map<Integer, Double> ratingsMap = globalParkingNoteRepository.findAll()
+                .stream()
+                .collect(Collectors.toMap(
+                        GlobalParkingNote::getIdParking,
+                        GlobalParkingNote::getAverage
+                ));
+        
+        // 3. Enrichir chaque annonce avec sa note moyenne
+        return announcements.stream()
+                .map(announcement -> {
+                    Integer parkingId = announcement.getParking() != null 
+                            ? announcement.getParking().getId_Parking() 
+                            : null;
+                    Double averageRating = parkingId != null ? ratingsMap.get(parkingId) : null;
+                    return AnnouncementWithRatingDTO.fromEntity(announcement, averageRating);
+                })
+                .collect(Collectors.toList());
     }
 
     public List<Announcements> findByUserId(int userId) {
@@ -59,17 +92,32 @@ public class AnnouncementsService {
         return announcementsRepository.save(announcement);
     }
 
+    /**
+     * Soft delete d'une annonce (suppression logique)
+     */
     @Transactional
     public void deleteById(int id) {
-        announcementsRepository.deleteById(id);
+        announcementsRepository.softDeleteById(id);
     }
-
+    
+    /**
+     * Restaurer une annonce supprimée
+     */
+    @Transactional
+    public Announcements restoreById(int id) {
+        announcementsRepository.restoreById(id);
+        return announcementsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Announcement not found"));
+    }
+    
+    /**
+     * Toggle le statut de publication d'une annonce
+     */
     @Transactional
     public Announcements togglePublished(int id) {
-        Announcements announcement = announcementsRepository.findById(id)
+        announcementsRepository.togglePublishedById(id);
+        return announcementsRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Announcement not found"));
-        announcement.setPublished(!announcement.isPublished());
-        return announcementsRepository.save(announcement);
     }
 
     /**

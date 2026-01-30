@@ -1,0 +1,13 @@
+/**
+ * Restaurer un parking supprimé (soft delete)
+ * Ex: PUT /api/v1/parkings/13/restore
+ */
+@PutMapping("/{id}/restore")
+public ResponseEntity<Parking> restoreParking(@PathVariable int id) {
+    try {
+        Parking restored = parkingService.restoreById(id);
+        return ResponseEntity.ok(restored);
+    } catch (RuntimeException e) {
+        return ResponseEntity.notFound().build();
+    }
+}

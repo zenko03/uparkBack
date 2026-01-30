@@ -39,17 +39,33 @@ public interface ParkingRepository extends JpaRepository<Parking, Integer> {
            "LOWER(p.description) LIKE LOWER(CONCAT('%', :address, '%'))")
     List<Parking> findByAddressContaining(@Param("address") String address);
 
-    @Query("SELECT p FROM Parking p WHERE p.user.Id_Users = :userId")
+    @Query("SELECT p FROM Parking p WHERE p.user.Id_Users = :userId AND p.isDeleted = false")
     List<Parking> findByUserId(@Param("userId") int userId);
     
     /**
      * Récupère un parking avec ses annonces chargées (pour éviter le lazy loading)
      */
-    @Query("SELECT p FROM Parking p LEFT JOIN FETCH p.announcements WHERE p.Id_Parking = :id")
+    @Query("SELECT p FROM Parking p LEFT JOIN FETCH p.announcements WHERE p.Id_Parking = :id AND p.isDeleted = false")
     java.util.Optional<Parking> findByIdWithAnnouncements(@Param("id") int id);
 
     @Modifying
     @Transactional
     @Query(value = "UPDATE parking SET is_active = NOT is_active, updated_at = NOW() WHERE id_parking = :id", nativeQuery = true)
     void toggleActive(@Param("id") int id);
+    
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE parking SET is_deleted = true, deleted_at = NOW(), updated_at = NOW() WHERE id_parking = :id", nativeQuery = true)
+    void softDeleteById(@Param("id") int id);
+    
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE parking SET is_deleted = false, deleted_at = NULL, updated_at = NOW() WHERE id_parking = :id", nativeQuery = true)
+    void restoreById(@Param("id") int id);
+    
+    @Query("SELECT p FROM Parking p WHERE p.isDeleted = false")
+    List<Parking> findAllActive();
+    
+    @Query("SELECT p FROM Parking p")
+    List<Parking> findAllIncludingDeleted();
 }

@@ -52,7 +52,7 @@ public class ParkingService {
     private EntityManager entityManager;
 
     public List<Parking> findAll() {
-        return parkingRepository.findAll();
+        return parkingRepository.findAllActive();
     }
 
     public Optional<Parking> findById(int id) {
@@ -82,13 +82,14 @@ public class ParkingService {
         // If the parking has an ID, it's an update
         if (parking.getId_Parking() > 0) {
             String sql = "UPDATE parking SET label = :label, hourly_rate = :hourlyRate, " +
-                         "description = :description, localisation = ST_GeogFromText(:localisation), " +
+                         "address = :address, description = :description, localisation = ST_GeogFromText(:localisation), " +
                          "id_users = :userId, is_active = :isActive, updated_at = NOW() " +
                          "WHERE id_parking = :id";
             
             entityManager.createNativeQuery(sql)
                     .setParameter("label", parking.getLabel())
                     .setParameter("hourlyRate", parking.getHourlyRate())
+                    .setParameter("address", parking.getAddress())
                     .setParameter("description", parking.getDescription())
                     .setParameter("localisation", parking.getLocalisation())
                     .setParameter("userId", parking.getUser().getId_Users())
@@ -100,12 +101,13 @@ public class ParkingService {
         }
         
         // For new parking, use native query to handle geography
-        String sql = "INSERT INTO parking (label, hourly_rate, description, localisation, id_users) " +
-                    "VALUES (:label, :hourlyRate, :description, ST_GeogFromText(:localisation), :userId)";
+        String sql = "INSERT INTO parking (label, hourly_rate, address, description, localisation, id_users) " +
+                    "VALUES (:label, :hourlyRate, :address, :description, ST_GeogFromText(:localisation), :userId)";
         
         entityManager.createNativeQuery(sql)
                 .setParameter("label", parking.getLabel())
                 .setParameter("hourlyRate", parking.getHourlyRate())
+                .setParameter("address", parking.getAddress())
                 .setParameter("description", parking.getDescription())
                 .setParameter("localisation", parking.getLocalisation())
                 .setParameter("userId", parking.getUser().getId_Users())
@@ -119,8 +121,22 @@ public class ParkingService {
                 .orElse(parking);
     }
 
+    /**
+     * Soft delete d'un parking (suppression logique)
+     */
+    @Transactional
     public void deleteById(int id) {
-        parkingRepository.deleteById(id);
+        parkingRepository.softDeleteById(id);
+    }
+    
+    /**
+     * Restaurer un parking supprimé
+     */
+    @Transactional
+    public Parking restoreById(int id) {
+        parkingRepository.restoreById(id);
+        return parkingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Parking not found"));
     }
 
     /**
@@ -136,6 +152,7 @@ public class ParkingService {
         Parking parking = Parking.builder()
                 .label(request.getLabel())
                 .hourlyRate(request.getHourlyRate())
+                .address(request.getAddress())
                 .description(request.getDescription())
                 .localisation(request.getLocalisation())
                 .user(user)
@@ -171,13 +188,14 @@ public class ParkingService {
             // Mettre à jour les champs du parking
             System.out.println("🔄 [ParkingService] Mise à jour des champs du parking...");
             String sql = "UPDATE parking SET label = :label, hourly_rate = :hourlyRate, " +
-                         "description = :description, localisation = ST_GeogFromText(:localisation), " +
+                         "address = :address, description = :description, localisation = ST_GeogFromText(:localisation), " +
                          "is_active = :isActive, updated_at = NOW() " +
                          "WHERE id_parking = :id";
             
             int updatedRows = entityManager.createNativeQuery(sql)
                     .setParameter("label", request.getLabel())
                     .setParameter("hourlyRate", request.getHourlyRate())
+                    .setParameter("address", request.getAddress())
                     .setParameter("description", request.getDescription())
                     .setParameter("localisation", request.getLocalisation())
                     .setParameter("isActive", request.getIsActive() != null ? request.getIsActive() : true)

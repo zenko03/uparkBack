@@ -41,7 +41,8 @@ public class ReservationStatusScheduler {
     public void updateReservationStatuses() {
         log.info("🔄 Début de la mise à jour automatique des statuts de réservations");
         
-        LocalDateTime now = LocalDateTime.now();
+        // Utiliser UTC pour cohérence avec la base TIMESTAMPTZ
+        LocalDateTime now = LocalDateTime.now(java.time.ZoneOffset.UTC);
         int updatedCount = 0;
         
         try {

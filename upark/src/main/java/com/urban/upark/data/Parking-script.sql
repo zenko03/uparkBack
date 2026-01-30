@@ -21,7 +21,13 @@ CREATE TABLE Parking(
    label VARCHAR(100)  NOT NULL,
    hourly_rate NUMERIC(15,2)   NOT NULL,
    description TEXT NOT NULL,
+   address VARCHAR(500),
    localisation GEOGRAPHY NOT NULL,
+   is_active BOOLEAN DEFAULT TRUE,
+   created_at TIMESTAMP DEFAULT NOW(),
+   updated_at TIMESTAMP DEFAULT NOW(),
+   deleted_at TIMESTAMP NULL,
+   is_deleted BOOLEAN DEFAULT FALSE,
    Id_Users INTEGER,
    PRIMARY KEY(Id_Parking),
    FOREIGN KEY(Id_Users) REFERENCES Users(Id_Users)
@@ -37,6 +43,9 @@ CREATE TABLE Vehicles(
 CREATE TABLE Parking_vehicles(
    Id_Parking_vehicles SERIAL,
    numbers INTEGER NOT NULL,
+   created_at TIMESTAMP DEFAULT NOW(),
+   deleted_at TIMESTAMP NULL,
+   is_deleted BOOLEAN DEFAULT FALSE,
    Id_Vehicles INTEGER,
    Id_Parking INTEGER,
    PRIMARY KEY(Id_Parking_vehicles),
@@ -48,7 +57,9 @@ CREATE TABLE Announcements(
    Id_Announcements SERIAL,
    description TEXT NOT NULL,
    creation_date TIMESTAMP NOT NULL,
-   is_published BOOLEAN NOT NULL DEFAULT false,  
+   is_published BOOLEAN NOT NULL DEFAULT false,
+   deleted_at TIMESTAMP NULL,
+   is_deleted BOOLEAN DEFAULT FALSE,
    Id_Parking INTEGER, 
    PRIMARY KEY(Id_Announcements),
    FOREIGN KEY(Id_Parking) REFERENCES Parking(Id_Parking)
@@ -70,6 +81,9 @@ CREATE TABLE Reservation_status(
 CREATE TABLE Announcements_vehicles(
    Id_Announcements_vehicles SERIAL,
    numbers INTEGER NOT NULL,
+   created_at TIMESTAMP DEFAULT NOW(),
+   deleted_at TIMESTAMP NULL,
+   is_deleted BOOLEAN DEFAULT FALSE,
    Id_Announcements INTEGER,
    Id_Parking_vehicles INTEGER,
    PRIMARY KEY(Id_Announcements_vehicles),
@@ -151,14 +165,16 @@ CREATE TABLE Profils(
 CREATE TABLE Reservation(
    Id_Reservation SERIAL,
    total_price NUMERIC(15,2)   NOT NULL,
-   creation_date TIMESTAMP NOT NULL,
-   payement_date TIMESTAMP,
-   start_datetime TIMESTAMP NOT NULL,
-   end_datetime TIMESTAMP NOT NULL,
+   creation_date TIMESTAMPTZ NOT NULL,
+   payement_date TIMESTAMPTZ,
+   start_datetime TIMESTAMPTZ NOT NULL,
+   end_datetime TIMESTAMPTZ NOT NULL,
    payment_method VARCHAR(50),
    qr_code_token VARCHAR(255),
    is_validated BOOLEAN DEFAULT FALSE,
-   validated_at TIMESTAMP,
+   validated_at TIMESTAMPTZ,
+   deleted_at TIMESTAMP NULL,
+   is_deleted BOOLEAN DEFAULT FALSE,
    Id_Users INTEGER,
    Id_Reservation_status INTEGER,
    PRIMARY KEY(Id_Reservation),
@@ -196,6 +212,9 @@ CREATE TABLE Availabilities_date(
    start_date DATE NOT NULL,
    end_date DATE NOT NULL,
    end_hour TIME NOT NULL,
+   created_at TIMESTAMP DEFAULT NOW(),
+   deleted_at TIMESTAMP NULL,
+   is_deleted BOOLEAN DEFAULT FALSE,
    Id_Reservation_vehicles INTEGER,
    Id_Announcements_vehicles INTEGER,
    PRIMARY KEY(Id_Availabilities_date),
@@ -207,6 +226,9 @@ CREATE TABLE Availabilities_frequence(
    Id_Availabilities_frequence SERIAL,
    start_hour TIME NOT NULL,
    end_hour TIME NOT NULL,
+   created_at TIMESTAMP DEFAULT NOW(),
+   deleted_at TIMESTAMP NULL,
+   is_deleted BOOLEAN DEFAULT FALSE,
    Id_Reservation_vehicles INTEGER,
    Id_Announcements_vehicles INTEGER,
    Id_Days_week INTEGER,
@@ -226,6 +248,8 @@ create table public.reservation_requests (
   state smallint null,
   accepted_at timestamp with time zone null,
   expires_at timestamp with time zone null,
+  deleted_at timestamp with time zone null,
+  is_deleted boolean default false,
   id_announcement integer null,
   id_requester integer null,
   constraint reservation_requests_pkey primary key (id),
@@ -257,6 +281,8 @@ create table public.user_note (
   id_parking integer null,
   description text null,
   id_user integer null,
+  deleted_at timestamp with time zone null,
+  is_deleted boolean default false,
   constraint user_note_pkey primary key (id),
   constraint user_note_id_parking_fkey foreign KEY (id_parking) references parking (id_parking) on update CASCADE on delete CASCADE,
   constraint user_note_id_user_fkey foreign KEY (id_user) references users (id_users)
@@ -286,7 +312,7 @@ SELECT
     -- Informations parking (via reservation_vehicles si disponible, sinon null)
     MIN(p.id_parking) AS parking_id,
     MIN(p.label) AS parking_name,
-    MIN(CAST(p.localisation AS TEXT)) AS parking_address,
+    MIN(p.address) AS parking_address,
     
     -- Statut
     COALESCE(MIN(rs.label), 'En attente') AS status_label,
@@ -309,6 +335,76 @@ GROUP BY
     r.id_users;
 
 
+-- ========================================
+-- VUE: Réservations pour les propriétaires de parking
+-- Permet de voir les réservations faites sur ses parkings
+-- avec les informations du client qui a réservé
+-- ========================================
+CREATE OR REPLACE VIEW v_owner_reservations AS
+SELECT 
+    r.id_reservation,
+    r.total_price,
+    r.creation_date,
+    r.payement_date AS payment_date,
+    r.start_datetime,
+    r.end_datetime,
+    r.payment_method,
+    r.qr_code_token,
+    r.is_validated,
+    r.validated_at,
+    
+    -- Informations du CLIENT qui a réservé
+    u.id_users AS client_id,
+    CONCAT(u.first_name, ' ', u.name) AS client_name,
+    u.phone_number AS client_phone,
+    u.email AS client_email,
+    
+    -- Informations du parking
+    p.id_parking AS parking_id,
+    p.label AS parking_name,
+    p.address AS parking_address,
+    
+    -- ID du propriétaire (pour le filtre)
+    p.id_users AS owner_id,
+    
+    -- Statut de la réservation
+    COALESCE(rs.label, 'En attente') AS status_label,
+    COALESCE(rs.value_, 10) AS status_value
+    
+FROM reservation r
+-- Jointure pour retrouver le parking via reservation_vehicles
+LEFT JOIN reservation_vehicles rv ON r.id_reservation = rv.id_reservation
+LEFT JOIN announcements_vehicles av ON rv.id_announcements_vehicles = av.id_announcements_vehicles
+LEFT JOIN parking_vehicles pv ON av.id_parking_vehicles = pv.id_parking_vehicles
+LEFT JOIN parking p ON pv.id_parking = p.id_parking
+-- Jointure pour le client qui a fait la réservation
+LEFT JOIN users u ON r.id_users = u.id_users
+-- Jointure pour le statut
+LEFT JOIN reservation_status rs ON r.id_reservation_status = rs.id_reservation_status
+-- Groupe par réservation pour éviter les doublons
+GROUP BY 
+    r.id_reservation,
+    r.total_price,
+    r.creation_date,
+    r.payement_date,
+    r.start_datetime,
+    r.end_datetime,
+    r.payment_method,
+    r.qr_code_token,
+    r.is_validated,
+    r.validated_at,
+    u.id_users,
+    u.first_name,
+    u.name,
+    u.phone_number,
+    u.email,
+    p.id_parking,
+    p.label,
+    p.localisation,
+    p.id_users,
+    rs.label,
+    rs.value_;
+
 CREATE TABLE parking_images (
     id_parking_image SERIAL PRIMARY KEY,
     id_parking INTEGER NOT NULL REFERENCES Parking(Id_Parking) ON DELETE CASCADE,
@@ -318,6 +414,8 @@ CREATE TABLE parking_images (
     is_primary BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
+    deleted_at TIMESTAMP NULL,
+    is_deleted BOOLEAN DEFAULT FALSE,
     CONSTRAINT fk_parking_image FOREIGN KEY (id_parking) REFERENCES Parking(Id_Parking)
 );
 
@@ -428,6 +526,7 @@ WHERE is_validated = TRUE;
 create table public.disputes (
   id bigint generated by default as identity not null,
   created_at timestamp with time zone not null default now(),
+  updated_at timestamp with time zone default now(),
   motif text not null,
   description text null,
   id_reservation bigint null,
@@ -445,3 +544,12 @@ create table public.disputes_proofs (
   constraint disputes_proofs_pkey primary key (id),
   constraint disputes_proofs_id_dispute_fkey foreign KEY (id_dispute) references disputes (id)
 ) TABLESPACE pg_default;
+
+-- ========================================
+-- INDEX: Performance pour Soft Delete
+-- ========================================
+CREATE INDEX IF NOT EXISTS idx_parking_active ON Parking(is_deleted) WHERE is_deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_announcements_active ON Announcements(is_deleted) WHERE is_deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_reservation_active ON Reservation(is_deleted) WHERE is_deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_user_note_active ON User_note(is_deleted) WHERE is_deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_parking_images_active ON Parking_images(is_deleted) WHERE is_deleted = FALSE;

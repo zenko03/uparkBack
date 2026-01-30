@@ -98,6 +98,16 @@ public class ReservationController {
     public List<ReservationResponse> getUserReservations(@PathVariable int userId) {
         return reservationService.findByUserIdWithParkingInfo(userId);
     }
+    
+    /**
+     * Récupérer les réservations sur les parkings d'un propriétaire
+     * Utilise la vue SQL v_owner_reservations pour des performances optimales
+     * GET /api/v1/reservations/owner/{ownerId}
+     */
+    @GetMapping("/owner/{ownerId}")
+    public List<ReservationResponse> getOwnerParkingReservations(@PathVariable int ownerId) {
+        return reservationService.findByParkingOwnerIdWithDetails(ownerId);
+    }
 
     @PostMapping("/check-availability")
     public ResponseEntity<Boolean> checkAvailability(@RequestBody PriceCalculationRequest request) {

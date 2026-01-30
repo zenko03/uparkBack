@@ -1,6 +1,7 @@
 package com.urban.upark.dto.reservation;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class ReservationResponse {
     private Integer id;
     private BigDecimal totalPrice;
@@ -32,8 +34,17 @@ public class ReservationResponse {
     private String paymentMethod;
     private String status;
     
-    // Informations du parking
+    // Informations du parking (objet imbriqué)
     private ParkingInfo parking;
+    
+    // Champs directs pour compatibilité avec le frontend
+    private Integer parkingId;
+    private String parkingName;
+    private String parkingAddress;
+    
+    // Informations du client (pour le propriétaire)
+    private Integer clientId;
+    private String clientName;
     
     @Data
     @Builder

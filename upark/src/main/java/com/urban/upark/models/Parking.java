@@ -45,6 +45,9 @@ public class Parking {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
 
+    @Column(name = "address", length = 500)
+    private String address;
+
     @Column(name = "localisation", nullable = false, columnDefinition = "GEOGRAPHY")
     private String localisation;
 
@@ -58,6 +61,14 @@ public class Parking {
 
     @Column(name = "updated_at")
     private java.time.LocalDateTime updatedAt;
+    
+    @Column(name = "deleted_at")
+    private java.time.LocalDateTime deletedAt;
+    
+    @Column(name = "is_deleted", nullable = false)
+    @Builder.Default
+    @JsonProperty("isDeleted")
+    private boolean isDeleted = false;
 
     @jakarta.persistence.PrePersist
     protected void onCreate() {
@@ -79,16 +90,16 @@ public class Parking {
     @JsonIgnore
     private List<ParkingVehicles> parkingVehicles;
     
-    /**
-     * Relation avec les annonces du parking
-     */
+    
+     // Relation avec les annonces du parking
+     
     @OneToMany(mappedBy = "parking", fetch = FetchType.LAZY)
     @JsonIgnoreProperties({"parking", "announcementsVehicles"})
     private List<Announcements> announcements;
     
-    /**
-     * Relation avec les images du parking
-     */
+   
+     //Relation avec les images du parking
+     
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_parking", referencedColumnName = "Id_Parking")
     @JsonProperty("images")
@@ -108,11 +119,7 @@ public class Parking {
     @JsonProperty("longitude")
     private Double longitude;
     
-    /**
-     * Retourne l'URL de l'image principale (isPrimary = true)
-     * Si aucune image principale, retourne la première image disponible
-     * Si aucune image, retourne null
-     */
+   
     @Transient
     @JsonProperty("primaryImageUrl")
     public String getPrimaryImageUrl() {
@@ -148,5 +155,23 @@ public class Parking {
             .findFirst()
             .map(Announcements::getId_Announcements)
             .orElse(null);
+    }
+    
+    /**
+     * Suppression logique du parking
+     */
+    public void softDelete() {
+        this.isDeleted = true;
+        this.deletedAt = java.time.LocalDateTime.now();
+        this.updatedAt = java.time.LocalDateTime.now();
+    }
+    
+    /**
+     * Restauration d'un parking supprimé
+     */
+    public void restore() {
+        this.isDeleted = false;
+        this.deletedAt = null;
+        this.updatedAt = java.time.LocalDateTime.now();
     }
 }

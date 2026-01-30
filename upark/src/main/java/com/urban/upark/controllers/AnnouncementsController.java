@@ -1,5 +1,6 @@
 package com.urban.upark.controllers;
 
+import com.urban.upark.dto.AnnouncementWithRatingDTO;
 import com.urban.upark.dto.CreateAnnouncementDTO;
 import com.urban.upark.models.Announcements;
 import com.urban.upark.services.AnnouncementsService;
@@ -22,9 +23,13 @@ public class AnnouncementsController {
         return announcementsService.findAll();
     }
 
+    /**
+     * Récupère les annonces publiées avec la note moyenne de chaque parking
+     * Optimisé pour l'affichage dans la liste (évite N requêtes supplémentaires)
+     */
     @GetMapping("/published")
-    public List<Announcements> getPublishedAnnouncements() {
-        return announcementsService.findPublished();
+    public List<AnnouncementWithRatingDTO> getPublishedAnnouncements() {
+        return announcementsService.findPublishedWithRatings();
     }
 
     /**
@@ -105,5 +110,14 @@ public class AnnouncementsController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+    
+    @PutMapping("/{id}/restore")
+    public ResponseEntity<Announcements> restoreAnnouncement(@PathVariable int id) {
+        try {
+            return ResponseEntity.ok(announcementsService.restoreById(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

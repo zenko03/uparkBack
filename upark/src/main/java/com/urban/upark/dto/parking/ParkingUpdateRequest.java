@@ -15,6 +15,7 @@ import java.util.List;
 public class ParkingUpdateRequest {
     private String label;
     private BigDecimal hourlyRate;
+    private String address;
     private String description;
     private String localisation; // Format: "SRID=4326;POINT(longitude latitude)"
     private Boolean isActive;

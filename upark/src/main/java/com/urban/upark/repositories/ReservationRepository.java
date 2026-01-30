@@ -119,4 +119,15 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
      */
     @Query("SELECT r FROM Reservation r WHERE r.qrCodeToken = :qrToken")
     Optional<Reservation> findByQrCodeToken(@Param("qrToken") String qrToken);
+    
+    // ========================================
+    // METHODES PROPRIETAIRE
+    // ========================================
+    
+    /**
+     * Récupérer les réservations sur les parkings d'un propriétaire
+     * Utilise la vue SQL v_owner_reservations pour des performances optimales
+     */
+    @Query(value = "SELECT * FROM v_owner_reservations WHERE owner_id = :ownerId ORDER BY creation_date DESC", nativeQuery = true)
+    List<Map<String, Object>> findOwnerReservationsFromView(@Param("ownerId") int ownerId);
 }
