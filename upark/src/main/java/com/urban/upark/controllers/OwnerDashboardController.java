@@ -7,10 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Contrôleur Dashboard pour le front-office mobile (propriétaires)
- * Séparé du DashboardController admin pour éviter les conflits de rôles
- */
+
 @RestController
 @RequestMapping("/api/v1/owner-dashboard")
 @RequiredArgsConstructor

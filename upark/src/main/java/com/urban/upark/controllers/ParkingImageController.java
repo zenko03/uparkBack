@@ -17,12 +17,7 @@ public class ParkingImageController {
 
     private final ParkingImageService parkingImageService;
 
-    /**
-     * Upload une image en base64 vers Supabase et sauvegarder les métadonnées
-     * @param parkingId ID du parking
-     * @param request Requête avec image base64
-     * @return Image uploadée et sauvegardée
-     */
+    
     @PostMapping("/{parkingId}/upload")
     public ResponseEntity<ParkingImage> uploadImage(
             @PathVariable Integer parkingId,
@@ -36,12 +31,7 @@ public class ParkingImageController {
         }
     }
 
-    /**
-     * Sauvegarder une image de parking
-     * @param parkingId ID du parking
-     * @param imageDTO Données de l'image (filePath, fileUrl, fileSize, isPrimary)
-     * @return Image sauvegardée
-     */
+    
     @PostMapping("/{parkingId}")
     public ResponseEntity<ParkingImage> saveParkingImage(
             @PathVariable Integer parkingId,
@@ -54,23 +44,14 @@ public class ParkingImageController {
         }
     }
 
-    /**
-     * Récupérer toutes les images d'un parking
-     * @param parkingId ID du parking
-     * @return Liste des images
-     */
+    
     @GetMapping("/{parkingId}")
     public ResponseEntity<List<ParkingImage>> getParkingImages(@PathVariable Integer parkingId) {
         List<ParkingImage> images = parkingImageService.getImagesByParkingId(parkingId);
         return ResponseEntity.ok(images);
     }
 
-    /**
-     * Supprimer une image de parking
-     * @param parkingId ID du parking
-     * @param filePath Chemin du fichier à supprimer
-     * @return 204 No Content
-     */
+    
     @DeleteMapping("/{parkingId}/file")
     public ResponseEntity<Void> deleteParkingImage(
             @PathVariable Integer parkingId,

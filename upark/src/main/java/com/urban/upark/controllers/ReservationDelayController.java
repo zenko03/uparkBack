@@ -19,17 +19,13 @@ public class ReservationDelayController {
 
     private final ReservationDelayService reservationDelayService;
 
-    /**
-     * Récupérer tous les délais de réservation
-     */
+    
     @GetMapping
     public List<ReservationDelay> getAllReservationDelays() {
         return reservationDelayService.findAll();
     }
 
-    /**
-     * Récupérer un délai de réservation par son ID
-     */
+    
     @GetMapping("/{id}")
     public ResponseEntity<ReservationDelay> getReservationDelayById(@PathVariable int id) {
         Optional<ReservationDelay> reservationDelay = reservationDelayService.findById(id);
@@ -40,9 +36,7 @@ public class ReservationDelayController {
         }
     }
 
-    /**
-     * Récupérer le délai de réservation actif (le plus récent)
-     */
+    
     @GetMapping("/active")
     public ResponseEntity<ReservationDelay> getActiveReservationDelay() {
         Optional<ReservationDelay> activeDelay = reservationDelayService.getActiveDelay();
@@ -53,9 +47,7 @@ public class ReservationDelayController {
         }
     }
 
-    /**
-     * Créer un nouveau délai de réservation
-     */
+    
     @PostMapping
     public ResponseEntity<ReservationDelay> createReservationDelay(@RequestBody ReservationDelay reservationDelay) {
         try {
@@ -67,9 +59,7 @@ public class ReservationDelayController {
         }
     }
 
-    /**
-     * Mettre à jour un délai de réservation
-     */
+    
     @PutMapping("/{id}")
     public ResponseEntity<ReservationDelay> updateReservationDelay(@PathVariable int id, 
                                                                   @RequestBody ReservationDelay reservationDelayDetails) {
@@ -93,9 +83,7 @@ public class ReservationDelayController {
         }
     }
 
-    /**
-     * Supprimer un délai de réservation
-     */
+    
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservationDelay(@PathVariable int id) {
         try {
@@ -112,9 +100,7 @@ public class ReservationDelayController {
         }
     }
 
-    /**
-     * Vérifier si une réservation est possible pour une date donnée
-     */
+    
     @GetMapping("/check-availability")
     public ResponseEntity<Boolean> checkReservationAvailability(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime requestedDateTime) {
@@ -127,9 +113,7 @@ public class ReservationDelayController {
         }
     }
 
-    /**
-     * Obtenir le délai minimum en minutes pour une réservation
-     */
+    
     @GetMapping("/minimum-delay")
     public ResponseEntity<Integer> getMinimumDelayInMinutes() {
         try {
@@ -141,9 +125,7 @@ public class ReservationDelayController {
         }
     }
 
-    /**
-     * Obtenir la date la plus proche pour laquelle une réservation est possible
-     */
+    
     @GetMapping("/earliest-possible-time")
     public ResponseEntity<LocalDateTime> getEarliestPossibleReservationTime() {
         try {

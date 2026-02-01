@@ -15,9 +15,7 @@ public class DeviceTokenController {
     
     private final NotificationService notificationService;
     
-    /**
-     * Enregistrer un token FCM
-     */
+   
     @PostMapping
     public ResponseEntity<DeviceToken> registerToken(@RequestBody Map<String, Object> request) {
         try {
@@ -40,9 +38,7 @@ public class DeviceTokenController {
         }
     }
     
-    /**
-     * Désactiver un token FCM (lors du logout)
-     */
+   
     @DeleteMapping("/deactivate")
     public ResponseEntity<Map<String, String>> deactivateToken(@RequestBody Map<String, Object> request) {
         try {

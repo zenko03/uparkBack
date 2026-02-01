@@ -50,9 +50,7 @@ public class NotificationController {
         }
     }
     
-    /**
-     * Récupérer les notifications d'un utilisateur
-     */
+    
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Notification>> getUserNotifications(
             @PathVariable Integer userId,
@@ -66,9 +64,7 @@ public class NotificationController {
         }
     }
     
-    /**
-     * Compter les notifications non lues
-     */
+   
     @GetMapping("/user/{userId}/unread-count")
     public ResponseEntity<Map<String, Long>> getUnreadCount(@PathVariable Integer userId) {
         try {
@@ -81,9 +77,7 @@ public class NotificationController {
         }
     }
     
-    /**
-     * Marquer une notification comme lue
-     */
+   
     @PutMapping("/{notificationId}/read")
     public ResponseEntity<Notification> markAsRead(@PathVariable Integer notificationId) {
         try {
@@ -94,9 +88,7 @@ public class NotificationController {
         }
     }
     
-    /**
-     * Marquer toutes les notifications comme lues
-     */
+   
     @PutMapping("/user/{userId}/read-all")
     public ResponseEntity<Map<String, Integer>> markAllAsRead(@PathVariable Integer userId) {
         try {
@@ -109,9 +101,7 @@ public class NotificationController {
         }
     }
     
-    /**
-     * Supprimer une notification
-     */
+   
     @DeleteMapping("/{notificationId}")
     public ResponseEntity<Void> deleteNotification(@PathVariable Integer notificationId) {
         try {

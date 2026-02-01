@@ -46,11 +46,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(hashedPassword);
     }
 
-    /**
-     * Authentification OAuth2 avec Google
-     * @param request Contient le token Google
-     * @return JWT et informations utilisateur
-     */
+    //google
     @PostMapping("/oauth/google")
     public ResponseEntity<AuthenticationResponse> loginWithGoogle(
         @RequestBody OAuthLoginRequest request) {
@@ -65,11 +61,7 @@ public class AuthenticationController {
         }
     }
 
-    /**
-     * Authentification OAuth2 avec Facebook
-     * @param request Contient le token Facebook
-     * @return JWT et informations utilisateur
-     */
+   //fb
     @PostMapping("/oauth/facebook")
     public ResponseEntity<AuthenticationResponse> loginWithFacebook(
         @RequestBody OAuthLoginRequest request) {
@@ -84,15 +76,7 @@ public class AuthenticationController {
         }
     }
 
-    // ========================================
-    // PASSWORD RESET ENDPOINTS
-    // ========================================
-
-    /**
-     * Demande de réinitialisation de mot de passe
-     * Envoie un code par email si l'email existe
-     * POST /api/v1/auth/forgot-password
-     */
+   
     @PostMapping("/forgot-password")
     public ResponseEntity<Map<String, Object>> forgotPassword(
         @RequestBody ForgotPasswordRequest request) {
@@ -114,10 +98,7 @@ public class AuthenticationController {
         }
     }
 
-    /**
-     * Vérification du code de réinitialisation
-     * POST /api/v1/auth/verify-reset-code
-     */
+   
     @PostMapping("/verify-reset-code")
     public ResponseEntity<Map<String, Object>> verifyResetCode(
         @RequestBody VerifyResetCodeRequest request) {
@@ -145,10 +126,7 @@ public class AuthenticationController {
         }
     }
 
-    /**
-     * Réinitialisation du mot de passe
-     * POST /api/v1/auth/reset-password
-     */
+    
     @PostMapping("/reset-password")
     public ResponseEntity<Map<String, Object>> resetPassword(
         @RequestBody ResetPasswordRequest request) {

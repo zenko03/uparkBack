@@ -29,9 +29,7 @@ public class DashboardController {
     }
 
     // STATISTIQUES DES COMMISSIONS
-    /**
-     * ex: /api/dashboard/commissions?startDate=2024-01-01&endDate=2024-01-31
-     */
+  
     @GetMapping("/commissions")
     public ResponseEntity<Map<String, Object>> getCommissionStatistics(
             @RequestParam(required = false) 
@@ -62,9 +60,7 @@ public class DashboardController {
     }
 
     // STATISTIQUES DES RÉSERVATIONS PAR STATUT
-    /**
-     * ex: /api/dashboard/reservations/status?startDate=2024-01-01&endDate=2024-01-31
-     */
+    
     @GetMapping("/reservations/status")
     public ResponseEntity<Map<String, Object>> getReservationsByStatus(
             @RequestParam(required = false) 
@@ -95,9 +91,7 @@ public class DashboardController {
     }
 
     // CLASSEMENT DES PARKINGS
-    /**
-     * ex: /api/dashboard/parkings/top-reservations?limit=10
-     */
+    
     @GetMapping("/parkings/top-reservations")
     public ResponseEntity<?> getTopParkingsByReservations(
             @RequestParam(defaultValue = "10") int limit) {
@@ -123,9 +117,7 @@ public class DashboardController {
     }
 
     // UTILISATEURS ACTIFS
-    /**
-     * ex: /api/dashboard/users/active?startDate=2024-01-01&endDate=2024-01-31
-     */
+   
     @GetMapping("/users/active")
     public ResponseEntity<Map<String, Object>> getActiveUsersStatistics(
             @RequestParam(required = false) 

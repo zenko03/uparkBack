@@ -33,10 +33,8 @@ public class ParkingController {
 
     @GetMapping
     public List<Parking> getAllParkings() {
-        // Utiliser une requête native pour obtenir les coordonnées en texte
         List<Parking> parkings = parkingService.findAll();
         
-        // Convertir les coordonnées pour chaque parking
         for (Parking parking : parkings) {
             String locationText = (String) entityManager.createNativeQuery(
                 "SELECT ST_AsText(localisation) FROM parking WHERE id_parking = :id")
@@ -121,18 +119,14 @@ public class ParkingController {
         return parkingService.searchParkings(startDate, endDate, minPrice, maxPrice, vehicleType, numberOfVehicles, sortBy);
     }
 
-    /**
-     * Ex: /api/parkings/search/address?address=AMPITATAFIKA
-     */
+   
     @GetMapping("/search/address")
     public List<Parking> searchByAddress(
             @RequestParam(required = false) String address) {
         return parkingService.searchByAddress(address);
     }
 
-    /**
-     * Recherche  parkings par coordonnées géographiques
-     */
+    
     @GetMapping("/search/location")
     public List<Parking> searchByLocation(
             @RequestParam(required = false) String location,
@@ -140,10 +134,7 @@ public class ParkingController {
         return parkingService.searchByLocation(location, radius);
     }
 
-    /**
-     * 
-     * Ex: /api/parkings/search/combined?address=Paris&location=SRID=4326;POINT(2.3522 48.8566)&radius=5
-     */
+    
     @GetMapping("/search/combined")
     public List<Parking> searchCombined(
             @RequestParam(required = false) String address,
@@ -152,10 +143,7 @@ public class ParkingController {
         return parkingService.searchByLocationAndAddress(address, location, radius);
     }
 
-    /**
-     * Obtenir la disponibilité d'un parking par type de véhicule
-     * Ex: /api/parkings/3/availability?startDateTime=2025-11-11T14:00:00&endDateTime=2025-11-11T16:00:00
-     */
+    
     @GetMapping("/{id}/availability")
     public ResponseEntity<ParkingAvailabilityResponse> getParkingAvailability(
             @PathVariable int id,
@@ -169,11 +157,7 @@ public class ParkingController {
         ParkingAvailabilityResponse availability = parkingService.getParkingAvailability(id, start, end);
         return ResponseEntity.ok(availability);
     }
-    /**
-     * Obtenir les parkings de l'utilisateur connecté (depuis JWT)
-     * Ex: GET /api/v1/parkings/my-parkings
-     * Nécessite un token JWT valide
-     */
+    
     @GetMapping("/my-parkings")
     public ResponseEntity<List<Parking>> getMyParkings() {
         try {
@@ -189,10 +173,7 @@ public class ParkingController {
         }
     }
 
-    /**
-     * @deprecated Utiliser /my-parkings à la place (sécurisé par JWT)
-     * Cet endpoint reste pour compatibilité mais nécessite maintenant l'authentification
-     */
+    
     @GetMapping("/user/{userId}")
     @Deprecated
     public ResponseEntity<List<Parking>> getParkingsByUserId(@PathVariable int userId) {
@@ -213,10 +194,7 @@ public class ParkingController {
         }
     }
 
-    /**
-     * Obtenir les véhicules associés à un parking
-     * Ex: /api/parkings/3/vehicles
-     */
+    
     @GetMapping("/{id}/vehicles")
     public ResponseEntity<List<com.urban.upark.models.ParkingVehicles>> getParkingVehicles(@PathVariable int id) {
         try {

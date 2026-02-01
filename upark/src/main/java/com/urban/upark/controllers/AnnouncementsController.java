@@ -23,19 +23,13 @@ public class AnnouncementsController {
         return announcementsService.findAll();
     }
 
-    /**
-     * Récupère les annonces publiées avec la note moyenne de chaque parking
-     * Optimisé pour l'affichage dans la liste (évite N requêtes supplémentaires)
-     */
+    
     @GetMapping("/published")
     public List<AnnouncementWithRatingDTO> getPublishedAnnouncements() {
         return announcementsService.findPublishedWithRatings();
     }
 
-    /**
-     * Recherche avancée d'annonces avec filtres
-     * GET /api/v1/announcements/search?searchText=xxx&vehicleTypeId=1&minPlaces=2
-     */
+    
     @GetMapping("/search")
     public List<Announcements> searchAnnouncements(
             @RequestParam(required = false) String searchText,
@@ -69,9 +63,7 @@ public class AnnouncementsController {
         return announcementsService.save(announcement);
     }
 
-    /**
-     * Créer une annonce complète avec véhicules et disponibilités
-     */
+    
     @PostMapping("/complete")
     public ResponseEntity<Announcements> createCompleteAnnouncement(@RequestBody CreateAnnouncementDTO dto) {
         try {

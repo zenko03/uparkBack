@@ -7,10 +7,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 
-/**
- * Contrôleur proxy pour servir les images Supabase
- * Résout les problèmes de certificat SSL sur React Native Android
- */
+
 @RestController
 @RequestMapping("/api/images")
 @CrossOrigin(origins = "*")
@@ -19,10 +16,7 @@ public class ImageProxyController {
     @Value("${supabase.url:https://fbpefbjoxzkxombdcqif.supabase.co}")
     private String supabaseUrl;
 
-    /**
-     * Proxy pour récupérer une image depuis Supabase Storage
-     * URL: /api/images/proxy?path=userId/parkingId/filename.jpg
-     */
+    //proxy pour recuperer image via supabase
     @GetMapping("/proxy")
     public ResponseEntity<byte[]> proxyImage(@RequestParam String path) {
         try {

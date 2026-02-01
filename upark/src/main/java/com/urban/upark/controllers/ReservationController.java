@@ -99,11 +99,7 @@ public class ReservationController {
         return reservationService.findByUserIdWithParkingInfo(userId);
     }
     
-    /**
-     * Récupérer les réservations sur les parkings d'un propriétaire
-     * Utilise la vue SQL v_owner_reservations pour des performances optimales
-     * GET /api/v1/reservations/owner/{ownerId}
-     */
+    
     @GetMapping("/owner/{ownerId}")
     public List<ReservationResponse> getOwnerParkingReservations(@PathVariable int ownerId) {
         return reservationService.findByParkingOwnerIdWithDetails(ownerId);
@@ -226,10 +222,7 @@ public class ReservationController {
         }
     }
 
-    /**
-     * Met à jour manuellement tous les statuts de réservations
-     * Utile pour le débogage et pour forcer la mise à jour immédiate
-     */
+    
     @PostMapping("/update-all-statuses")
     public ResponseEntity<String> updateAllReservationStatuses() {
         try {
@@ -241,10 +234,7 @@ public class ReservationController {
         }
     }
 
-    /**
-     * Met à jour le statut d'une réservation spécifique en fonction de la date/heure actuelle
-     * Utile pour le débogage
-     */
+    
     @PostMapping("/{id}/update-status")
     public ResponseEntity<String> updateReservationStatus(@PathVariable int id) {
         try {
@@ -271,14 +261,7 @@ public class ReservationController {
         }
     }
 
-    // ========================================
-    // ENDPOINTS QR CODE
-    // ========================================
-
-    /**
-     * Récupérer le token QR d'une réservation
-     * GET /api/v1/reservations/{id}/qr-token
-     */
+    
     @GetMapping("/{id}/qr-token")
     public ResponseEntity<?> getQRToken(@PathVariable int id) {
         try {
@@ -310,10 +293,7 @@ public class ReservationController {
         }
     }
 
-    /**
-     * Générer une image QR Code pour une réservation
-     * GET /api/v1/reservations/{id}/qr-image
-     */
+    
     @GetMapping("/{id}/qr-image")
     public ResponseEntity<byte[]> getQRCodeImage(@PathVariable int id) {
         try {
@@ -346,11 +326,7 @@ public class ReservationController {
         }
     }
 
-    /**
-     * Valider un QR Code scanné
-     * POST /api/v1/reservations/validate-qr
-     * Body: { "qrToken": "..." }
-     */
+    
     @PostMapping("/validate-qr")
     public ResponseEntity<?> validateQRCode(@RequestBody Map<String, String> request) {
         try {
@@ -405,10 +381,7 @@ public class ReservationController {
         }
     }
 
-    /**
-     * Vérifier le statut de validation d'un QR Code
-     * GET /api/v1/reservations/check-qr/{qrToken}
-     */
+    
     @GetMapping("/check-qr/{qrToken}")
     public ResponseEntity<?> checkQRCodeStatus(@PathVariable String qrToken) {
         try {
@@ -435,9 +408,7 @@ public class ReservationController {
         }
     }
 
-    /**
-     * Méthode utilitaire pour extraire le nom du parking depuis une réservation
-     */
+    
     private String extractParkingName(Reservation reservation) {
         try {
             if (reservation.getReservationVehicles() != null && !reservation.getReservationVehicles().isEmpty()) {
