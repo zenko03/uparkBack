@@ -273,12 +273,12 @@ public class ReservationRequestService {
                          " - Statut: " + (savedReservation.getReservationStatus() != null ? 
                          savedReservation.getReservationStatus().getLabel() : "NON DÉFINI"));
 
-        // 🔐 Générer le QR Code token pour la réservation
+        //  Générer le QR Code token pour la réservation
         String qrToken = qrCodeService.generateFormattedQRToken(savedReservation.getId_Reservation());
         savedReservation.setQrCodeToken(qrToken);
         savedReservation.setIsValidated(false);
         savedReservation = reservationRepository.save(savedReservation);
-        System.out.println("🔐 QR Code token généré: " + qrToken);
+        System.out.println(" QR Code token généré: " + qrToken);
 
         // Créer les ReservationVehicles à partir de l'annonce
         createReservationVehiclesFromAnnouncement(savedReservation, request);
@@ -287,9 +287,9 @@ public class ReservationRequestService {
         System.out.println("💰 Création de la commission pour la réservation finalisée...");
         try {
             commissionReceivedService.createCommissionForReservation(savedReservation);
-            System.out.println("✅ Commission créée avec succès");
+            System.out.println(" Commission créée avec succès");
         } catch (Exception e) {
-            System.err.println("⚠️ Erreur lors de la création de la commission (non-bloquant): " + e.getMessage());
+            System.err.println(" Erreur lors de la création de la commission (non-bloquant): " + e.getMessage());
         }
 
         // Mettre à jour la demande

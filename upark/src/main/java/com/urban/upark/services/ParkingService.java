@@ -56,7 +56,6 @@ public class ParkingService {
     }
 
     public Optional<Parking> findById(int id) {
-        // Charger le parking avec ses annonces pour que getIdAnnouncements() fonctionne
         return parkingRepository.findByIdWithAnnouncements(id);
     }
 
@@ -79,7 +78,7 @@ public class ParkingService {
 
     @Transactional
     public Parking save(Parking parking) {
-        // If the parking has an ID, it's an update
+        // update existing
         if (parking.getId_Parking() > 0) {
             String sql = "UPDATE parking SET label = :label, hourly_rate = :hourlyRate, " +
                          "address = :address, description = :description, localisation = ST_GeogFromText(:localisation), " +
@@ -100,7 +99,7 @@ public class ParkingService {
             return parkingRepository.findById(parking.getId_Parking()).orElse(parking);
         }
         
-        // For new parking, use native query to handle geography
+        // insert new
         String sql = "INSERT INTO parking (label, hourly_rate, address, description, localisation, id_users) " +
                     "VALUES (:label, :hourlyRate, :address, :description, ST_GeogFromText(:localisation), :userId)";
         
@@ -113,7 +112,6 @@ public class ParkingService {
                 .setParameter("userId", parking.getUser().getId_Users())
                 .executeUpdate();
         
-        // Retrieve the newly created parking
         return parkingRepository.findAll().stream()
                 .filter(p -> p.getLabel().equals(parking.getLabel())
                         && p.getUser().getId_Users() == parking.getUser().getId_Users())
@@ -121,17 +119,13 @@ public class ParkingService {
                 .orElse(parking);
     }
 
-    /**
-     * Soft delete d'un parking (suppression logique)
-     */
+    // soft delete
     @Transactional
     public void deleteById(int id) {
         parkingRepository.softDeleteById(id);
     }
     
-    /**
-     * Restaurer un parking supprimé
-     */
+    // restore deleted parking
     @Transactional
     public Parking restoreById(int id) {
         parkingRepository.restoreById(id);
@@ -139,16 +133,12 @@ public class ParkingService {
                 .orElseThrow(() -> new RuntimeException("Parking not found"));
     }
 
-    /**
-     * Créer un nouveau parking avec ses véhicules associés
-     */
+    // create parking with vehicles
     @Transactional
     public Parking createParkingWithVehicles(ParkingCreateRequest request) {
-        // Récupérer l'utilisateur
         Users user = usersRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec ID: " + request.getUserId()));
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouve avec ID: " + request.getUserId()));
 
-        // Créer le parking
         Parking parking = Parking.builder()
                 .label(request.getLabel())
                 .hourlyRate(request.getHourlyRate())
@@ -159,10 +149,8 @@ public class ParkingService {
                 .isActive(request.getIsActive() != null ? request.getIsActive() : true)
                 .build();
 
-        // Sauvegarder le parking (utilise la méthode save existante)
         Parking savedParking = save(parking);
 
-        // Sauvegarder les véhicules associés si fournis
         if (request.getVehicles() != null && !request.getVehicles().isEmpty()) {
             saveParkingVehicles(savedParking.getId_Parking(), request.getVehicles());
         }
@@ -170,75 +158,44 @@ public class ParkingService {
         return savedParking;
     }
 
-    /**
-     * Mettre à jour un parking existant avec ses véhicules
-     */
+    // update parking with vehicles
     @Transactional
     public Parking updateParkingWithVehicles(int parkingId, ParkingUpdateRequest request) {
-        System.out.println("🔍 [ParkingService] updateParkingWithVehicles - Parking ID: " + parkingId);
-        System.out.println(" [ParkingService] Request: " + request);
+        Parking existingParking = parkingRepository.findById(parkingId)
+                .orElseThrow(() -> new RuntimeException("Parking non trouve avec ID: " + parkingId));
+
+        String sql = "UPDATE parking SET label = :label, hourly_rate = :hourlyRate, " +
+                     "address = :address, description = :description, localisation = ST_GeogFromText(:localisation), " +
+                     "is_active = :isActive, updated_at = NOW() " +
+                     "WHERE id_parking = :id";
         
-        try {
-            // Vérifier que le parking existe
-            System.out.println("🔍 [ParkingService] Recherche du parking...");
-            Parking existingParking = parkingRepository.findById(parkingId)
-                    .orElseThrow(() -> new RuntimeException("Parking non trouvé avec ID: " + parkingId));
-            System.out.println(" [ParkingService] Parking trouvé: " + existingParking.getLabel());
+        entityManager.createNativeQuery(sql)
+                .setParameter("label", request.getLabel())
+                .setParameter("hourlyRate", request.getHourlyRate())
+                .setParameter("address", request.getAddress())
+                .setParameter("description", request.getDescription())
+                .setParameter("localisation", request.getLocalisation())
+                .setParameter("isActive", request.getIsActive() != null ? request.getIsActive() : true)
+                .setParameter("id", parkingId)
+                .executeUpdate();
 
-            // Mettre à jour les champs du parking
-            System.out.println("🔄 [ParkingService] Mise à jour des champs du parking...");
-            String sql = "UPDATE parking SET label = :label, hourly_rate = :hourlyRate, " +
-                         "address = :address, description = :description, localisation = ST_GeogFromText(:localisation), " +
-                         "is_active = :isActive, updated_at = NOW() " +
-                         "WHERE id_parking = :id";
-            
-            int updatedRows = entityManager.createNativeQuery(sql)
-                    .setParameter("label", request.getLabel())
-                    .setParameter("hourlyRate", request.getHourlyRate())
-                    .setParameter("address", request.getAddress())
-                    .setParameter("description", request.getDescription())
-                    .setParameter("localisation", request.getLocalisation())
-                    .setParameter("isActive", request.getIsActive() != null ? request.getIsActive() : true)
-                    .setParameter("id", parkingId)
-                    .executeUpdate();
-            System.out.println(" [ParkingService] Parking mis à jour. Lignes affectées: " + updatedRows);
+        if (request.getVehicles() != null) {
+            List<ParkingVehicles> existingVehicles = parkingVehiclesRepository.findByParkingId(parkingId);
+            existingVehicles.forEach(pv -> parkingVehiclesRepository.deleteById(pv.getId_Parking_vehicles()));
 
-            // Mettre à jour les véhicules associés si fournis
-            if (request.getVehicles() != null) {
-                System.out.println(" [ParkingService] Mise à jour des véhicules (" + request.getVehicles().size() + " véhicule(s))...");
-                
-                // Supprimer les anciennes associations
-                List<ParkingVehicles> existingVehicles = parkingVehiclesRepository.findByParkingId(parkingId);
-                System.out.println("🗑️ [ParkingService] Suppression de " + existingVehicles.size() + " ancienne(s) association(s)...");
-                existingVehicles.forEach(pv -> parkingVehiclesRepository.deleteById(pv.getId_Parking_vehicles()));
-
-                // Créer les nouvelles associations
-                if (!request.getVehicles().isEmpty()) {
-                    System.out.println(" [ParkingService] Création des nouvelles associations...");
-                    saveParkingVehicles(parkingId, request.getVehicles());
-                }
+            if (!request.getVehicles().isEmpty()) {
+                saveParkingVehicles(parkingId, request.getVehicles());
             }
-
-            System.out.println(" [ParkingService] Mise à jour terminée avec succès");
-            return parkingRepository.findById(parkingId).orElse(existingParking);
-            
-        } catch (Exception e) {
-            System.err.println("Erreur: [ParkingService] ERREUR lors de la mise à jour: " + e.getClass().getName());
-            System.err.println("Erreur: [ParkingService] Message: " + e.getMessage());
-            e.printStackTrace();
-            throw e;
         }
+
+        return parkingRepository.findById(parkingId).orElse(existingParking);
     }
 
-    /**
-     * Méthode privée pour sauvegarder les véhicules d'un parking
-     */
     private void saveParkingVehicles(int parkingId, List<?> vehicleDtos) {
         Parking parking = parkingRepository.findById(parkingId)
-                .orElseThrow(() -> new RuntimeException("Parking non trouvé"));
+                .orElseThrow(() -> new RuntimeException("Parking non trouve"));
 
         for (Object dto : vehicleDtos) {
-            // Cast générique pour supporter les deux types de DTO
             int vehicleId;
             int count;
             
@@ -255,7 +212,7 @@ public class ParkingService {
             }
 
             Vehicles vehicle = vehiclesRepository.findById(vehicleId)
-                    .orElseThrow(() -> new RuntimeException("Type de véhicule non trouvé avec ID: " + vehicleId));
+                    .orElseThrow(() -> new RuntimeException("Type de vehicule non trouve avec ID: " + vehicleId));
 
             ParkingVehicles parkingVehicle = ParkingVehicles.builder()
                     .parking(parking)
@@ -267,25 +224,11 @@ public class ParkingService {
         }
     }
 
-    /**
-     * Récupérer les véhicules associés à un parking
-     */
     public List<ParkingVehicles> getParkingVehicles(int parkingId) {
         return parkingVehiclesRepository.findByParkingId(parkingId);
     }
 
-    /**
-     * Recherche avancée de parkings avec filtres
-     *
-     * @param startDate Date de début souhaitée
-     * @param endDate Date de fin souhaitée
-     * @param minPrice Prix minimum
-     * @param maxPrice Prix maximum
-     * @param vehicleType Type de véhicule
-     * @param numberOfVehicles Nombre de véhicules souhaité
-     * @param sortBy Critère de tri (price, distance)
-     * @return Liste de parkings filtrés et triés
-     */
+    // search with filters
     public List<Parking> searchParkings(
             LocalDateTime startDate,
             LocalDateTime endDate,
@@ -295,10 +238,8 @@ public class ParkingService {
             Integer numberOfVehicles,
             String sortBy) {
 
-        // Récupérer tous les parkings
         List<Parking> parkings = parkingRepository.findAll();
 
-        // Appliquer les filtres
         return parkings.stream()
                 .filter(parking -> filterByPrice(parking, minPrice, maxPrice))
                 .filter(parking -> filterByVehicleType(parking, vehicleType))
@@ -308,9 +249,6 @@ public class ParkingService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Recherche de parkings par adresse/localisation
-     */
     public List<Parking> searchByAddress(String address) {
         if (address == null || address.trim().isEmpty()) {
             return parkingRepository.findAll();
@@ -318,35 +256,18 @@ public class ParkingService {
         return parkingRepository.findByAddressContaining(address.trim());
     }
 
-    /**
-     * Recherche de parkings par coordonnées géographiques
-     */
     public List<Parking> searchByLocation(String location, double radiusKm) {
-        // Convertir le rayon en mètres (PostGIS utilise des mètres)
         double radiusMeters = radiusKm * 1000;
         return parkingRepository.findParkingsByLocation(location, radiusMeters);
     }
 
-    /**
-     * Recherche combinée : adresse + coordonnées
-     */
     public List<Parking> searchByLocationAndAddress(String address, String location, double radiusKm) {
-        List<Parking> parkings;
-        
         if (location != null && !location.trim().isEmpty()) {
-            // Priorité à la recherche géolocalisée
-            parkings = searchByLocation(location, radiusKm);
-        } else {
-            // Recherche par adresse si pas de coordonnées
-            parkings = searchByAddress(address);
+            return searchByLocation(location, radiusKm);
         }
-        
-        return parkings;
+        return searchByAddress(address);
     }
 
-    /**
-     * Filtre les parkings par prix
-     */
     private boolean filterByPrice(Parking parking, BigDecimal minPrice, BigDecimal maxPrice) {
         if (minPrice != null && parking.getHourlyRate().compareTo(minPrice) < 0) {
             return false;
@@ -357,29 +278,19 @@ public class ParkingService {
         return true;
     }
 
-    /**
-     * Filtre les parkings par type de véhicule
-     */
     private boolean filterByVehicleType(Parking parking, Integer vehicleType) {
         if (vehicleType == null) {
             return true;
         }
-        
-        // Vérifier si le parking accepte ce type de véhicule
         return parkingVehiclesRepository.findByParkingId(parking.getId_Parking())
                 .stream()
                 .anyMatch(pv -> pv.getVehicle().getId_Vehicles() == vehicleType);
     }
 
-    /**
-     * Filtre les parkings par nombre de véhicules disponibles
-     */
     private boolean filterByNumberOfVehicles(Parking parking, Integer vehicleType, Integer numberOfVehicles) {
         if (numberOfVehicles == null) {
             return true;
         }
-        
-        // Vérifier si le parking a assez de places pour le type de véhicule demandé
         return parkingVehiclesRepository.findByParkingId(parking.getId_Parking())
                 .stream()
                 .filter(pv -> vehicleType == null || pv.getVehicle().getId_Vehicles() == vehicleType)
@@ -387,16 +298,11 @@ public class ParkingService {
                 .sum() >= numberOfVehicles;
     }
 
-    /**
-     * Filtre les parkings par disponibilité
-     */
     private boolean filterByAvailability(Parking parking, LocalDateTime startDate, LocalDateTime endDate) {
-        // Si aucune date n'est spécifiée, le parking est considéré comme disponible
         if (startDate == null || endDate == null) {
             return true;
         }
         
-        // Vérifier s'il y a des disponibilités qui chevauchent la période demandée
         LocalDate startLocalDate = startDate.toLocalDate();
         LocalDate endLocalDate = endDate.toLocalDate();
         
@@ -404,14 +310,10 @@ public class ParkingService {
             availabilitiesDateRepository.findOverlappingAvailabilities(
                 parking.getId_Parking(), startLocalDate, endLocalDate);
         
-        // Vérifier si au moins une disponibilité couvre la période demandée
         return availabilities.stream().anyMatch(availability ->
             isAvailabilityCoveringPeriod(availability, startDate, endDate));
     }
     
-    /**
-     * Vérifie si une disponibilité couvre une période donnée
-     */
     private boolean isAvailabilityCoveringPeriod(
             com.urban.upark.models.AvailabilitiesDate availability,
             LocalDateTime requestedStart,
@@ -422,53 +324,36 @@ public class ParkingService {
         return !requestedStart.isAfter(availabilityEnd) && !requestedEnd.isBefore(availabilityStart);
     }
 
-    /**
-     * Retourne le comparateur pour le tri
-     */
     private java.util.Comparator<Parking> getSortComparator(String sortBy, LocalDateTime referenceDateTime) {
         switch (sortBy) {
             case "price":
                 return java.util.Comparator.comparing(Parking::getHourlyRate);
             case "distance":
-                // Pour l'instant, tri par ID comme placeholder
-                // À implémenter avec la géolocalisation réelle
                 return java.util.Comparator.comparing(Parking::getId_Parking);
             default:
                 return java.util.Comparator.comparing(Parking::getHourlyRate);
         }
     }
 
-    /**
-     * Obtenir la disponibilité d'un parking par type de véhicule
-     */
+    // get parking availability by vehicle type
     public ParkingAvailabilityResponse getParkingAvailability(int parkingId, LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        // Récupérer le parking
         Parking parking = parkingRepository.findById(parkingId)
                 .orElseThrow(() -> new RuntimeException("Parking not found"));
 
-        // Récupérer tous les types de véhicules
         List<Vehicles> allVehicles = vehiclesRepository.findAll();
-        
         List<VehicleAvailability> vehicleAvailabilities = new ArrayList<>();
 
         for (Vehicles vehicle : allVehicles) {
-            // Utiliser Announcements_vehicles pour avoir la capacité PROPOSÉE à la réservation
-            // (pas Parking_vehicles qui est la capacité physique totale)
             List<AnnouncementsVehicles> announcements = announcementsVehiclesRepository
                     .findByParkingAndVehicleType(parkingId, vehicle.getId_Vehicles());
             
             if (!announcements.isEmpty()) {
-                // Calculer la capacité totale PROPOSÉE pour ce type de véhicule
                 int totalCapacity = announcements.stream()
                         .mapToInt(AnnouncementsVehicles::getNumbers)
                         .sum();
                 
-                // Calculer la capacité disponible en tenant compte des réservations existantes
                 int reservedCapacity = calculateReservedCapacity(announcements, startDateTime, endDateTime);
                 int availableCapacity = Math.max(0, totalCapacity - reservedCapacity);
-                
-                System.out.println(" " + vehicle.getTypes() + " - Capacité proposée: " + totalCapacity 
-                    + ", Réservée: " + reservedCapacity + ", Disponible: " + availableCapacity);
                 
                 vehicleAvailabilities.add(VehicleAvailability.builder()
                         .vehicleTypeId(vehicle.getId_Vehicles())
@@ -479,7 +364,6 @@ public class ParkingService {
                         .isAvailable(availableCapacity > 0)
                         .build());
             } else {
-                // Ce parking n'accepte pas ce type de véhicule (aucune annonce)
                 vehicleAvailabilities.add(VehicleAvailability.builder()
                         .vehicleTypeId(vehicle.getId_Vehicles())
                         .vehicleType(vehicle.getTypes())
@@ -500,12 +384,8 @@ public class ParkingService {
                 .build();
     }
     
-    /**
-     * Génère le texte de disponibilité horaire (ex: "Du lundi au vendredi à 10:30-18:30")
-     */
     private String generateAvailabilitySchedule(int parkingId) {
         try {
-            // Récupérer toutes les disponibilités de fréquence pour ce parking
             List<AvailabilitiesFrequence> frequences = availabilitiesFrequenceRepository.findAll().stream()
                     .filter(af -> af.getAnnouncementsVehicles() != null 
                             && af.getAnnouncementsVehicles().getParkingVehicles() != null
@@ -517,7 +397,6 @@ public class ParkingService {
                 return "24h/24 et 7j/7";
             }
             
-            // Grouper par horaires
             Map<String, List<String>> scheduleByTime = new HashMap<>();
             for (AvailabilitiesFrequence af : frequences) {
                 LocalTime startHour = af.getStartHour();
@@ -534,7 +413,6 @@ public class ParkingService {
                 return "24h/24 et 7j/7";
             }
             
-            // Formater le texte
             StringBuilder schedule = new StringBuilder();
             for (Map.Entry<String, List<String>> entry : scheduleByTime.entrySet()) {
                 if (schedule.length() > 0) schedule.append(", ");
@@ -542,35 +420,24 @@ public class ParkingService {
                 List<String> days = entry.getValue();
                 String timeSlot = entry.getKey();
                 
-                // Simplifier si c'est du lundi au vendredi
                 if (days.size() >= 5 && days.contains("Lundi") && days.contains("Vendredi")) {
-                    schedule.append("Du lundi au vendredi à ").append(timeSlot);
+                    schedule.append("Du lundi au vendredi a ").append(timeSlot);
                 } else if (days.size() == 7) {
-                    schedule.append("7j/7 à ").append(timeSlot);
+                    schedule.append("7j/7 a ").append(timeSlot);
                 } else {
-                    schedule.append(String.join(", ", days)).append(" à ").append(timeSlot);
+                    schedule.append(String.join(", ", days)).append(" a ").append(timeSlot);
                 }
             }
             
             return schedule.toString();
         } catch (Exception e) {
-            System.err.println("Erreur lors de la génération du planning: " + e.getMessage());
-            return "Disponibilités à vérifier";
+            return "Disponibilites a verifier";
         }
     }
     
-    /**
-     * Calcule le nombre de places réservées pour une liste d'annonces durant une période donnée
-     * 
-     * @param announcements Liste des annonces de véhicules pour un parking et un type de véhicule
-     * @param startDateTime Début de la période recherchée
-     * @param endDateTime Fin de la période recherchée
-     * @return Nombre de places déjà réservées durant cette période
-     */
     private int calculateReservedCapacity(List<AnnouncementsVehicles> announcements, 
                                          LocalDateTime startDateTime, 
                                          LocalDateTime endDateTime) {
-        // Récupérer les IDs des annonces
         List<Integer> announcementIds = announcements.stream()
                 .map(AnnouncementsVehicles::getId_Announcements_vehicles)
                 .collect(Collectors.toList());
@@ -579,17 +446,13 @@ public class ParkingService {
             return 0;
         }
         
-        // Compter les réservations qui chevauchent la période demandée
-        // Une réservation chevauche si:
-        // - Elle commence avant la fin de notre période ET
-        // - Elle se termine après le début de notre période
         String sql = "SELECT COUNT(rv.id_reservation_vehicles) " +
                     "FROM reservation_vehicles rv " +
                     "JOIN reservation r ON rv.id_reservation = r.id_reservation " +
                     "WHERE rv.id_announcements_vehicles IN :announcementIds " +
                     "AND r.start_datetime < :endDateTime " +
                     "AND r.end_datetime > :startDateTime " +
-                    "AND r.id_reservation_status != 3"; // Exclure les réservations annulées (status 3)
+                    "AND r.id_reservation_status != 3";
         
         Long count = (Long) entityManager.createNativeQuery(sql)
                 .setParameter("announcementIds", announcementIds)

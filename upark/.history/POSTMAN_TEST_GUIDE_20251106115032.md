@@ -22,7 +22,7 @@ Le serveur démarrera sur `http://localhost:8080`
 
 ---
 
-## 🔐 **ÉTAPE 1 : AUTHENTIFICATION**
+##  **ÉTAPE 1 : AUTHENTIFICATION**
 
 ### 1.1 **Connexion Utilisateur**
 ```http
@@ -225,7 +225,7 @@ Authorization: Bearer {{token}}
 
 ---
 
-## 🔄 **ÉTAPE 7 : OPÉRATIONS SUPPLÉMENTAIRES**
+##  **ÉTAPE 7 : OPÉRATIONS SUPPLÉMENTAIRES**
 
 ### 7.1 **Mettre à jour une réservation**
 ```http

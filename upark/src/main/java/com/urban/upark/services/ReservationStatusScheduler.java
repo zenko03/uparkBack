@@ -39,7 +39,7 @@ public class ReservationStatusScheduler {
     @Scheduled(fixedRate = 300000) // Toutes les 5 minutes
     @Transactional
     public void updateReservationStatuses() {
-        log.info("🔄 Début de la mise à jour automatique des statuts de réservations");
+        log.info(" Début de la mise à jour automatique des statuts de réservations");
         
         // Utiliser UTC pour cohérence avec la base TIMESTAMPTZ
         LocalDateTime now = LocalDateTime.now(java.time.ZoneOffset.UTC);

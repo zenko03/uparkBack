@@ -54,7 +54,7 @@ public class DeviceTokenController {
             }
             
             notificationService.deactivateDeviceToken(token, userId);
-            System.out.println("🔴 Token FCM désactivé" + (userId != null ? " pour user " + userId : ""));
+            System.out.println(" Token FCM désactivé" + (userId != null ? " pour user " + userId : ""));
             
             return ResponseEntity.ok(Map.of("status", "success", "message", "Token désactivé"));
         } catch (Exception e) {

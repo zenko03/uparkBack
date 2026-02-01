@@ -136,14 +136,14 @@ public class NotificationService {
         // 1. DÉSACTIVER ce token pour TOUS les autres utilisateurs
         // Cela évite les doubles notifications si un autre user était connecté avant
         deviceTokenRepository.deactivateTokenForOtherUsers(token, userId);
-        System.out.println("🔄 Token désactivé pour les autres utilisateurs (si existait)");
+        System.out.println(" Token désactivé pour les autres utilisateurs (si existait)");
         
         // 2. Vérifier si le token existe déjà pour CET utilisateur
         return deviceTokenRepository.findByUserIdAndToken(userId, token)
                 .map(existingToken -> {
                     existingToken.setIsActive(true);
                     existingToken.setUpdatedAt(LocalDateTime.now());
-                    System.out.println("✅ Token réactivé pour user " + userId);
+                    System.out.println(" Token réactivé pour user " + userId);
                     return deviceTokenRepository.save(existingToken);
                 })
                 .orElseGet(() -> {
@@ -157,7 +157,7 @@ public class NotificationService {
                             .isActive(true)
                             .build();
                     
-                    System.out.println("✅ Nouveau token créé pour user " + userId);
+                    System.out.println(" Nouveau token créé pour user " + userId);
                     return deviceTokenRepository.save(newToken);
                 });
     }
@@ -233,7 +233,7 @@ public class NotificationService {
                     .ifPresent(deviceToken -> {
                         deviceToken.setIsActive(false);
                         deviceTokenRepository.save(deviceToken);
-                        System.out.println("🔴 Token désactivé pour user " + userId);
+                        System.out.println(" Token désactivé pour user " + userId);
                     });
         } else {
             // Désactiver le token quel que soit l'utilisateur
@@ -241,7 +241,7 @@ public class NotificationService {
                     .ifPresent(deviceToken -> {
                         deviceToken.setIsActive(false);
                         deviceTokenRepository.save(deviceToken);
-                        System.out.println("🔴 Token désactivé (sans userId)");
+                        System.out.println(" Token désactivé (sans userId)");
                     });
         }
     }

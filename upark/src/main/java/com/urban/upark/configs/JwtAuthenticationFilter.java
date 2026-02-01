@@ -42,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // D'abord vérifier les endpoints TOUJOURS PROTÉGÉS
         if (requestURI.contains("/my-parkings") || 
             requestURI.contains("/user/")) {
-            System.out.println("🔐 Endpoint protégé - vérification JWT requise");
+            System.out.println(" Endpoint protégé - vérification JWT requise");
             // Continue avec la vérification JWT plus bas
         }
         // Ensuite vérifier les endpoints publics
@@ -71,10 +71,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         else {
-            System.out.println("🔐 Endpoint protégé - vérification JWT requise");
+            System.out.println(" Endpoint protégé - vérification JWT requise");
         }
         
-        System.out.println("🔐 Endpoint protégé - vérification JWT requise");
+        System.out.println(" Endpoint protégé - vérification JWT requise");
         
         final String authHeader=request.getHeader("Authorization");
         final String jwt;
@@ -87,7 +87,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         
         jwt=authHeader.substring(7);
-        System.out.println("🔑 Token JWT extrait: " + jwt.substring(0, Math.min(20, jwt.length())) + "...");
+        System.out.println(" Token JWT extrait: " + jwt.substring(0, Math.min(20, jwt.length())) + "...");
         
         try {
             username = jwtService.extractUsername(jwt);

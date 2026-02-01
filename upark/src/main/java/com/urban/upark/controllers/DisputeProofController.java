@@ -54,12 +54,7 @@ public class DisputeProofController {
         return ResponseEntity.ok().build();
     }
 
-    /**
-     * Upload une preuve en base64 vers Supabase et sauvegarder
-     * @param disputeId ID du litige
-     * @param request Requête avec image base64
-     * @return Preuve uploadée et sauvegardée
-     */
+    
     @PostMapping("/{disputeId}/upload")
     public ResponseEntity<DisputeProof> uploadProof(
             @PathVariable Long disputeId,

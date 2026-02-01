@@ -129,7 +129,7 @@ npm run android
 ### Test 1 : Enregistrer le token FCM
 
 1. Lancez l'app React Native
-2. Vérifiez les logs : vous devriez voir `🔑 FCM Token obtenu: ...`
+2. Vérifiez les logs : vous devriez voir ` FCM Token obtenu: ...`
 3. Le token est automatiquement envoyé au backend
 
 ### Test 2 : Créer une demande de réservation

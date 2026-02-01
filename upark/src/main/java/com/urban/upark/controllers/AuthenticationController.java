@@ -55,7 +55,7 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> loginWithGoogle(
         @RequestBody OAuthLoginRequest request) {
         try {
-            System.out.println("🔵 Tentative de connexion Google OAuth");
+            System.out.println(" Tentative de connexion Google OAuth");
             AuthenticationResponse response = service.loginWithGoogle(request.getToken());
             System.out.println(" Connexion Google réussie pour: " + response.getEmail());
             return ResponseEntity.ok(response);
@@ -74,7 +74,7 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> loginWithFacebook(
         @RequestBody OAuthLoginRequest request) {
         try {
-            System.out.println("🔵 Tentative de connexion Facebook OAuth");
+            System.out.println(" Tentative de connexion Facebook OAuth");
             AuthenticationResponse response = service.loginWithFacebook(request.getToken());
             System.out.println(" Connexion Facebook réussie pour: " + response.getEmail());
             return ResponseEntity.ok(response);
@@ -97,7 +97,7 @@ public class AuthenticationController {
     public ResponseEntity<Map<String, Object>> forgotPassword(
         @RequestBody ForgotPasswordRequest request) {
         try {
-            System.out.println("📧 Demande de reset password pour: " + request.getEmail());
+            System.out.println(" Demande de reset password pour: " + request.getEmail());
             boolean sent = passwordResetService.requestPasswordReset(request.getEmail());
             
             // Toujours retourner succès pour ne pas révéler si l'email existe
@@ -106,7 +106,7 @@ public class AuthenticationController {
                 "message", "Si cette adresse email est associée à un compte, vous recevrez un code de vérification."
             ));
         } catch (Exception e) {
-            System.err.println("❌ Erreur forgot-password: " + e.getMessage());
+            System.err.println(" Erreur forgot-password: " + e.getMessage());
             return ResponseEntity.internalServerError().body(Map.of(
                 "success", false,
                 "message", "Une erreur est survenue lors de l'envoi de l'email."
@@ -122,7 +122,7 @@ public class AuthenticationController {
     public ResponseEntity<Map<String, Object>> verifyResetCode(
         @RequestBody VerifyResetCodeRequest request) {
         try {
-            System.out.println("🔐 Vérification du code pour: " + request.getEmail());
+            System.out.println(" Vérification du code pour: " + request.getEmail());
             boolean valid = passwordResetService.verifyCode(request.getEmail(), request.getCode());
             
             if (valid) {
@@ -137,7 +137,7 @@ public class AuthenticationController {
                 ));
             }
         } catch (Exception e) {
-            System.err.println("❌ Erreur verify-reset-code: " + e.getMessage());
+            System.err.println(" Erreur verify-reset-code: " + e.getMessage());
             return ResponseEntity.internalServerError().body(Map.of(
                 "success", false,
                 "message", "Une erreur est survenue lors de la vérification."
@@ -153,7 +153,7 @@ public class AuthenticationController {
     public ResponseEntity<Map<String, Object>> resetPassword(
         @RequestBody ResetPasswordRequest request) {
         try {
-            System.out.println("🔑 Réinitialisation du mot de passe pour: " + request.getEmail());
+            System.out.println(" Réinitialisation du mot de passe pour: " + request.getEmail());
             boolean success = passwordResetService.resetPassword(
                 request.getEmail(), 
                 request.getCode(), 
@@ -177,7 +177,7 @@ public class AuthenticationController {
                 "message", e.getMessage()
             ));
         } catch (Exception e) {
-            System.err.println("❌ Erreur reset-password: " + e.getMessage());
+            System.err.println(" Erreur reset-password: " + e.getMessage());
             return ResponseEntity.internalServerError().body(Map.of(
                 "success", false,
                 "message", "Une erreur est survenue lors de la réinitialisation."

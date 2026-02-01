@@ -36,7 +36,7 @@ Selon les données de test (`test-data-complete.sql`), les statuts sont définis
 
 **Exemple de log:**
 ```
-🔄 Début de la mise à jour automatique des statuts de réservations
+ Début de la mise à jour automatique des statuts de réservations
  Réservation ID 5 : 'à venir' → 'En cours'
  Réservation ID 3 : 'En cours' → 'Terminée'
 ✨ Mise à jour automatique terminée : 2 réservation(s) mise(s) à jour
@@ -184,7 +184,7 @@ GET /api/reservations/filter?statusId={statusId}&userId={userId}
 
 Le scheduler affiche des logs clairs :
 ```
-🔄 Début de la mise à jour automatique des statuts de réservations
+ Début de la mise à jour automatique des statuts de réservations
  Réservation ID 5 : 'à venir' → 'En cours'
 ✨ Mise à jour automatique terminée : 1 réservation(s) mise(s) à jour
 ```

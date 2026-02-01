@@ -53,7 +53,7 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<?> createReservation(@RequestBody ReservationRequest request) {
         try {
-            System.out.println("🔵 POST /reservations - Request received:");
+            System.out.println(" POST /reservations - Request received:");
             System.out.println("  - parkingId: " + request.getParkingId());
             System.out.println("  - userId: " + request.getUserId());
             System.out.println("  - startDateTime: " + request.getStartDateTime());

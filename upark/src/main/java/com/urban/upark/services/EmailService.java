@@ -45,7 +45,7 @@ public class EmailService {
         message.setText(text);
         
         mailSender.send(message);
-        System.out.println("📧 Email envoyé à: " + to);
+        System.out.println(" Email envoyé à: " + to);
     }
 
     /**
@@ -68,7 +68,7 @@ public class EmailService {
         helper.setText(htmlContent, true);
         
         mailSender.send(message);
-        System.out.println("📧 Email HTML envoyé à: " + to);
+        System.out.println(" Email HTML envoyé à: " + to);
     }
 
     /**

@@ -67,7 +67,7 @@ Implémenter une gestion automatique et dynamique des statuts de réservations p
 | **Terminée** | 20 | Date de fin dépassée | Automatique (scheduler) |
 | **Annulée** | 25 | Annulation utilisateur | Manuelle (endpoint) |
 
-## 🔄 Flux Automatique
+##  Flux Automatique
 
 ```
 Création de réservation
@@ -144,7 +144,7 @@ PUT /api/reservations/{id}/status/{statusId}
 
 ### Scheduler au démarrage
 ```
-🔄 Début de la mise à jour automatique des statuts de réservations
+ Début de la mise à jour automatique des statuts de réservations
 ```
 
 ### Mise à jour réussie
@@ -189,7 +189,7 @@ GET /api/reservations/filter?statusId=1
 ```
 **Vérification:** Retourne uniquement les réservations "à venir"
 
-## 🔐 Sécurité
+##  Sécurité
 
 - Endpoints protégés par JWT (si configuré dans SecurityConfiguration)
 - Validation des IDs avant mise à jour

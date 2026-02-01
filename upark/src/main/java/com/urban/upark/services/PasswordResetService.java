@@ -39,7 +39,7 @@ public class PasswordResetService {
         Optional<Users> userOpt = usersRepository.findByEmail(email);
         
         if (userOpt.isEmpty()) {
-            System.out.println("⚠️ Tentative de reset pour email inexistant: " + email);
+            System.out.println(" Tentative de reset pour email inexistant: " + email);
             // Pour des raisons de sécurité, on retourne true même si l'email n'existe pas
             // Cela évite de révéler si un email est enregistré ou non
             return true;
@@ -49,7 +49,7 @@ public class PasswordResetService {
 
         // Vérifier si l'utilisateur OAuth (pas de mot de passe)
         if (user.getOauthProvider() != null && user.getPassword() == null) {
-            System.out.println("⚠️ Utilisateur OAuth, pas de mot de passe à réinitialiser: " + email);
+            System.out.println(" Utilisateur OAuth, pas de mot de passe à réinitialiser: " + email);
             return true; // Même réponse pour éviter la fuite d'information
         }
 
@@ -73,10 +73,10 @@ public class PasswordResetService {
         // Envoyer l'email
         try {
             emailService.sendPasswordResetCode(email, code);
-            System.out.println("✅ Code de réinitialisation envoyé à: " + email);
+            System.out.println(" Code de réinitialisation envoyé à: " + email);
             return true;
         } catch (Exception e) {
-            System.err.println("❌ Erreur envoi email: " + e.getMessage());
+            System.err.println(" Erreur envoi email: " + e.getMessage());
             throw new RuntimeException("Erreur lors de l'envoi de l'email");
         }
     }
@@ -91,18 +91,18 @@ public class PasswordResetService {
         Optional<PasswordResetToken> tokenOpt = tokenRepository.findByEmailAndCode(email, code);
 
         if (tokenOpt.isEmpty()) {
-            System.out.println("⚠️ Code non trouvé pour: " + email);
+            System.out.println(" Code non trouvé pour: " + email);
             return false;
         }
 
         PasswordResetToken token = tokenOpt.get();
 
         if (!token.isValid()) {
-            System.out.println("⚠️ Code expiré ou déjà utilisé pour: " + email);
+            System.out.println(" Code expiré ou déjà utilisé pour: " + email);
             return false;
         }
 
-        System.out.println("✅ Code vérifié avec succès pour: " + email);
+        System.out.println(" Code vérifié avec succès pour: " + email);
         return true;
     }
 
@@ -119,14 +119,14 @@ public class PasswordResetService {
         Optional<PasswordResetToken> tokenOpt = tokenRepository.findByEmailAndCode(email, code);
 
         if (tokenOpt.isEmpty()) {
-            System.out.println("❌ Token non trouvé pour reset: " + email);
+            System.out.println(" Token non trouvé pour reset: " + email);
             return false;
         }
 
         PasswordResetToken token = tokenOpt.get();
 
         if (!token.isValid()) {
-            System.out.println("❌ Token invalide pour reset: " + email);
+            System.out.println(" Token invalide pour reset: " + email);
             return false;
         }
 
@@ -134,7 +134,7 @@ public class PasswordResetService {
         Optional<Users> userOpt = usersRepository.findByEmail(email);
 
         if (userOpt.isEmpty()) {
-            System.out.println("❌ Utilisateur non trouvé pour reset: " + email);
+            System.out.println(" Utilisateur non trouvé pour reset: " + email);
             return false;
         }
 
@@ -156,7 +156,7 @@ public class PasswordResetService {
         // Invalider tous les autres tokens pour cet email
         tokenRepository.invalidateAllTokensForEmail(email);
 
-        System.out.println("✅ Mot de passe réinitialisé pour: " + email);
+        System.out.println(" Mot de passe réinitialisé pour: " + email);
         return true;
     }
 
