@@ -2,6 +2,7 @@ package com.urban.upark.configs;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -42,9 +43,20 @@ public class CorsFilter implements Filter {
             
             // Vercel deployments
             "https://parking-administration-ne15.vercel.app",
+            "https://upark-web.vercel.app",
             "https://upark-ivjilfyve-zeniths-projects-bf3d7e5d.vercel.app",
             "https://upark-web-git-v2-zeniths-projects-bf3d7e5d.vercel.app"
     );
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // Initialization logic if needed
+    }
+
+    @Override
+    public void destroy() {
+        // Cleanup logic if needed
+    }
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
