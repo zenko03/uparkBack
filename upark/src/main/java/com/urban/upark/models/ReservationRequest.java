@@ -1,5 +1,6 @@
 package com.urban.upark.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,12 +25,15 @@ public class ReservationRequest {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "start_datetime")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     private LocalDateTime startDateTime;
 
     @Column(name = "end_datetime")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     private LocalDateTime endDateTime;
 
     @Column(name = "total_gain")
@@ -37,15 +41,18 @@ public class ReservationRequest {
 
     @Column(name = "updated_at")
     @Builder.Default
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     @Column(name = "state")
     private Short state;
 
     @Column(name = "accepted_at")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     private LocalDateTime acceptedAt;
 
     @Column(name = "expires_at")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     private LocalDateTime expiresAt;
 
     @ManyToOne(fetch = FetchType.LAZY)

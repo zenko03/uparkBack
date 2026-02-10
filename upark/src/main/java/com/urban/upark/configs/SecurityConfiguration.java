@@ -27,7 +27,8 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        // CORS handled by CorsFilter.java (HIGHEST_PRECEDENCE)
+        http.cors(cors -> cors.disable())
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 // OPTIONS requests must be first for CORS preflight
@@ -79,6 +80,9 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+    // CORS configuration moved to CorsFilter.java for better control
+    // CorsFilter executes with HIGHEST_PRECEDENCE before Spring Security
+    /*
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -101,4 +105,5 @@ public class SecurityConfiguration {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+    */
 }

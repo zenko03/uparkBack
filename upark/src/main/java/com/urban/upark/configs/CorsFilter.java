@@ -26,6 +26,7 @@ public class CorsFilter implements Filter {
             "http://127.0.0.1:8081",
             "http://localhost:3000",          // si tu testes avec Expo Web ou autre
             "http://localhost:5173",          // Vite dev server (React Admin Panel)
+            "http://localhost:19006",         // Expo web dev
 
             // Appareils physiques sur le même réseau WiFi
             "http://192.168.1.",              // tous les 192.168.1.x (change si ton réseau est différent)
@@ -38,7 +39,11 @@ public class CorsFilter implements Filter {
             "capacitor://localhost",          // Capacitor iOS
             "ionic://localhost",              // Ionic
             "http://localhost",                // Expo Go parfois
-            "https://parking-administration-ne15.vercel.app"
+            
+            // Vercel deployments
+            "https://parking-administration-ne15.vercel.app",
+            "https://upark-ivjilfyve-zeniths-projects-bf3d7e5d.vercel.app",
+            "https://upark-web-git-v2-zeniths-projects-bf3d7e5d.vercel.app"
     );
 
     @Override
