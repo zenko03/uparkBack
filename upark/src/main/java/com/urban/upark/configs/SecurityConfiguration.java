@@ -27,8 +27,7 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // CORS handled by CorsFilter.java (HIGHEST_PRECEDENCE)
-        http.cors(cors -> cors.disable())
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 // OPTIONS requests must be first for CORS preflight
@@ -80,14 +79,18 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    // CORS configuration moved to CorsFilter.java for better control
-    // CorsFilter executes with HIGHEST_PRECEDENCE before Spring Security
-    /*
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Allow all origins for development
-        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        // Allowed origins (explicit list for credentials support)
+        configuration.setAllowedOrigins(Arrays.asList(
+            "http://localhost:8081",           // Dev mobile web
+            "http://localhost:19006",          // Expo web dev
+            "http://10.0.2.2:8081",            // Android emulator
+            "https://upark-ivjilfyve-zeniths-projects-bf3d7e5d.vercel.app",  // Vercel prod
+            "https://upark-web-git-v2-zeniths-projects-bf3d7e5d.vercel.app", // Vercel branch alias
+            "https://*.vercel.app"             // All Vercel preview deployments
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList(
             "Authorization",
@@ -99,11 +102,10 @@ public class SecurityConfiguration {
         ));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L); // Cache la configuration CORS pendant 1 heure
+        configuration.setMaxAge(3600L); // Cache CORS config for 1 hour
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-    */
 }
