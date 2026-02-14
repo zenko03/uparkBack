@@ -16,10 +16,8 @@ import java.util.List;
 public class PriceCalculationRequest {
     private int parkingId;
     
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime startDateTime;
     
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime endDateTime;
     
     private List<VehicleSelection> selectedVehicles;
